@@ -1,11 +1,20 @@
 {
-    "name": "webpb-npm",
-    "version": "1.0.0",
+    "name": "webpb",
+    "version": "0.0.3",
     "description": "",
-    "main": "index.js",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
     "scripts": {
+        "build": "tsc",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
-    "author": "",
-    "license": "ISC"
+    "author": "156023966@qq.com",
+    "license": "ISC",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jg513/webpb"
+    },
+    "devDependencies": {
+        "typescript": "^3.6.4"
+    }
 }

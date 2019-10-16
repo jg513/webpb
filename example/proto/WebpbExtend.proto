@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+import "google/protobuf/descriptor.proto";
+
+extend google.protobuf.MessageOptions {
+    optional string method = 1000;
+
+    optional string path = 1001;
+}
+
+extend google.protobuf.FieldOptions {
+    optional bool omitted = 1000;
+
+    repeated string JAVA = 2000;
+}
