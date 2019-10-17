@@ -4,6 +4,7 @@ import com.squareup.wire.schema.ProtoMember;
 
 import static com.squareup.wire.schema.Options.ENUM_VALUE_OPTIONS;
 import static com.squareup.wire.schema.Options.FIELD_OPTIONS;
+import static com.squareup.wire.schema.Options.FILE_OPTIONS;
 import static com.squareup.wire.schema.Options.MESSAGE_OPTIONS;
 
 public class Const {
@@ -19,5 +20,13 @@ public class Const {
 
     public static final ProtoMember OMITTED = ProtoMember.get(FIELD_OPTIONS, "omitted");
 
-    public static final ProtoMember JAVA = ProtoMember.get(FIELD_OPTIONS, "JAVA");
+    public static final ProtoMember JAVA_ANNO = ProtoMember.get(FIELD_OPTIONS, "java_anno");
+
+    public static final ProtoMember JAVA_IMPORT = ProtoMember.get(FILE_OPTIONS, "java_import");
+
+    public static final ProtoMember JAVA_MESSAGE_ANNO = ProtoMember.get(FILE_OPTIONS, "java_message_anno");
+
+    public static final ProtoMember JAVA_GETTER = ProtoMember.get(FILE_OPTIONS, "java_getter");
+
+    public static final ProtoMember JAVA_SETTER = ProtoMember.get(FILE_OPTIONS, "java_setter");
 }

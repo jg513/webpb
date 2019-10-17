@@ -3,21 +3,14 @@
 package com.github.jg513.example.resource;
 
 import com.github.jg513.webpb.WebpbMessage;
-import java.lang.Integer;
-import java.lang.String;
-import lombok.Getter;
 import lombok.Setter;
+import lombok.Getter;
 import lombok.experimental.Accessors;
 
-@Getter
 @Setter
-@Accessors(
-        chain = true
-)
+@Getter
+@Accessors(chain = true)
 public class PagingPb implements WebpbMessage {
-    public static final String PATH = "";
-
-    public static final String METHOD = "";
 
     private Integer page;
 

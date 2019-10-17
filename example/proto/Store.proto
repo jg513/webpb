@@ -5,7 +5,7 @@ package StoreProto;
 option java_package = "com.github.jg513.example.store";
 
 import "Resource.proto";
-import "WebPbExtend.proto";
+import "WebpbOptions.proto";
 
 message StorePb {
     required int32 id = 1;
@@ -22,7 +22,17 @@ message StoreRequest {
 }
 
 message StoreResponse {
+    message StoreNestedPb {
+        required string employee = 1;
+    }
+
     required StorePb store = 1;
+    required StoreNestedPb nested = 2;
+}
+
+message EmptyPb {
+    message EnclosingPb {
+    }
 }
 
 message StoresRequest {
@@ -32,7 +42,7 @@ message StoresRequest {
 
     required ResourceProto.PageablePb pageable = 1 [(omitted) = true];
     required int32 type = 2 [(omitted) = true];
-    required int32 city = 3 [(JAVA) = "@javax.validation.constraints.NotNull(message = \"City is required\")", (JAVA) = "@org.hibernate.validator.constraints.Range(min = 0)"];
+    required int32 city = 3 [(java_anno) = "@NotNull(message = \"City is required\")", (java_anno) = "@Range(min = 0)"];
 }
 
 message StoresResponse {

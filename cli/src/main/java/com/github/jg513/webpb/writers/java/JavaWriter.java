@@ -1,16 +1,16 @@
 package com.github.jg513.webpb.writers.java;
 
-import com.github.jg513.webpb.common.Const;
-import com.github.jg513.webpb.common.specs.PendingTypeSpec;
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.TypeSpec;
-import com.squareup.wire.schema.Type;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.PackageDeclaration;
 import com.github.jg513.webpb.common.CodeWriter;
 import com.github.jg513.webpb.common.CodeWriterContext;
 import com.github.jg513.webpb.common.PendingSpec;
+import com.github.jg513.webpb.common.specs.PendingTypeSpec;
+import com.squareup.wire.schema.ProtoFile;
+import com.squareup.wire.schema.Type;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -21,7 +21,8 @@ public class JavaWriter extends CodeWriter {
 
     @Override
     public Void call() throws Exception {
-        JavaGenerator generator = JavaGenerator.create(context.getSchema());
+        JavaOptions options = new JavaOptions(context.getSchema());
+        JavaGenerator generator = JavaGenerator.create(context.getSchema(), options);
         while (true) {
             PendingSpec spec = context.getSpecs().poll();
             if (spec == null) {
@@ -30,21 +31,30 @@ public class JavaWriter extends CodeWriter {
             if (!(spec instanceof PendingTypeSpec)) {
                 continue;
             }
+            ProtoFile file = ((PendingTypeSpec) spec).getFile();
             Type type = ((PendingTypeSpec) spec).getType();
-            TypeSpec typeSpec = generator.generateType(type);
-            ClassName javaTypeName = generator.generatedTypeName(type);
-            JavaFile.Builder builder = JavaFile.builder(javaTypeName.packageName(), typeSpec)
-                .indent("    ")
-                .addFileComment("$L\n", Const.HEADER)
-                .addFileComment("$L", Const.GIT_URL);
 
-            JavaFile javaFile = builder.build();
+            CompilationUnit unit = generator.generate(file, type);
             Path path = Paths.get(context.getOut());
+            if (unit.getPackageDeclaration().isPresent()) {
+                PackageDeclaration declaration = unit.getPackageDeclaration().get();
+                String packageName = declaration.getName().asString();
+                if (!packageName.isEmpty()) {
+                    for (String packageComponent : packageName.split("\\.")) {
+                        path = path.resolve(packageComponent);
+                    }
+                    try {
+                        Files.createDirectories(path);
+                    } catch (Exception e) {
+                        context.getLog().error("Cannot create directory %s", path);
+                    }
+                }
+            }
+            path = path.resolve(type.type().simpleName() + ".java");
             try {
-                javaFile.writeTo(path);
+                Files.write(path, unit.toString().getBytes());
             } catch (IOException e) {
-                throw new IOException("Error emitting " + javaFile.packageName
-                    + '.' + javaFile.typeSpec.name + " to " + context.getOut(), e);
+                throw new IOException("Error emitting " + spec.toString() + context.getOut(), e);
             }
         }
     }

@@ -3,20 +3,24 @@
 package com.github.jg513.example.store;
 
 import com.github.jg513.webpb.WebpbMessage;
-import java.lang.String;
-import lombok.Getter;
 import lombok.Setter;
+import lombok.Getter;
 import lombok.experimental.Accessors;
 
-@Getter
 @Setter
-@Accessors(
-        chain = true
-)
+@Getter
+@Accessors(chain = true)
 public class StoreResponse implements WebpbMessage {
-    public static final String PATH = "";
-
-    public static final String METHOD = "";
 
     private StorePb store;
+
+    private StoreNestedPb nested;
+
+    @Setter
+    @Getter
+    @Accessors(chain = true)
+    public static class StoreNestedPb implements WebpbMessage {
+
+        private String employee;
+    }
 }

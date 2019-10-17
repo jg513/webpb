@@ -6,14 +6,15 @@ import com.github.jg513.webpb.WebpbMessage;
 import lombok.Setter;
 import lombok.Getter;
 import lombok.experimental.Accessors;
-import com.github.jg513.example.resource.PagingPb;
 
 @Setter
 @Getter
 @Accessors(chain = true)
-public class StoresResponse implements WebpbMessage {
+public class EmptyPb implements WebpbMessage {
 
-    private StorePb stores;
-
-    private PagingPb paging;
+    @Setter
+    @Getter
+    @Accessors(chain = true)
+    public static class EnclosingPb implements WebpbMessage {
+    }
 }

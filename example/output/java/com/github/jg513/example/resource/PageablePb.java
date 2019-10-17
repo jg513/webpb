@@ -3,22 +3,14 @@
 package com.github.jg513.example.resource;
 
 import com.github.jg513.webpb.WebpbMessage;
-import java.lang.Boolean;
-import java.lang.Integer;
-import java.lang.String;
-import lombok.Getter;
 import lombok.Setter;
+import lombok.Getter;
 import lombok.experimental.Accessors;
 
-@Getter
 @Setter
-@Accessors(
-        chain = true
-)
+@Getter
+@Accessors(chain = true)
 public class PageablePb implements WebpbMessage {
-    public static final String PATH = "";
-
-    public static final String METHOD = "";
 
     private Boolean pagination;
 

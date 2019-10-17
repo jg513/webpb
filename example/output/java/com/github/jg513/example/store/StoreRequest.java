@@ -3,18 +3,16 @@
 package com.github.jg513.example.store;
 
 import com.github.jg513.webpb.WebpbMessage;
-import java.lang.String;
-import lombok.Getter;
 import lombok.Setter;
+import lombok.Getter;
 import lombok.experimental.Accessors;
 
-@Getter
 @Setter
-@Accessors(
-        chain = true
-)
+@Getter
+@Accessors(chain = true)
 public class StoreRequest implements WebpbMessage {
-    public static final String PATH = "/stores/{id}";
 
     public static final String METHOD = "GET";
+
+    public static final String PATH = "/stores/{id}";
 }

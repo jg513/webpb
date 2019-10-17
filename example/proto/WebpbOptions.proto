@@ -1,0 +1,17 @@
+syntax = "proto2";
+
+import "WebPbExtend.proto";
+
+option (java_import) = "lombok.Getter";
+option (java_import) = "lombok.Setter";
+option (java_import) = "lombok.experimental.Accessors";
+
+option (java_import) = "javax.validation.constraints.NotNull";
+option (java_import) = "org.hibernate.validator.constraints.Range";
+
+option (java_message_anno) = "@Getter";
+option (java_message_anno) = "@Setter";
+option (java_message_anno) = "@Accessors(chain = true)";
+
+option (java_getter) = false;
+option (java_setter) = false;

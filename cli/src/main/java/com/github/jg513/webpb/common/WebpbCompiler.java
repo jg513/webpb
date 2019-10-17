@@ -67,6 +67,10 @@ public class WebpbCompiler {
 
         ExecutorService executor = Executors.newCachedThreadPool();
         List<Future<Void>> futures = new ArrayList<>(MAX_WRITE_CONCURRENCY);
+        Path path = Paths.get(out);
+        if (Files.exists(path) && !Files.isDirectory(path)) {
+            throw new IllegalArgumentException(String.format("path %s exists but is not a directory.", path));
+        }
         CodeWriterContext context = CodeWriterContext.builder()
             .log(log)
             .out(out)
@@ -154,11 +158,11 @@ public class WebpbCompiler {
             }
             specs.add(new PendingFileSpec(file));
             specs.addAll(file.types().stream()
-                .map(PendingTypeSpec::new)
+                .map(t -> new PendingTypeSpec(file, t))
                 .collect(Collectors.toList())
             );
             specs.addAll(file.services().stream()
-                .map(PendingServiceSpec::new)
+                .map(s -> new PendingServiceSpec(file, s))
                 .collect(Collectors.toList())
             );
         }

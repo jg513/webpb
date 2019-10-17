@@ -3,21 +3,22 @@
 package com.github.jg513.example.store;
 
 import com.github.jg513.webpb.WebpbMessage;
-import java.lang.Integer;
-import java.lang.String;
-import lombok.Getter;
 import lombok.Setter;
+import lombok.Getter;
 import lombok.experimental.Accessors;
+import javax.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.Range;
 
-@Getter
 @Setter
-@Accessors(
-        chain = true
-)
+@Getter
+@Accessors(chain = true)
 public class StoresRequest implements WebpbMessage {
-    public static final String PATH = "/stores/{type}";
 
     public static final String METHOD = "POST";
 
+    public static final String PATH = "/stores/{type}";
+
+    @NotNull(message = "City is required")
+    @Range(min = 0)
     private Integer city;
 }

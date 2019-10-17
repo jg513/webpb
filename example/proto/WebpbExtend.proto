@@ -2,14 +2,25 @@ syntax = "proto2";
 
 import "google/protobuf/descriptor.proto";
 
-extend google.protobuf.MessageOptions {
-    optional string method = 1000;
+extend google.protobuf.FileOptions {
+    repeated string java_import = 2000;
+    repeated string java_message_anno = 2001;
+    optional bool java_setter = 2002;
+    optional bool java_getter = 2003;
+}
 
-    optional string path = 1001;
+extend google.protobuf.MessageOptions {
+    optional bool omitted = 1000;
+
+    optional string method = 1001;
+
+    optional string path = 1002;
+
+    repeated string java_anno = 2000;
 }
 
 extend google.protobuf.FieldOptions {
     optional bool omitted = 1000;
 
-    repeated string JAVA = 2000;
+    repeated string java_anno = 2000;
 }
