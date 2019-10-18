@@ -3,7 +3,9 @@ package com.github.jg513.webpb.writers.java;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
+import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.EnumConstantDeclaration;
@@ -32,6 +34,8 @@ import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.type.Type;
 import com.github.jg513.webpb.WebpbMessage;
 import com.github.jg513.webpb.common.Const;
+import com.github.jg513.webpb.common.options.FieldOptions;
+import com.github.jg513.webpb.common.options.MessageOptions;
 import com.squareup.wire.schema.EnclosingType;
 import com.squareup.wire.schema.EnumConstant;
 import com.squareup.wire.schema.EnumType;
@@ -121,7 +125,7 @@ public final class JavaGenerator {
         parser.parseName(WebpbMessage.class.getName()).ifSuccessful(imports::add);
         declaration.addImplementedType(WebpbMessage.class);
 
-        generateTypeAnnotations(declaration, imports);
+        generateTypeAnnotations(type, declaration, imports);
 
         addMethodOption(type, declaration);
         addPathOption(type, declaration);
@@ -163,10 +167,25 @@ public final class JavaGenerator {
         return generateType(type, imports);
     }
 
-    private void generateTypeAnnotations(TypeDeclaration declaration, List<Name> imports) {
+    @SuppressWarnings("unchecked")
+    private void generateTypeAnnotations(MessageType type, TypeDeclaration declaration, List<Name> imports) {
         for (Map.Entry<AnnotationExpr, Name> entry : options.getAnnotationMap().entrySet()) {
             declaration.addAnnotation(entry.getKey());
             imports.add(entry.getValue());
+        }
+        List<String> annotations = (List<String>) type.options().get(MessageOptions.JAVA_ANNO);
+        addAnnotations(declaration, annotations, imports);
+    }
+
+    private void addAnnotations(BodyDeclaration declaration, List<String> annotations, List<Name> imports) {
+        if (annotations != null && !annotations.isEmpty()) {
+            for (String annotation : annotations) {
+                parser.parseAnnotation(annotation).ifSuccessful(expr -> {
+                    parseImports(expr, imports);
+                    expr.getName().setQualifier(null);
+                    declaration.addAnnotation(expr);
+                });
+            }
         }
     }
 
@@ -207,54 +226,26 @@ public final class JavaGenerator {
     @SuppressWarnings("unchecked")
     private void generateMessageFields(List<Name> imports, MessageType type, ClassOrInterfaceDeclaration clazz) {
         for (Field field : type.fieldsAndOneOfFields()) {
-            if ("true".equals(field.options().get(Const.OMITTED))) {
+            if ("true".equals(field.options().get(FieldOptions.OMITTED))) {
                 continue;
             }
             Type fieldType = getType(field);
-            if (fieldType instanceof ClassOrInterfaceType) {
-                addImports((ClassOrInterfaceType) fieldType, imports);
-            }
-            Name name = options.getName(fieldType.asString());
-            if (name != null) {
-                imports.add(name);
-            }
+            parseImports(fieldType, imports);
             FieldDeclaration declaration = clazz.addField(fieldType, field.name(), Modifier.Keyword.PRIVATE);
-            List<String> decorations = (List<String>) field.options().get(Const.JAVA_ANNO);
-            if (decorations != null && !decorations.isEmpty()) {
-                for (String decoration : decorations) {
-                    parser.parseAnnotation(decoration).ifSuccessful(expr -> {
-                        imports.add(options.getFullName(expr.getName()));
-                        expr.getName().setQualifier(null);
-                        declaration.addAnnotation(expr);
-                    });
-                }
-            }
+            List<String> annotations = (List<String>) field.options().get(FieldOptions.JAVA_ANNO);
+            addAnnotations(declaration, annotations, imports);
         }
-    }
-
-    private void addImports(ClassOrInterfaceType type, List<Name> imports) {
-        Name name = options.getName(type.getNameAsString());
-        if (name != null) {
-            imports.add(name);
-        }
-        type.getTypeArguments().ifPresent(list -> {
-            for (Type t : list) {
-                if (t instanceof ClassOrInterfaceType) {
-                    addImports((ClassOrInterfaceType) t, imports);
-                }
-            }
-        });
     }
 
     private void addMethodOption(MessageType type, ClassOrInterfaceDeclaration declaration) {
-        Field field = schema.getField(Const.METHOD);
-        String value = (String) type.options().get(Const.METHOD);
+        Field field = schema.getField(MessageOptions.METHOD);
+        String value = (String) type.options().get(MessageOptions.METHOD);
         addStaticOption(declaration, field, "METHOD", value);
     }
 
     private void addPathOption(MessageType type, ClassOrInterfaceDeclaration declaration) {
-        Field field = schema.getField(Const.PATH);
-        String path = (String) type.options().get(Const.PATH);
+        Field field = schema.getField(MessageOptions.PATH);
+        String path = (String) type.options().get(MessageOptions.PATH);
         String value = StringUtils.isEmpty(path) ? "" : path.split("\\?")[0];
         addStaticOption(declaration, field, "PATH", value);
     }
@@ -290,5 +281,31 @@ public final class JavaGenerator {
             return type.clone();
         }
         return new ClassOrInterfaceType(null, protoType.simpleName());
+    }
+
+    private void parseImports(Node node, List<Name> imports) {
+        if (node instanceof FieldAccessExpr) {
+            imports.add(options.getFullName(new Name(null, ((FieldAccessExpr) node).getScope().toString())));
+        } else if (node instanceof AnnotationExpr) {
+            imports.add(options.getFullName(((AnnotationExpr) node).getName()));
+        } else if (node instanceof ClassOrInterfaceType) {
+            addImports((ClassOrInterfaceType) node, imports);
+        } else {
+            options.getName(node.toString()).ifPresent(imports::add);
+        }
+        for (Node childNode : node.getChildNodes()) {
+            parseImports(childNode, imports);
+        }
+    }
+
+    private void addImports(ClassOrInterfaceType type, List<Name> imports) {
+        options.getName(type.getNameAsString()).ifPresent(imports::add);
+        type.getTypeArguments().ifPresent(list -> {
+            for (Type t : list) {
+                if (t instanceof ClassOrInterfaceType) {
+                    addImports((ClassOrInterfaceType) t, imports);
+                }
+            }
+        });
     }
 }

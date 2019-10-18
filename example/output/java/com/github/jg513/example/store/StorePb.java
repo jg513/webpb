@@ -6,10 +6,13 @@ import com.github.jg513.webpb.WebpbMessage;
 import lombok.Setter;
 import lombok.Getter;
 import lombok.experimental.Accessors;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @Setter
 @Getter
 @Accessors(chain = true)
+@JsonInclude(Include.NON_NULL)
 public class StorePb implements WebpbMessage {
 
     private Integer id;

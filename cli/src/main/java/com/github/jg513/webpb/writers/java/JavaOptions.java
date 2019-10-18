@@ -3,7 +3,8 @@ package com.github.jg513.webpb.writers.java;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.expr.Name;
-import com.github.jg513.webpb.common.Const;
+import com.github.jg513.webpb.common.options.FileOptions;
+import com.github.jg513.webpb.exception.ConsoleException;
 import com.squareup.wire.schema.ProtoFile;
 import com.squareup.wire.schema.Schema;
 import com.squareup.wire.schema.Type;
@@ -14,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -46,7 +48,7 @@ public class JavaOptions {
             }
             nameMap.put(identifier, new Name(new Name(null, file.javaPackage()), identifier));
         }
-        List<String> importList = (List<String>) file.options().get(Const.JAVA_IMPORT);
+        List<String> importList = (List<String>) file.options().get(FileOptions.JAVA_IMPORT);
         if (importList != null && !importList.isEmpty()) {
             for (String str : importList) {
                 parser.parseName(str).ifSuccessful(name ->
@@ -54,7 +56,7 @@ public class JavaOptions {
                 );
             }
         }
-        List<String> annotationList = (List<String>) file.options().get(Const.JAVA_MESSAGE_ANNO);
+        List<String> annotationList = (List<String>) file.options().get(FileOptions.JAVA_MESSAGE_ANNO);
         if (annotationList != null && !annotationList.isEmpty()) {
             for (String annotation : annotationList) {
                 parser.parseAnnotation(annotation).ifSuccessful(expr -> {
@@ -64,8 +66,8 @@ public class JavaOptions {
                 });
             }
         }
-        this.getter = "true".equals(file.options().get(Const.JAVA_GETTER));
-        this.setter = "true".equals(file.options().get(Const.JAVA_SETTER));
+        this.getter = "true".equals(file.options().get(FileOptions.JAVA_GETTER));
+        this.setter = "true".equals(file.options().get(FileOptions.JAVA_SETTER));
     }
 
     public Name getFullName(Name name) {
@@ -74,16 +76,16 @@ public class JavaOptions {
         }
         Name full = nameMap.get(name.getIdentifier());
         if (full == null) {
-            throw new RuntimeException("Unknown identifier " + name.getIdentifier());
+            throw new ConsoleException("Unknown identifier %s is not imported", name.getIdentifier());
         }
         return new Name(full.getQualifier().orElse(null), full.getIdentifier());
     }
 
-    public Name getName(String identifier) {
+    public Optional<Name> getName(String identifier) {
         Name name = nameMap.get(identifier);
         if (name == null) {
-            return null;
+            return Optional.empty();
         }
-        return name.clone();
+        return Optional.of(name.clone());
     }
 }

@@ -6,6 +6,7 @@ import com.github.jg513.webpb.common.CodeWriter;
 import com.github.jg513.webpb.common.CodeWriterContext;
 import com.github.jg513.webpb.common.PendingSpec;
 import com.github.jg513.webpb.common.specs.PendingTypeSpec;
+import com.github.jg513.webpb.exception.ConsoleException;
 import com.squareup.wire.schema.ProtoFile;
 import com.squareup.wire.schema.Type;
 
@@ -20,7 +21,7 @@ public class JavaWriter extends CodeWriter {
     }
 
     @Override
-    public Void call() throws Exception {
+    public Void call() {
         JavaOptions options = new JavaOptions(context.getSchema());
         JavaGenerator generator = JavaGenerator.create(context.getSchema(), options);
         while (true) {
@@ -34,27 +35,29 @@ public class JavaWriter extends CodeWriter {
             ProtoFile file = ((PendingTypeSpec) spec).getFile();
             Type type = ((PendingTypeSpec) spec).getType();
 
-            CompilationUnit unit = generator.generate(file, type);
-            Path path = Paths.get(context.getOut());
-            if (unit.getPackageDeclaration().isPresent()) {
-                PackageDeclaration declaration = unit.getPackageDeclaration().get();
-                String packageName = declaration.getName().asString();
-                if (!packageName.isEmpty()) {
-                    for (String packageComponent : packageName.split("\\.")) {
-                        path = path.resolve(packageComponent);
-                    }
-                    try {
-                        Files.createDirectories(path);
-                    } catch (Exception e) {
-                        context.getLog().error("Cannot create directory %s", path);
+            try {
+                CompilationUnit unit = generator.generate(file, type);
+                Path path = Paths.get(context.getOut());
+                if (unit.getPackageDeclaration().isPresent()) {
+                    PackageDeclaration declaration = unit.getPackageDeclaration().get();
+                    String packageName = declaration.getName().asString();
+                    if (!packageName.isEmpty()) {
+                        for (String packageComponent : packageName.split("\\.")) {
+                            path = path.resolve(packageComponent);
+                        }
+                        try {
+                            Files.createDirectories(path);
+                        } catch (Exception e) {
+                            context.getLog().error("Cannot create directory %s", path);
+                        }
                     }
                 }
-            }
-            path = path.resolve(type.type().simpleName() + ".java");
-            try {
+                path = path.resolve(type.type().simpleName() + ".java");
                 Files.write(path, unit.toString().getBytes());
+            } catch (ConsoleException e) {
+                context.getLog().error(e.getMessage());
             } catch (IOException e) {
-                throw new IOException("Error emitting " + spec.toString() + context.getOut(), e);
+                context.getLog().error("Error emitting %s, %s, %s", spec.toString(), context.getOut(), e.getMessage());
             }
         }
     }

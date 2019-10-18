@@ -6,6 +6,8 @@ import com.github.jg513.webpb.WebpbMessage;
 import lombok.Setter;
 import lombok.Getter;
 import lombok.experimental.Accessors;
+import javax.validation.constraints.Pattern;
+import com.somewhere.Const;
 
 @Setter
 @Getter
@@ -15,4 +17,7 @@ public class StoreRequest implements WebpbMessage {
     public static final String METHOD = "GET";
 
     public static final String PATH = "/stores/{id}";
+
+    @Pattern(regexp = Const.EMAIL_REGEX)
+    private String email;
 }

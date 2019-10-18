@@ -1,6 +1,9 @@
 package com.github.jg513.webpb.writers.typescript;
 
-import com.google.common.collect.ImmutableMap;
+import com.github.jg513.webpb.common.Const;
+import com.github.jg513.webpb.common.Handler;
+import com.github.jg513.webpb.common.options.FieldOptions;
+import com.github.jg513.webpb.common.options.MessageOptions;
 import com.squareup.wire.schema.EnclosingType;
 import com.squareup.wire.schema.EnumConstant;
 import com.squareup.wire.schema.EnumType;
@@ -11,11 +14,10 @@ import com.squareup.wire.schema.ProtoFile;
 import com.squareup.wire.schema.ProtoType;
 import com.squareup.wire.schema.Schema;
 import com.squareup.wire.schema.Type;
-import com.github.jg513.webpb.common.Const;
-import com.github.jg513.webpb.common.Handler;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -36,30 +38,29 @@ final class TypescriptGenerator {
 
     private int level = 0;
 
-    private static final Map<ProtoType, String> typesMap =
-        ImmutableMap.<ProtoType, String>builder()
-            .put(ProtoType.BOOL, "boolean")
-            .put(ProtoType.BYTES, "Uint8Array")
-            .put(ProtoType.DOUBLE, "number")
-            .put(ProtoType.FLOAT, "number")
-            .put(ProtoType.FIXED32, "number")
-            .put(ProtoType.FIXED64, "number")
-            .put(ProtoType.INT32, "number")
-            .put(ProtoType.INT64, "number")
-            .put(ProtoType.SFIXED32, "number")
-            .put(ProtoType.SFIXED64, "number")
-            .put(ProtoType.SINT32, "number")
-            .put(ProtoType.SINT64, "number")
-            .put(ProtoType.STRING, "string")
-            .put(ProtoType.UINT32, "number")
-            .put(ProtoType.UINT64, "number")
-            .build();
+    private static final Map<ProtoType, String> TYPES_MAP = new HashMap<ProtoType, String>() {{
+        put(ProtoType.BOOL, "boolean");
+        put(ProtoType.BYTES, "Uint8Array");
+        put(ProtoType.DOUBLE, "number");
+        put(ProtoType.FLOAT, "number");
+        put(ProtoType.FIXED32, "number");
+        put(ProtoType.FIXED64, "number");
+        put(ProtoType.INT32, "number");
+        put(ProtoType.INT64, "number");
+        put(ProtoType.SFIXED32, "number");
+        put(ProtoType.SFIXED64, "number");
+        put(ProtoType.SINT32, "number");
+        put(ProtoType.SINT64, "number");
+        put(ProtoType.STRING, "string");
+        put(ProtoType.UINT32, "number");
+        put(ProtoType.UINT64, "number");
+    }};
 
     public void generate(ProtoFile protoFile) {
         String packageName = protoFile.packageName();
         generateTypes(packageName, protoFile.types());
         for (String type : imports) {
-            if (!packageName.equals(type)) {
+            if (!type.startsWith(packageName)) {
                 builder.insert(0, "import { " + type + " } from './" + type + "';\n\n");
             }
         }
@@ -120,7 +121,7 @@ final class TypescriptGenerator {
             indent()
                 .append("export class ").append(className)
                 .append(" implements ").append(interfaceName(className));
-            if (type.options().get(Const.PATH) != null) {
+            if (type.options().get(MessageOptions.PATH) != null) {
                 builder.append(", Webpb.WebpbMessage {\n");
             } else {
                 builder.append(" {\n");
@@ -144,12 +145,20 @@ final class TypescriptGenerator {
             indent().append(field.name());
             if (field.isOptional()) {
                 builder.append('?');
-            } else if (!isInterface) {
+            } else if (!isInterface & field.getDefault() == null) {
                 builder.append('!');
             }
             builder.append(": ").append(typeName);
             if (field.isRepeated()) {
                 builder.append("[]");
+            }
+            if (!isInterface && field.getDefault() != null) {
+                builder.append(" = ");
+                if ("string".equals(typeName)) {
+                    builder.append('"').append(field.getDefault()).append('"');
+                } else {
+                    builder.append(field.getDefault());
+                }
             }
             builder.append(";\n");
         }
@@ -184,9 +193,9 @@ final class TypescriptGenerator {
         level(() -> {
             generateMetaField("class", "'" + type.type().simpleName() + "'");
             Options options = type.options();
-            String method = (String) options.get(Const.METHOD);
+            String method = (String) options.get(MessageOptions.METHOD);
             generateMetaField("method", method == null ? "''" : "'" + method + "'");
-            String path = (String) options.get(Const.PATH);
+            String path = (String) options.get(MessageOptions.PATH);
             generateMetaPath(path);
         });
         trimDuplicatedNewline();
@@ -251,7 +260,7 @@ final class TypescriptGenerator {
         StringBuilder builder = new StringBuilder("[");
         String separator = null;
         for (Field field : type.fieldsAndOneOfFields()) {
-            if ("true".equals(field.options().get(Const.OMITTED))) {
+            if ("true".equals(field.options().get(FieldOptions.OMITTED))) {
                 if (separator != null) {
                     builder.append(separator);
                 }
@@ -288,8 +297,8 @@ final class TypescriptGenerator {
     }
 
     private String toTypeName(ProtoType protoType) {
-        if (typesMap.containsKey(protoType)) {
-            return typesMap.get(protoType);
+        if (TYPES_MAP.containsKey(protoType)) {
+            return TYPES_MAP.get(protoType);
         }
 
         Type type = this.schema.getType(protoType);

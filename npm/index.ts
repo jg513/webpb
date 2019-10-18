@@ -14,7 +14,7 @@ export namespace Webpb {
     export function assign(src: any, dest: any, omitted?: string[]) {
         if (src) {
             for (let ks = Object.keys(src), i = 0; i < ks.length; ++i) {
-                if (src[ks[i]] != null && !isOmitted(ks[i], omitted)) {
+                if (src[ks[i]] != undefined && !isOmitted(ks[i], omitted)) {
                     dest[ks[i]] = src[ks[i]];
                 }
             }

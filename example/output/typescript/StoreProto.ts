@@ -14,8 +14,8 @@ export namespace StoreProto {
 
     export class StorePb implements IStorePb {
         id!: number;
-        name!: string;
-        city!: number;
+        name: string = "store";
+        city: number = 100;
         META: () => Webpb.WebpbMeta;
 
         private constructor(p: IStorePb) {
@@ -34,10 +34,12 @@ export namespace StoreProto {
 
     export interface IStoreRequest {
         id: number;
+        email: string;
     }
 
     export class StoreRequest implements IStoreRequest, Webpb.WebpbMessage {
         id!: number;
+        email!: string;
         META: () => Webpb.WebpbMeta;
 
         private constructor(p: IStoreRequest) {
@@ -56,10 +58,12 @@ export namespace StoreProto {
 
     export interface IStoreResponse {
         store: StoreProto.IStorePb;
+        nested: StoreProto.StoreResponse.IStoreNestedPb;
     }
 
     export class StoreResponse implements IStoreResponse {
         store!: StoreProto.IStorePb;
+        nested!: StoreProto.StoreResponse.IStoreNestedPb;
         META: () => Webpb.WebpbMeta;
 
         private constructor(p: IStoreResponse) {
@@ -76,16 +80,80 @@ export namespace StoreProto {
         }
     }
 
+    export namespace StoreResponse {
+        export interface IStoreNestedPb {
+            employee: string;
+        }
+
+        export class StoreNestedPb implements IStoreNestedPb {
+            employee!: string;
+            META: () => Webpb.WebpbMeta;
+
+            private constructor(p: IStoreNestedPb) {
+                Webpb.assign(p, this, []);
+                this.META = () => ({
+                    class: 'StoreNestedPb',
+                    method: '',
+                    path: ''
+                });
+            }
+
+            static create(properties: IStoreNestedPb): StoreNestedPb {
+                return new StoreNestedPb(properties);
+            }
+        }
+    }
+
+    export interface IEmptyPb {
+    }
+
+    export class EmptyPb implements IEmptyPb {
+        META: () => Webpb.WebpbMeta;
+
+        private constructor() {
+            this.META = () => ({
+                class: 'EmptyPb',
+                method: '',
+                path: ''
+            });
+        }
+
+        static create(): EmptyPb {
+            return new EmptyPb();
+        }
+    }
+
+    export namespace EmptyPb {
+        export interface IEnclosingPb {
+        }
+
+        export class EnclosingPb implements IEnclosingPb {
+            META: () => Webpb.WebpbMeta;
+
+            private constructor() {
+                this.META = () => ({
+                    class: 'EnclosingPb',
+                    method: '',
+                    path: ''
+                });
+            }
+
+            static create(): EnclosingPb {
+                return new EnclosingPb();
+            }
+        }
+    }
+
     export interface IStoresRequest {
         pageable: ResourceProto.IPageablePb;
         type: number;
-        city?: number;
+        city: number;
     }
 
     export class StoresRequest implements IStoresRequest, Webpb.WebpbMessage {
         pageable!: ResourceProto.IPageablePb;
         type!: number;
-        city?: number;
+        city!: number;
         META: () => Webpb.WebpbMeta;
 
         private constructor(p: IStoresRequest) {

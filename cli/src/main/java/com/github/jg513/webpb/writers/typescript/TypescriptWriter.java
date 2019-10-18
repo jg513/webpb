@@ -17,7 +17,7 @@ public class TypescriptWriter extends CodeWriter {
     }
 
     @Override
-    public Void call() throws Exception {
+    public Void call() {
         while (true) {
             PendingSpec spec = context.getSpecs().poll();
             if (spec == null) {
@@ -26,21 +26,21 @@ public class TypescriptWriter extends CodeWriter {
             if (!(spec instanceof PendingFileSpec)) {
                 continue;
             }
-            ProtoFile protoFile = ((PendingFileSpec) spec).getFile();
-            if (protoFile.types().isEmpty()) {
-                continue;
-            }
-            String packageName = protoFile.packageName();
-            StringBuilder builder = new StringBuilder();
-            TypescriptGenerator
-                .of(context.getSchema(), builder)
-                .generate(protoFile);
-
-            Path path = Paths.get(context.getOut(), packageName + ".ts");
             try {
+                ProtoFile protoFile = ((PendingFileSpec) spec).getFile();
+                if (protoFile.types().isEmpty()) {
+                    continue;
+                }
+                String packageName = protoFile.packageName();
+                StringBuilder builder = new StringBuilder();
+                TypescriptGenerator
+                    .of(context.getSchema(), builder)
+                    .generate(protoFile);
+
+                Path path = Paths.get(context.getOut(), packageName + ".ts");
                 Files.write(path, builder.toString().getBytes());
             } catch (IOException e) {
-                throw new IOException("Error emitting " + spec.toString() + context.getOut(), e);
+                context.getLog().error("Error emitting %s, %s, %s", spec.toString(), context.getOut(), e.getMessage());
             }
         }
     }
