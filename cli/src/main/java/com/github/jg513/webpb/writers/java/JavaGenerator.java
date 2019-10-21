@@ -28,6 +28,7 @@ import com.github.javaparser.ast.expr.ThisExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.stmt.SwitchEntry;
+import com.github.javaparser.ast.stmt.SwitchStmt;
 import com.github.javaparser.ast.type.ArrayType;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.PrimitiveType;
@@ -150,7 +151,7 @@ public final class JavaGenerator {
             enumConstant.addArgument(new IntegerLiteralExpr(constant.getTag()));
         }
 
-        declaration.addField(PrimitiveType.intType(), ENUM_VALUE);
+        declaration.addField(PrimitiveType.intType(), ENUM_VALUE, Modifier.Keyword.PRIVATE);
         generateEnumConstructor(declaration);
         generateEnumOfMethod(declaration, type);
         generateEnumValueGetter(declaration);
@@ -190,7 +191,7 @@ public final class JavaGenerator {
     }
 
     private void generateEnumConstructor(EnumDeclaration declaration) {
-        ConstructorDeclaration constructor = declaration.addConstructor(Modifier.Keyword.PRIVATE);
+        ConstructorDeclaration constructor = declaration.addConstructor();
         constructor.addParameter(new Parameter(PrimitiveType.intType(), ENUM_VALUE));
         constructor.getBody().addStatement(new AssignExpr(
             new FieldAccessExpr(new ThisExpr(), ENUM_VALUE),
@@ -212,7 +213,7 @@ public final class JavaGenerator {
             ));
         }
         entries.add(new SwitchEntry().addStatement(new ReturnStmt("null")));
-        method.setBody(new BlockStmt().addStatement(new SwitchExpr(new NameExpr(ENUM_VALUE), entries)));
+        method.setBody(new BlockStmt().addStatement(new SwitchStmt(new NameExpr(ENUM_VALUE), entries)));
     }
 
     private void generateEnumValueGetter(EnumDeclaration declaration) {

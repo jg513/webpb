@@ -6,9 +6,9 @@ public enum ErrorCode {
 
     OK(0), ERROR(1);
 
-    int code;
+    private int code;
 
-    private ErrorCode(int code) {
+    ErrorCode(int code) {
         this.code = code;
     }
 
@@ -20,7 +20,7 @@ public enum ErrorCode {
                 return ERROR;
             default:
                 return null;
-        };
+        }
     }
 
     public int getCode() {
