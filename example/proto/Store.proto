@@ -41,7 +41,7 @@ message EmptyPb {
 message StoresRequest {
     option (method) = "POST";
 
-    option (path) = "/stores/{type}?page={paging.page}&size={paging.size}";
+    option (path) = "/stores/{type}?page={pageable.page}&size={pageable.size}";
 
     required ResourceProto.PageablePb pageable = 1 [(omitted) = true];
     required int32 type = 2 [(omitted) = true];

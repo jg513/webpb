@@ -3,12 +3,12 @@
 package com.github.jg513.example.store;
 
 import com.github.jg513.webpb.WebpbMessage;
-import lombok.Setter;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 
-@Setter
 @Getter
+@Setter
 @Accessors(chain = true)
 public class StoreResponse implements WebpbMessage {
 
@@ -16,8 +16,8 @@ public class StoreResponse implements WebpbMessage {
 
     private StoreNestedPb nested;
 
-    @Setter
     @Getter
+    @Setter
     @Accessors(chain = true)
     public static class StoreNestedPb implements WebpbMessage {
 

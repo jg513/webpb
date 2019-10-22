@@ -2,6 +2,7 @@ package com.github.jg513.webpb.writers.typescript;
 
 import com.github.jg513.webpb.common.Const;
 import com.github.jg513.webpb.common.Handler;
+import com.github.jg513.webpb.common.ParamGroup;
 import com.github.jg513.webpb.common.options.FieldOptions;
 import com.github.jg513.webpb.common.options.MessageOptions;
 import com.squareup.wire.schema.EnclosingType;
@@ -19,12 +20,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @RequiredArgsConstructor(staticName = "of")
 final class TypescriptGenerator {
@@ -196,54 +195,45 @@ final class TypescriptGenerator {
             String method = (String) options.get(MessageOptions.METHOD);
             generateMetaField("method", method == null ? "''" : "'" + method + "'");
             String path = (String) options.get(MessageOptions.PATH);
-            generateMetaPath(path);
+            generateMetaPath(type, path);
         });
         trimDuplicatedNewline();
         indent().append("});\n\n");
     }
 
-    private void generateMetaPath(String path) {
+    private void generateMetaPath(MessageType type, String path) {
         indent().append("path").append(": ");
         if (StringUtils.isEmpty(path)) {
             builder.append("''\n");
             return;
         }
-        Pattern pattern = Pattern.compile("((?<key>\\w+)=)?\\{(?<path>[\\w.]+)}&?");
-        Matcher matcher = pattern.matcher(path);
 
-        AtomicInteger index = new AtomicInteger();
         builder.append('`');
-        boolean hasQuery = false;
-        while (matcher.find()) {
-            builder.append(path, index.get(), matcher.start());
-            String key = matcher.group("key");
-            String value = matcher.group("path");
-            if (StringUtils.isNotEmpty(key)) {
+        ParamGroup group = ParamGroup.of(path).validation(schema, type);
+        Iterator<ParamGroup.Param> iterator = group.getParams().iterator();
+        while (iterator.hasNext()) {
+            ParamGroup.Param param = iterator.next();
+            builder.append(param.getPrefix());
+            if (StringUtils.isNotEmpty(param.getKey())) {
                 if (builder.charAt(builder.length() - 1) == '?') {
                     builder.deleteCharAt(builder.length() - 1);
                 }
                 builder.append("${Webpb.query({\n");
                 level(() -> {
-                    do {
-                        String levelKey = matcher.group("key");
-                        String levelValue = matcher.group("path");
-                        indent().append(levelKey).append(": ").append(getter(levelValue)).append(",\n");
-                        index.set(matcher.end());
-                    } while (matcher.find());
+                    indent().append(param.getKey()).append(": ")
+                        .append(getter(param.getAccessor())).append(",\n");
+                    while (iterator.hasNext()) {
+                        ParamGroup.Param p = iterator.next();
+                        indent().append(p.getKey()).append(": ")
+                            .append(getter(p.getAccessor())).append(",\n");
+                    }
                 });
-                indent().append("})}`\n");
-                hasQuery = true;
-                break;
+                indent().append("})}`\n").append(group.getSuffix());
+                return;
             }
-            builder.append("${").append(getter(value)).append("}");
-            index.set(matcher.end());
+            builder.append("${").append(getter(param.getAccessor())).append("}");
         }
-        if (index.get() < path.length() - 1) {
-            builder.append(path, index.get(), path.length());
-        }
-        if (!hasQuery) {
-            builder.append("`\n");
-        }
+        builder.append(group.getSuffix()).append("`\n");
     }
 
     private String getter(String value) {

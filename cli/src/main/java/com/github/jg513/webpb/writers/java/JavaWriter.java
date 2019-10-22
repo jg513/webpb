@@ -6,7 +6,7 @@ import com.github.jg513.webpb.common.CodeWriter;
 import com.github.jg513.webpb.common.CodeWriterContext;
 import com.github.jg513.webpb.common.PendingSpec;
 import com.github.jg513.webpb.common.specs.PendingTypeSpec;
-import com.github.jg513.webpb.exception.ConsoleException;
+import com.github.jg513.webpb.exception.ConsoleErrorException;
 import com.squareup.wire.schema.ProtoFile;
 import com.squareup.wire.schema.Type;
 
@@ -54,7 +54,7 @@ public class JavaWriter extends CodeWriter {
                 }
                 path = path.resolve(type.type().simpleName() + ".java");
                 Files.write(path, unit.toString().getBytes());
-            } catch (ConsoleException e) {
+            } catch (ConsoleErrorException e) {
                 context.getLog().error(e.getMessage());
             } catch (IOException e) {
                 context.getLog().error("Error emitting %s, %s, %s", spec.toString(), context.getOut(), e.getMessage());

@@ -34,12 +34,12 @@ export namespace Webpb {
     }
 
     export function getter(data: any, path: string): any {
-        if (!data) {
+        if (data === null || data === undefined) {
             return null;
         }
         for (const k of path.split('.')) {
             data = data[k];
-            if (!data) {
+            if (data === null || data === undefined) {
                 return null;
             }
         }
@@ -51,7 +51,7 @@ export namespace Webpb {
         // tslint:disable-next-line:forin
         for (const key in params) {
             const v = params[key];
-            if (v === null) {
+            if (v === null || v === undefined) {
                 continue;
             }
             str += str.length === 0 ? '?' : '&';

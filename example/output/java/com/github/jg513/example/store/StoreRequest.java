@@ -3,14 +3,14 @@
 package com.github.jg513.example.store;
 
 import com.github.jg513.webpb.WebpbMessage;
-import lombok.Setter;
-import lombok.Getter;
-import lombok.experimental.Accessors;
-import javax.validation.constraints.Pattern;
 import com.somewhere.Const;
+import javax.validation.constraints.Pattern;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
-@Setter
 @Getter
+@Setter
 @Accessors(chain = true)
 public class StoreRequest implements WebpbMessage {
 

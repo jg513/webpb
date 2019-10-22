@@ -2,14 +2,14 @@
 // https://github.com/jg513/webpb
 package com.github.jg513.example.store;
 
-import com.github.jg513.webpb.WebpbMessage;
-import lombok.Setter;
-import lombok.Getter;
-import lombok.experimental.Accessors;
 import com.github.jg513.example.resource.PagingPb;
+import com.github.jg513.webpb.WebpbMessage;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
-@Setter
 @Getter
+@Setter
 @Accessors(chain = true)
 public class StoresResponse implements WebpbMessage {
 

@@ -5,7 +5,7 @@ var Webpb;
     function assign(src, dest, omitted) {
         if (src) {
             for (var ks = Object.keys(src), i = 0; i < ks.length; ++i) {
-                if (src[ks[i]] != null && !isOmitted(ks[i], omitted)) {
+                if (src[ks[i]] != undefined && !isOmitted(ks[i], omitted)) {
                     dest[ks[i]] = src[ks[i]];
                 }
             }
@@ -25,13 +25,13 @@ var Webpb;
         return false;
     }
     function getter(data, path) {
-        if (!data) {
+        if (data === null || data === undefined) {
             return null;
         }
         for (var _i = 0, _a = path.split('.'); _i < _a.length; _i++) {
             var k = _a[_i];
             data = data[k];
-            if (!data) {
+            if (data === null || data === undefined) {
                 return null;
             }
         }
@@ -43,7 +43,7 @@ var Webpb;
         // tslint:disable-next-line:forin
         for (var key in params) {
             var v = params[key];
-            if (v === null) {
+            if (v === null || v === undefined) {
                 continue;
             }
             str += str.length === 0 ? '?' : '&';

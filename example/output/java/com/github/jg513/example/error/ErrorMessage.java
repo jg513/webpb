@@ -3,12 +3,12 @@
 package com.github.jg513.example.error;
 
 import com.github.jg513.webpb.WebpbMessage;
-import lombok.Setter;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 
-@Setter
 @Getter
+@Setter
 @Accessors(chain = true)
 public class ErrorMessage implements WebpbMessage {
 

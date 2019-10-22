@@ -162,8 +162,8 @@ export namespace StoreProto {
                 class: 'StoresRequest',
                 method: 'POST',
                 path: `/stores/${p.type}${Webpb.query({
-                    page: Webpb.getter(p, 'paging.page'),
-                    size: Webpb.getter(p, 'paging.size'),
+                    page: Webpb.getter(p, 'pageable.page'),
+                    size: Webpb.getter(p, 'pageable.size'),
                 })}`
             });
         }

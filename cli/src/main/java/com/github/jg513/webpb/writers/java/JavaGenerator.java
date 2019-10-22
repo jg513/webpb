@@ -23,7 +23,6 @@ import com.github.javaparser.ast.expr.Name;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.SimpleName;
 import com.github.javaparser.ast.expr.StringLiteralExpr;
-import com.github.javaparser.ast.expr.SwitchExpr;
 import com.github.javaparser.ast.expr.ThisExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
@@ -35,6 +34,7 @@ import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.type.Type;
 import com.github.jg513.webpb.WebpbMessage;
 import com.github.jg513.webpb.common.Const;
+import com.github.jg513.webpb.common.ParamGroup;
 import com.github.jg513.webpb.common.options.FieldOptions;
 import com.github.jg513.webpb.common.options.MessageOptions;
 import com.squareup.wire.schema.EnclosingType;
@@ -48,6 +48,7 @@ import com.squareup.wire.schema.Schema;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -95,6 +96,7 @@ public final class JavaGenerator {
         unit.setPackageDeclaration(getPackage(file, type));
         List<Name> imports = new ArrayList<>();
         TypeDeclaration declaration = generateType(type, imports);
+        imports.sort(Comparator.comparing(Name::asString));
         imports.forEach(i -> unit.addImport(i.asString()));
         unit.addType(declaration);
         return unit;
@@ -241,14 +243,19 @@ public final class JavaGenerator {
     private void addMethodOption(MessageType type, ClassOrInterfaceDeclaration declaration) {
         Field field = schema.getField(MessageOptions.METHOD);
         String value = (String) type.options().get(MessageOptions.METHOD);
-        addStaticOption(declaration, field, "METHOD", value);
+        if (StringUtils.isNotEmpty(value)) {
+            addStaticOption(declaration, field, "METHOD", value);
+        }
     }
 
     private void addPathOption(MessageType type, ClassOrInterfaceDeclaration declaration) {
         Field field = schema.getField(MessageOptions.PATH);
         String path = (String) type.options().get(MessageOptions.PATH);
-        String value = StringUtils.isEmpty(path) ? "" : path.split("\\?")[0];
-        addStaticOption(declaration, field, "PATH", value);
+        if (StringUtils.isNotEmpty(path)) {
+            ParamGroup.of(path).validation(schema, type);
+            String value = StringUtils.isEmpty(path) ? "" : path.split("\\?")[0];
+            addStaticOption(declaration, field, "PATH", value);
+        }
     }
 
     private void addStaticOption(ClassOrInterfaceDeclaration declaration, Field field, String key, String value) {

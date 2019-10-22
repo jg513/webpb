@@ -4,7 +4,7 @@ import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.expr.Name;
 import com.github.jg513.webpb.common.options.FileOptions;
-import com.github.jg513.webpb.exception.ConsoleException;
+import com.github.jg513.webpb.exception.ConsoleErrorException;
 import com.squareup.wire.schema.ProtoFile;
 import com.squareup.wire.schema.Schema;
 import com.squareup.wire.schema.Type;
@@ -13,6 +13,7 @@ import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,7 +23,7 @@ import java.util.Optional;
 public class JavaOptions {
     private Map<String, Name> nameMap = new HashMap<>();
 
-    private Map<AnnotationExpr, Name> annotationMap = new HashMap<>();
+    private Map<AnnotationExpr, Name> annotationMap = new LinkedHashMap<>();
 
     private boolean getter = true;
 
@@ -76,7 +77,7 @@ public class JavaOptions {
         }
         Name full = nameMap.get(name.getIdentifier());
         if (full == null) {
-            throw new ConsoleException("Unknown identifier %s is not imported", name.getIdentifier());
+            throw new ConsoleErrorException("Unknown identifier %s is not imported", name.getIdentifier());
         }
         return new Name(full.getQualifier().orElse(null), full.getIdentifier());
     }
