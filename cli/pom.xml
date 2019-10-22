@@ -10,20 +10,37 @@
     <name>cli</name>
 
     <properties>
-        <wire.version>3.0.0-rc01</wire.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.squareup.wire</groupId>
             <artifactId>wire-schema</artifactId>
-            <version>${wire.version}</version>
+            <version>3.0.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.squareup.wire</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>28.1-jre</version>
         </dependency>
 
         <dependency>
             <groupId>com.github.jg513</groupId>
             <artifactId>webpb-spring</artifactId>
             <version>0.0.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

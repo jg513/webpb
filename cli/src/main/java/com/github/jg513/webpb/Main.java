@@ -16,7 +16,7 @@ public class Main implements Runnable {
     @Option(names = "--proto_path", arity = "1..*", description = "Paths to resolving proto files.", required = true)
     private String[] protoPaths;
 
-    @Option(names = "--type", arity = "1", description = "Generated code type.", required = true)
+    @Option(names = "--type", arity = "1", description = "TS, JAVA", required = true)
     private String type;
 
     @Option(names = "--out", arity = "1", description = "Generated code output directory.", required = true)
