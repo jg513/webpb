@@ -63,7 +63,7 @@ final class TypescriptGenerator {
                 builder.insert(0, "import { " + type + " } from './" + type + "';\n\n");
             }
         }
-        builder.insert(0, "import { Webpb } from 'Webpb';\n\n");
+        builder.insert(0, "import { Webpb } from 'webpb';\n\n");
         builder.insert(0, "// " + Const.GIT_URL + "\n\n");
         builder.insert(0, "// " + Const.HEADER + "\n");
     }

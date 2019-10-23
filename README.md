@@ -77,8 +77,8 @@ export class StoresRequest implements IStoresRequest, Webpb.WebpbMessage {
             class: 'StoresRequest',
             method: 'POST',
             path: `/stores/${p.type}${Webpb.query({
-                page: Webpb.getter(p, 'paging.page'),
-                size: Webpb.getter(p, 'paging.size'),
+                page: Webpb.getter(p, 'pageable.page'),
+                size: Webpb.getter(p, 'pageable.size'),
             })}`
         });
     }
@@ -112,6 +112,7 @@ feignClient.request({
 ### Spring boot
 
 #### Maven package
+https://mvnrepository.com/artifact/com.github.jg513/webpb-spring
 
 #### Sample request mapping
 
