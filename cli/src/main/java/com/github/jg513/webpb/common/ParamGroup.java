@@ -50,9 +50,7 @@ public class ParamGroup {
             group.params.add(param);
             index = matcher.end();
         }
-        if (!group.params.isEmpty()) {
-            group.suffix = path.substring(index);
-        }
+        group.suffix = path.substring(index);
         return group;
     }
 

@@ -33,6 +33,12 @@ message StoreResponse {
     required StoreNestedPb nested = 2;
 }
 
+message StoreCurrentRequest {
+    option (method) = "GET";
+
+    option (path) = "/stores/current";
+}
+
 message EmptyPb {
     message EnclosingPb {
     }

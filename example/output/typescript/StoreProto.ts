@@ -104,6 +104,25 @@ export namespace StoreProto {
         }
     }
 
+    export interface IStoreCurrentRequest {
+    }
+
+    export class StoreCurrentRequest implements IStoreCurrentRequest, Webpb.WebpbMessage {
+        META: () => Webpb.WebpbMeta;
+
+        private constructor() {
+            this.META = () => ({
+                class: 'StoreCurrentRequest',
+                method: 'GET',
+                path: `/stores/current`
+            });
+        }
+
+        static create(): StoreCurrentRequest {
+            return new StoreCurrentRequest();
+        }
+    }
+
     export interface IEmptyPb {
     }
 
