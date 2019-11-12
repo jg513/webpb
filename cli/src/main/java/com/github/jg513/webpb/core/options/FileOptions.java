@@ -1,4 +1,4 @@
-package com.github.jg513.webpb.common.options;
+package com.github.jg513.webpb.core.options;
 
 import com.squareup.wire.schema.ProtoMember;
 

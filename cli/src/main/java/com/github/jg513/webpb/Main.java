@@ -1,6 +1,6 @@
 package com.github.jg513.webpb;
 
-import com.github.jg513.webpb.common.WebpbCompiler;
+import com.github.jg513.webpb.core.WebpbCompiler;
 import com.github.jg513.webpb.log.Logger;
 import com.github.jg513.webpb.log.LoggerImpl;
 import com.squareup.wire.schema.IdentifierSet;
@@ -34,6 +34,9 @@ public class Main implements Runnable {
     @Option(names = "--files", arity = "1..*", description = "Source files.")
     private String[] files;
 
+    @Option(names = "--tags", arity = "0..*", description = "Generation tags.")
+    private String[] tags;
+
     private static CommandLine commandLine;
 
     public void run() {
@@ -43,7 +46,7 @@ public class Main implements Runnable {
             .exclude(excludes == null ? Collections.emptyList() : Arrays.asList(excludes))
             .build();
         try {
-            new WebpbCompiler(log, protoPaths, files, type, out, identifierSet).compile();
+            new WebpbCompiler(log, protoPaths, files, tags, type, out, identifierSet).compile();
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());

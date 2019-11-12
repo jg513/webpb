@@ -2,11 +2,14 @@ package com.github.jg513.webpb.writers.java;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.PackageDeclaration;
-import com.github.jg513.webpb.common.CodeWriter;
-import com.github.jg513.webpb.common.CodeWriterContext;
-import com.github.jg513.webpb.common.PendingSpec;
-import com.github.jg513.webpb.common.specs.PendingTypeSpec;
+import com.github.jg513.webpb.core.CodeWriter;
+import com.github.jg513.webpb.core.CodeWriterContext;
+import com.github.jg513.webpb.core.PendingSpec;
+import com.github.jg513.webpb.core.Utils;
+import com.github.jg513.webpb.core.options.MessageOptions;
+import com.github.jg513.webpb.core.specs.PendingTypeSpec;
 import com.github.jg513.webpb.exception.ConsoleErrorException;
+import com.squareup.wire.schema.MessageType;
 import com.squareup.wire.schema.ProtoFile;
 import com.squareup.wire.schema.Type;
 
@@ -14,12 +17,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 public class JavaWriter extends CodeWriter {
     public JavaWriter(CodeWriterContext options) {
         super(options);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Void call() {
         JavaOptions options = new JavaOptions(context.getSchema());
@@ -34,6 +39,12 @@ public class JavaWriter extends CodeWriter {
             }
             ProtoFile file = ((PendingTypeSpec) spec).getFile();
             Type type = ((PendingTypeSpec) spec).getType();
+            if (type instanceof MessageType && !context.getTags().isEmpty()) {
+                List<String> tags = (List<String>) type.options().get(MessageOptions.TAG);
+                if (tags != null && !Utils.containsAny(context.getTags(), tags)) {
+                    continue;
+                }
+            }
 
             try {
                 CompilationUnit unit = generator.generate(file, type);

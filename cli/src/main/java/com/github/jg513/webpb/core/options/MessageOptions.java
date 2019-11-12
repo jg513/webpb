@@ -1,4 +1,4 @@
-package com.github.jg513.webpb.common.options;
+package com.github.jg513.webpb.core.options;
 
 import com.squareup.wire.schema.ProtoMember;
 
@@ -10,4 +10,6 @@ public class MessageOptions {
     public static final ProtoMember PATH = ProtoMember.get(MESSAGE_OPTIONS, "path");
 
     public static final ProtoMember JAVA_ANNO = ProtoMember.get(MESSAGE_OPTIONS, "java_anno");
+
+    public static final ProtoMember TAG = ProtoMember.get(MESSAGE_OPTIONS, "tag");
 }

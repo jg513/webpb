@@ -1,4 +1,4 @@
-package com.github.jg513.webpb.common;
+package com.github.jg513.webpb.core;
 
 import com.github.jg513.webpb.exception.ConsoleErrorException;
 import com.squareup.wire.schema.Field;

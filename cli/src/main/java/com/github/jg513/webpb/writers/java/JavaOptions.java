@@ -3,7 +3,7 @@ package com.github.jg513.webpb.writers.java;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.expr.Name;
-import com.github.jg513.webpb.common.options.FileOptions;
+import com.github.jg513.webpb.core.options.FileOptions;
 import com.github.jg513.webpb.exception.ConsoleErrorException;
 import com.squareup.wire.schema.ProtoFile;
 import com.squareup.wire.schema.Schema;

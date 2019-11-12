@@ -16,6 +16,8 @@ extend google.protobuf.MessageOptions {
 
     optional string path = 1002;
 
+    repeated string tag = 1003;
+
     repeated string java_anno = 2000;
 }
 

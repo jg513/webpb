@@ -1,4 +1,4 @@
-package com.github.jg513.webpb.common;
+package com.github.jg513.webpb.core;
 
 @FunctionalInterface
 public interface Handler {

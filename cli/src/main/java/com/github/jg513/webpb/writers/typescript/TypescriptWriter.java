@@ -1,10 +1,10 @@
 package com.github.jg513.webpb.writers.typescript;
 
-import com.github.jg513.webpb.common.specs.PendingFileSpec;
+import com.github.jg513.webpb.core.CodeWriter;
+import com.github.jg513.webpb.core.CodeWriterContext;
+import com.github.jg513.webpb.core.PendingSpec;
+import com.github.jg513.webpb.core.specs.PendingFileSpec;
 import com.squareup.wire.schema.ProtoFile;
-import com.github.jg513.webpb.common.CodeWriter;
-import com.github.jg513.webpb.common.CodeWriterContext;
-import com.github.jg513.webpb.common.PendingSpec;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -33,9 +33,12 @@ public class TypescriptWriter extends CodeWriter {
                 }
                 String packageName = protoFile.packageName();
                 StringBuilder builder = new StringBuilder();
-                TypescriptGenerator
-                    .of(context.getSchema(), builder)
+                boolean hasContent = TypescriptGenerator
+                    .of(context.getSchema(), context.getTags(), builder)
                     .generate(protoFile);
+                if (!hasContent) {
+                    continue;
+                }
 
                 Path path = Paths.get(context.getOut(), packageName + ".ts");
                 Files.write(path, builder.toString().getBytes());

@@ -1,10 +1,11 @@
 package com.github.jg513.webpb.writers.typescript;
 
-import com.github.jg513.webpb.common.Const;
-import com.github.jg513.webpb.common.Handler;
-import com.github.jg513.webpb.common.ParamGroup;
-import com.github.jg513.webpb.common.options.FieldOptions;
-import com.github.jg513.webpb.common.options.MessageOptions;
+import com.github.jg513.webpb.core.Const;
+import com.github.jg513.webpb.core.Handler;
+import com.github.jg513.webpb.core.ParamGroup;
+import com.github.jg513.webpb.core.Utils;
+import com.github.jg513.webpb.core.options.FieldOptions;
+import com.github.jg513.webpb.core.options.MessageOptions;
 import com.squareup.wire.schema.EnclosingType;
 import com.squareup.wire.schema.EnumConstant;
 import com.squareup.wire.schema.EnumType;
@@ -31,6 +32,8 @@ final class TypescriptGenerator {
 
     private final Schema schema;
 
+    private final List<String> tags;
+
     private final StringBuilder builder;
 
     private Set<String> imports = new HashSet<>();
@@ -55,22 +58,34 @@ final class TypescriptGenerator {
         put(ProtoType.UINT64, "number");
     }};
 
-    public void generate(ProtoFile protoFile) {
+    public boolean generate(ProtoFile protoFile) {
         String packageName = protoFile.packageName();
-        generateTypes(packageName, protoFile.types());
-        for (String type : imports) {
-            if (!type.startsWith(packageName)) {
-                builder.insert(0, "import { " + type + " } from './" + type + "';\n\n");
+        if (generateTypes(packageName, protoFile.types())) {
+            for (String type : imports) {
+                if (!type.startsWith(packageName)) {
+                    builder.insert(0, "import { " + type + " } from './" + type + "';\n\n");
+                }
             }
+            builder.insert(0, "import { Webpb } from 'webpb';\n\n");
+            builder.insert(0, "// " + Const.GIT_URL + "\n\n");
+            builder.insert(0, "// " + Const.HEADER + "\n");
+            return true;
         }
-        builder.insert(0, "import { Webpb } from 'webpb';\n\n");
-        builder.insert(0, "// " + Const.GIT_URL + "\n\n");
-        builder.insert(0, "// " + Const.HEADER + "\n");
+        return false;
     }
 
-    private void generateTypes(String namespace, List<Type> types) {
+    @SuppressWarnings("unchecked")
+    private boolean generateTypes(String namespace, List<Type> types) {
         indent().append("export namespace ").append(namespace).append(" {\n");
+        boolean hasContent = false;
         for (Type type : types) {
+            if (type instanceof MessageType && !tags.isEmpty()) {
+                List<String> tags = (List<String>) type.options().get(MessageOptions.TAG);
+                if (tags != null && !Utils.containsAny(this.tags, tags)) {
+                    continue;
+                }
+            }
+            hasContent = true;
             generateType(type);
             if (!type.nestedTypes().isEmpty()) {
                 level(() -> generateTypes(type.type().simpleName(), type.nestedTypes()));
@@ -80,6 +95,7 @@ final class TypescriptGenerator {
         if (level == 0) {
             trimDuplicatedNewline();
         }
+        return hasContent;
     }
 
     private void generateType(Type type) {

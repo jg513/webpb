@@ -1,8 +1,8 @@
-package com.github.jg513.webpb.common;
+package com.github.jg513.webpb.core;
 
-import com.github.jg513.webpb.common.specs.PendingFileSpec;
-import com.github.jg513.webpb.common.specs.PendingServiceSpec;
-import com.github.jg513.webpb.common.specs.PendingTypeSpec;
+import com.github.jg513.webpb.core.specs.PendingFileSpec;
+import com.github.jg513.webpb.core.specs.PendingServiceSpec;
+import com.github.jg513.webpb.core.specs.PendingTypeSpec;
 import com.github.jg513.webpb.log.Logger;
 import com.github.jg513.webpb.writers.java.JavaWriter;
 import com.github.jg513.webpb.writers.typescript.TypescriptWriter;
@@ -12,6 +12,7 @@ import com.squareup.wire.schema.Schema;
 import com.squareup.wire.schema.SchemaLoader;
 import lombok.RequiredArgsConstructor;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -22,6 +23,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.AbstractQueue;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +53,8 @@ public class WebpbCompiler {
 
     private final String[] files;
 
+    private final String[] tags;
+
     private final String type;
 
     private final String out;
@@ -69,13 +73,18 @@ public class WebpbCompiler {
         List<Future<Void>> futures = new ArrayList<>(MAX_WRITE_CONCURRENCY);
         Path path = Paths.get(out);
         if (Files.exists(path) && !Files.isDirectory(path)) {
-            throw new IllegalArgumentException(String.format("path %s exists but is not a directory.", path));
+            throw new IllegalArgumentException(String.format("Path %s exists but is not a directory.", path));
+        }
+        File dir = path.toFile();
+        if (!dir.exists() && !dir.mkdirs()) {
+            throw new IllegalArgumentException(String.format("Failed create %s directory.", path));
         }
         CodeWriterContext context = CodeWriterContext.builder()
             .log(log)
             .out(out)
             .schema(schema)
             .specs(createSpecs(schema))
+            .tags(this.tags == null ? Collections.emptyList() : Arrays.asList(this.tags))
             .build();
         for (int i = 0; i < MAX_WRITE_CONCURRENCY; i++) {
             try {

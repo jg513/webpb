@@ -1,8 +1,8 @@
-package com.github.jg513.webpb.common.specs;
+package com.github.jg513.webpb.core.specs;
 
 import com.squareup.wire.schema.ProtoFile;
 import com.squareup.wire.schema.Type;
-import com.github.jg513.webpb.common.PendingSpec;
+import com.github.jg513.webpb.core.PendingSpec;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
