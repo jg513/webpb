@@ -64,7 +64,10 @@ public class JavaWriter extends CodeWriter {
                     }
                 }
                 path = path.resolve(type.type().simpleName() + ".java");
-                Files.write(path, unit.toString().getBytes());
+                String content = unit.toString()
+                    .replace("// https://github.com/jg513/webpb", "// https://github.com/jg513/webpb\n")
+                    .replace("switch(", "switch (");
+                Files.write(path, content.getBytes());
             } catch (ConsoleErrorException e) {
                 context.getLog().error(e.getMessage());
             } catch (IOException e) {
