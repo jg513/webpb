@@ -28,10 +28,10 @@ public class TypescriptWriter extends CodeWriter {
             }
             try {
                 ProtoFile protoFile = ((PendingFileSpec) spec).getFile();
-                if (protoFile.types().isEmpty()) {
+                if (protoFile.getTypes().isEmpty()) {
                     continue;
                 }
-                String packageName = protoFile.packageName();
+                String packageName = protoFile.getPackageName();
                 StringBuilder builder = new StringBuilder();
                 boolean hasContent = TypescriptGenerator
                     .of(context.getSchema(), context.getTags(), builder)

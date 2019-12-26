@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 @RequiredArgsConstructor(staticName = "of")
@@ -59,10 +60,10 @@ final class TypescriptGenerator {
     }};
 
     public boolean generate(ProtoFile protoFile) {
-        String packageName = protoFile.packageName();
-        if (generateTypes(packageName, protoFile.types())) {
+        String packageName = protoFile.getPackageName();
+        if (generateTypes(packageName, protoFile.getTypes())) {
             for (String type : imports) {
-                if (!type.startsWith(packageName)) {
+                if (!StringUtils.startsWith(type, packageName)) {
                     builder.insert(0, "import { " + type + " } from './" + type + "';\n\n");
                 }
             }
@@ -80,15 +81,18 @@ final class TypescriptGenerator {
         boolean hasContent = false;
         for (Type type : types) {
             if (type instanceof MessageType && !tags.isEmpty()) {
-                List<String> tags = (List<String>) type.options().get(MessageOptions.TAG);
+                List<String> tags = (List<String>) type.getOptions().get(MessageOptions.TAG);
                 if (tags != null && !Utils.containsAny(this.tags, tags)) {
                     continue;
                 }
             }
             hasContent = true;
             generateType(type);
-            if (!type.nestedTypes().isEmpty()) {
-                level(() -> generateTypes(type.type().simpleName(), type.nestedTypes()));
+            if (!type.getNestedTypes().isEmpty()) {
+                level(() -> generateTypes(
+                    Objects.requireNonNull(type.getType()).getSimpleName(),
+                    type.getNestedTypes()
+                ));
             }
         }
         closeBracket();
@@ -112,9 +116,9 @@ final class TypescriptGenerator {
 
     private void generateEnum(EnumType type) {
         level(() -> {
-            indent().append("export enum ").append(type.type().simpleName()).append(" {\n");
+            indent().append("export enum ").append(type.getType().getSimpleName()).append(" {\n");
 
-            for (EnumConstant constant : type.constants()) {
+            for (EnumConstant constant : type.getConstants()) {
                 level(() -> indent().append(constant.getName())
                     .append(" = ").append(constant.getTag()).append(",\n")
                 );
@@ -124,7 +128,7 @@ final class TypescriptGenerator {
     }
 
     private void generateMessage(MessageType type) {
-        String className = type.type().simpleName();
+        String className = type.getType().getSimpleName();
 
         level(() -> {
             indent().append("export interface ").append(interfaceName(className)).append(" {\n");
@@ -136,7 +140,7 @@ final class TypescriptGenerator {
             indent()
                 .append("export class ").append(className)
                 .append(" implements ").append(interfaceName(className));
-            if (type.options().get(MessageOptions.PATH) != null) {
+            if (type.getOptions().get(MessageOptions.PATH) != null) {
                 builder.append(", Webpb.WebpbMessage {\n");
             } else {
                 builder.append(" {\n");
@@ -152,12 +156,12 @@ final class TypescriptGenerator {
     }
 
     private void generateMessageFields(MessageType type, boolean isInterface) {
-        for (Field field : type.fieldsAndOneOfFields()) {
-            if (!field.type().isScalar()) {
-                imports.add(field.type().enclosingTypeOrPackage());
+        for (Field field : type.getFieldsAndOneOfFields()) {
+            if (!Objects.requireNonNull(field.getType()).isScalar()) {
+                imports.add(field.getType().getEnclosingTypeOrPackage());
             }
-            String typeName = toTypeName(field.type());
-            indent().append(field.name());
+            String typeName = toTypeName(field.getType());
+            indent().append(field.getName());
             if (field.isOptional()) {
                 builder.append('?');
             } else if (!isInterface & field.getDefault() == null) {
@@ -180,7 +184,7 @@ final class TypescriptGenerator {
     }
 
     private void generateConstructor(MessageType type, String className) {
-        if (type.fieldsAndOneOfFields().isEmpty()) {
+        if (type.getFieldsAndOneOfFields().isEmpty()) {
             indent().append("private constructor() {\n");
             level(() -> initializeMeta(type));
             closeBracket();
@@ -197,8 +201,9 @@ final class TypescriptGenerator {
             closeBracket();
             indent().append("static create(properties: ")
                 .append(interfaceName).append("): ").append(className).append(" {\n");
-            level(() -> indent().append("return new ").append(type.type()
-                .simpleName()).append("(properties").append(");\n"));
+            level(() -> indent().append("return new ")
+                .append(type.getType().getSimpleName())
+                .append("(properties").append(");\n"));
             closeBracket();
         }
     }
@@ -206,8 +211,8 @@ final class TypescriptGenerator {
     private void initializeMeta(MessageType type) {
         indent().append("this.META = () => ({\n");
         level(() -> {
-            generateMetaField("class", "'" + type.type().simpleName() + "'");
-            Options options = type.options();
+            generateMetaField("class", "'" + type.getType().getSimpleName() + "'");
+            Options options = type.getOptions();
             String method = (String) options.get(MessageOptions.METHOD);
             generateMetaField("method", method == null ? "''" : "'" + method + "'");
             String path = (String) options.get(MessageOptions.PATH);
@@ -265,12 +270,12 @@ final class TypescriptGenerator {
     private String generateOmitted(MessageType type) {
         StringBuilder builder = new StringBuilder("[");
         String separator = null;
-        for (Field field : type.fieldsAndOneOfFields()) {
-            if ("true".equals(field.options().get(FieldOptions.OMITTED))) {
+        for (Field field : type.getFieldsAndOneOfFields()) {
+            if ("true".equals(field.getOptions().get(FieldOptions.OMITTED))) {
                 if (separator != null) {
                     builder.append(separator);
                 }
-                builder.append('"').append(field.name()).append('"');
+                builder.append('"').append(field.getName()).append('"');
                 separator = ", ";
             }
         }
@@ -278,7 +283,7 @@ final class TypescriptGenerator {
     }
 
     private void generateEnclosingType(EnclosingType type) {
-        level(() -> generateTypes(type.type().simpleName(), type.nestedTypes()));
+        level(() -> generateTypes(type.getType().getSimpleName(), type.getNestedTypes()));
     }
 
     private void generateMetaField(String key, String value) {
@@ -309,7 +314,7 @@ final class TypescriptGenerator {
 
         Type type = this.schema.getType(protoType);
         if (type instanceof MessageType) {
-            return protoType.enclosingTypeOrPackage() + ".I" + protoType.simpleName();
+            return protoType.getEnclosingTypeOrPackage() + ".I" + protoType.getSimpleName();
         } else {
             return protoType.toString();
         }

@@ -1,14 +1,19 @@
 package com.github.jg513.webpb;
 
-import com.github.jg513.webpb.core.WebpbCompiler;
-import com.github.jg513.webpb.log.Logger;
-import com.github.jg513.webpb.log.LoggerImpl;
-import com.squareup.wire.schema.IdentifierSet;
+import com.github.jg513.webpb.writers.wire.WireArgs;
+import com.squareup.javapoet.JavaFile;
+import com.squareup.kotlinpoet.FileSpec;
+import com.squareup.wire.WireCompiler;
+import com.squareup.wire.WireLogger;
+import com.squareup.wire.schema.ProtoType;
+import com.squareup.wire.schema.PruningRules;
+import org.jetbrains.annotations.NotNull;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-import java.util.Arrays;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 
 @Command(name = "webpb", mixinStandardHelpOptions = true, version = "Picocli example 4.0")
@@ -40,16 +45,55 @@ public class Main implements Runnable {
     private static CommandLine commandLine;
 
     public void run() {
-        Logger log = LoggerImpl.of(commandLine.getOut(), commandLine.getErr(), quiet);
-        IdentifierSet identifierSet = new IdentifierSet.Builder()
-            .include(includes == null ? Collections.emptyList() : Arrays.asList(includes))
-            .exclude(excludes == null ? Collections.emptyList() : Arrays.asList(excludes))
-            .build();
+        WireArgs wireArgs = new WireArgs();
+        wireArgs
+            .setFs(Paths.get("").getFileSystem())
+            .setLog(new WireLogger() {
+                @Override
+                public void setQuiet(boolean b) {
+                }
+
+                @Override
+                public void artifact(@NotNull Path path, @NotNull JavaFile javaFile) {
+                }
+
+                @Override
+                public void artifact(@NotNull Path path, @NotNull FileSpec fileSpec) {
+                }
+
+                @Override
+                public void artifactSkipped(@NotNull ProtoType protoType) {
+                }
+
+                @Override
+                public void info(@NotNull String s) {
+                }
+            })
+            .setProtoPaths(Collections.singletonList("../example/proto"))
+            .setJavaOut("../example/out")
+            .setSourceFileNames(Collections.singletonList("Store.proto"))
+            .setPruningRules(new PruningRules.Builder()
+                .build()
+            );
+        WireCompiler compiler = new WireCompiler(
+            wireArgs.getFs(),
+            wireArgs.getLog(),
+            wireArgs.getProtoPaths(),
+            wireArgs.getJavaOut(),
+            wireArgs.getKotlinOut(),
+            wireArgs.getSourceFileNames(),
+            wireArgs.getPruningRules(),
+            wireArgs.isDryRun(),
+            wireArgs.isNamedFilesOnly(),
+            wireArgs.isEmitAndroid(),
+            wireArgs.isEmitAndroidAnnotations(),
+            wireArgs.isEmitCompact(),
+            wireArgs.isJavaInterop()
+        );
         try {
-            new WebpbCompiler(log, protoPaths, files, tags, type, out, identifierSet).compile();
+            compiler.compile();
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error(e.getMessage());
+            commandLine.getOut().println(e.getMessage());
         }
     }
 

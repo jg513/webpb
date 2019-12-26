@@ -52,6 +52,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public final class JavaGenerator {
     private static final String ENUM_VALUE = "code";
@@ -95,7 +96,7 @@ public final class JavaGenerator {
         unit.addOrphanComment(new LineComment(Const.GIT_URL));
         unit.setPackageDeclaration(getPackage(file, type));
         List<Name> imports = new ArrayList<>();
-        TypeDeclaration declaration = generateType(type, imports);
+        TypeDeclaration<?> declaration = generateType(type, imports);
         imports.sort(Comparator.comparing(Name::asString));
         imports.forEach(i -> unit.addImport(i.asString()));
         unit.addType(declaration);
@@ -106,10 +107,10 @@ public final class JavaGenerator {
         if (StringUtils.isNotEmpty(file.javaPackage())) {
             return file.javaPackage();
         }
-        return type.type().enclosingTypeOrPackage();
+        return Objects.requireNonNull(type.getType()).getEnclosingTypeOrPackage();
     }
 
-    private TypeDeclaration generateType(com.squareup.wire.schema.Type type, List<Name> imports) {
+    private TypeDeclaration<?> generateType(com.squareup.wire.schema.Type type, List<Name> imports) {
         if (type instanceof MessageType) {
             return generateMessage((MessageType) type, imports);
         } else if (type instanceof EnumType) {
@@ -123,7 +124,7 @@ public final class JavaGenerator {
 
     private ClassOrInterfaceDeclaration generateMessage(MessageType type, List<Name> imports) {
         ClassOrInterfaceDeclaration declaration = new ClassOrInterfaceDeclaration();
-        declaration.setName(type.type().simpleName());
+        declaration.setName(type.getType().getSimpleName());
         declaration.addModifier(Modifier.Keyword.PUBLIC);
         parser.parseName(WebpbMessage.class.getName()).ifSuccessful(imports::add);
         declaration.addImplementedType(WebpbMessage.class);
@@ -135,8 +136,8 @@ public final class JavaGenerator {
 
         generateMessageFields(imports, type, declaration);
 
-        for (com.squareup.wire.schema.Type nestedType : type.nestedTypes()) {
-            TypeDeclaration typeDeclaration = generateType(nestedType, imports);
+        for (com.squareup.wire.schema.Type nestedType : type.getNestedTypes()) {
+            TypeDeclaration<?> typeDeclaration = generateType(nestedType, imports);
             typeDeclaration.addModifier(Modifier.Keyword.STATIC);
             declaration.addMember(typeDeclaration);
         }
@@ -145,10 +146,10 @@ public final class JavaGenerator {
 
     private EnumDeclaration generateEnum(EnumType type) {
         EnumDeclaration declaration = new EnumDeclaration();
-        declaration.setName(type.type().simpleName());
+        declaration.setName(type.getType().getSimpleName());
         declaration.addModifier(Modifier.Keyword.PUBLIC);
 
-        for (EnumConstant constant : type.constants()) {
+        for (EnumConstant constant : type.getConstants()) {
             EnumConstantDeclaration enumConstant = declaration.addEnumConstant(constant.getName());
             enumConstant.addArgument(new IntegerLiteralExpr(constant.getTag()));
         }
@@ -160,27 +161,27 @@ public final class JavaGenerator {
         return declaration;
     }
 
-    private TypeDeclaration generateEnclosingType(EnclosingType type, List<Name> imports) {
+    private TypeDeclaration<?> generateEnclosingType(EnclosingType type, List<Name> imports) {
         ClassOrInterfaceDeclaration declaration = new ClassOrInterfaceDeclaration();
         declaration.addModifier(Modifier.Keyword.PUBLIC, Modifier.Keyword.FINAL);
-        declaration.setName(type.type().simpleName());
-        for (com.squareup.wire.schema.Type nestedType : type.nestedTypes()) {
+        declaration.setName(type.getType().getSimpleName());
+        for (com.squareup.wire.schema.Type nestedType : type.getNestedTypes()) {
             declaration.addMember(generateType(nestedType, imports));
         }
         return generateType(type, imports);
     }
 
     @SuppressWarnings("unchecked")
-    private void generateTypeAnnotations(MessageType type, TypeDeclaration declaration, List<Name> imports) {
+    private void generateTypeAnnotations(MessageType type, TypeDeclaration<?> declaration, List<Name> imports) {
         for (Map.Entry<AnnotationExpr, Name> entry : options.getAnnotationMap().entrySet()) {
             declaration.addAnnotation(entry.getKey());
             imports.add(entry.getValue());
         }
-        List<String> annotations = (List<String>) type.options().get(MessageOptions.JAVA_ANNO);
+        List<String> annotations = (List<String>) type.getOptions().get(MessageOptions.JAVA_ANNO);
         addAnnotations(declaration, annotations, imports);
     }
 
-    private void addAnnotations(BodyDeclaration declaration, List<String> annotations, List<Name> imports) {
+    private void addAnnotations(BodyDeclaration<?> declaration, List<String> annotations, List<Name> imports) {
         if (annotations != null && !annotations.isEmpty()) {
             for (String annotation : annotations) {
                 parser.parseAnnotation(annotation).ifSuccessful(expr -> {
@@ -207,7 +208,7 @@ public final class JavaGenerator {
         method.addParameter(new Parameter(PrimitiveType.intType(), ENUM_VALUE));
         method.setType(declaration.getName().asString());
         NodeList<SwitchEntry> entries = new NodeList<>();
-        for (EnumConstant constant : type.constants()) {
+        for (EnumConstant constant : type.getConstants()) {
             entries.add(new SwitchEntry(
                 NodeList.nodeList(new IntegerLiteralExpr(constant.getTag())),
                 SwitchEntry.Type.STATEMENT_GROUP,
@@ -228,21 +229,21 @@ public final class JavaGenerator {
 
     @SuppressWarnings("unchecked")
     private void generateMessageFields(List<Name> imports, MessageType type, ClassOrInterfaceDeclaration clazz) {
-        for (Field field : type.fieldsAndOneOfFields()) {
-            if ("true".equals(field.options().get(FieldOptions.OMITTED))) {
+        for (Field field : type.getFieldsAndOneOfFields()) {
+            if ("true".equals(field.getOptions().get(FieldOptions.OMITTED))) {
                 continue;
             }
             Type fieldType = getType(field);
             parseImports(fieldType, imports);
-            FieldDeclaration declaration = clazz.addField(fieldType, field.name(), Modifier.Keyword.PRIVATE);
-            List<String> annotations = (List<String>) field.options().get(FieldOptions.JAVA_ANNO);
+            FieldDeclaration declaration = clazz.addField(fieldType, field.getName(), Modifier.Keyword.PRIVATE);
+            List<String> annotations = (List<String>) field.getOptions().get(FieldOptions.JAVA_ANNO);
             addAnnotations(declaration, annotations, imports);
         }
     }
 
     private void addMethodOption(MessageType type, ClassOrInterfaceDeclaration declaration) {
         Field field = schema.getField(MessageOptions.METHOD);
-        String value = (String) type.options().get(MessageOptions.METHOD);
+        String value = (String) type.getOptions().get(MessageOptions.METHOD);
         if (StringUtils.isNotEmpty(value)) {
             addStaticOption(declaration, field, "METHOD", value);
         }
@@ -250,7 +251,7 @@ public final class JavaGenerator {
 
     private void addPathOption(MessageType type, ClassOrInterfaceDeclaration declaration) {
         Field field = schema.getField(MessageOptions.PATH);
-        String path = (String) type.options().get(MessageOptions.PATH);
+        String path = (String) type.getOptions().get(MessageOptions.PATH);
         if (StringUtils.isNotEmpty(path)) {
             ParamGroup.of(path).validation(schema, type);
             String value = StringUtils.isEmpty(path) ? "" : path.split("\\?")[0];
@@ -269,26 +270,29 @@ public final class JavaGenerator {
     }
 
     private Type getType(Field field) {
-        ProtoType type = field.type();
+        ProtoType type = field.getType();
         if (field.isRepeated()) {
-            return new ClassOrInterfaceType(null, new SimpleName(List.class.getSimpleName()), NodeList.nodeList(toType(type)));
+            return new ClassOrInterfaceType(null,
+                new SimpleName(List.class.getSimpleName()),
+                NodeList.nodeList(toType(Objects.requireNonNull(type)))
+            );
         } else {
-            return toType(type);
+            return toType(Objects.requireNonNull(type));
         }
     }
 
     private Type toType(ProtoType protoType) {
         if (protoType.isMap()) {
             return new ClassOrInterfaceType(null, new SimpleName(Map.class.getSimpleName()), NodeList.nodeList(
-                toType(protoType.keyType()),
-                toType(protoType.valueType())
+                toType(Objects.requireNonNull(protoType.getKeyType())),
+                toType(Objects.requireNonNull(protoType.getValueType()))
             ));
         }
         Type type = TYPES_MAP.get(protoType);
         if (type != null) {
             return type.clone();
         }
-        return new ClassOrInterfaceType(null, protoType.simpleName());
+        return new ClassOrInterfaceType(null, protoType.getSimpleName());
     }
 
     private void parseImports(Node node, List<Name> imports) {

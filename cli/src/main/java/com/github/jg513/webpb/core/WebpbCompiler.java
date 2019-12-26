@@ -6,11 +6,12 @@ import com.github.jg513.webpb.core.specs.PendingTypeSpec;
 import com.github.jg513.webpb.log.Logger;
 import com.github.jg513.webpb.writers.java.JavaWriter;
 import com.github.jg513.webpb.writers.typescript.TypescriptWriter;
-import com.squareup.wire.schema.IdentifierSet;
 import com.squareup.wire.schema.ProtoFile;
+import com.squareup.wire.schema.PruningRules;
 import com.squareup.wire.schema.Schema;
 import com.squareup.wire.schema.SchemaLoader;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,7 +60,8 @@ public class WebpbCompiler {
 
     private final String out;
 
-    private final IdentifierSet identifierSet;
+    @NotNull
+    private final PruningRules pruningRules;
 
     public void compile() throws IOException {
         String typeUppercase = type.toUpperCase();
@@ -127,15 +129,11 @@ public class WebpbCompiler {
             }
         }
         Schema schema = loader.load();
-        if (!identifierSet.isEmpty()) {
+        if (!pruningRules.isEmpty()) {
             log.info("Analyzing dependencies of root types.");
-            schema = schema.prune(identifierSet);
-            for (String rule : identifierSet.unusedIncludes()) {
-                log.info("Unused include: %s", rule);
-            }
-            for (String rule : identifierSet.unusedExcludes()) {
-                log.info("Unused exclude: %s", rule);
-            }
+            schema = schema.prune(pruningRules);
+            pruningRules.unusedIncludes().forEach(v -> log.info("Unused include: " + v));
+            pruningRules.unusedExcludes().forEach(v -> log.info("Unused exclude: " + v));
         }
         return schema;
     }
@@ -161,16 +159,16 @@ public class WebpbCompiler {
 
     private AbstractQueue<PendingSpec> createSpecs(Schema schema) {
         AbstractQueue<PendingSpec> specs = new ConcurrentLinkedQueue<>();
-        for (ProtoFile file : schema.protoFiles()) {
-            if (file.location().getPath().equals(DESCRIPTOR_PROTO)) {
+        for (ProtoFile file : schema.getProtoFiles()) {
+            if (file.getLocation().getPath().equals(DESCRIPTOR_PROTO)) {
                 continue;
             }
             specs.add(new PendingFileSpec(file));
-            specs.addAll(file.types().stream()
+            specs.addAll(file.getTypes().stream()
                 .map(t -> new PendingTypeSpec(file, t))
                 .collect(Collectors.toList())
             );
-            specs.addAll(file.services().stream()
+            specs.addAll(file.getServices().stream()
                 .map(s -> new PendingServiceSpec(file, s))
                 .collect(Collectors.toList())
             );

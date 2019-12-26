@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 
 public class JavaWriter extends CodeWriter {
     public JavaWriter(CodeWriterContext options) {
@@ -40,7 +41,7 @@ public class JavaWriter extends CodeWriter {
             ProtoFile file = ((PendingTypeSpec) spec).getFile();
             Type type = ((PendingTypeSpec) spec).getType();
             if (type instanceof MessageType && !context.getTags().isEmpty()) {
-                List<String> tags = (List<String>) type.options().get(MessageOptions.TAG);
+                List<String> tags = (List<String>) type.getOptions().get(MessageOptions.TAG);
                 if (tags != null && !Utils.containsAny(context.getTags(), tags)) {
                     continue;
                 }
@@ -63,7 +64,7 @@ public class JavaWriter extends CodeWriter {
                         }
                     }
                 }
-                path = path.resolve(type.type().simpleName() + ".java");
+                path = path.resolve(Objects.requireNonNull(type.getType()).getSimpleName() + ".java");
                 String content = unit.toString()
                     .replace("// https://github.com/jg513/webpb", "// https://github.com/jg513/webpb\n")
                     .replace("switch(", "switch (");
