@@ -1,27 +1,27 @@
 package com.github.jg513.webpb;
 
+import com.github.jg513.webpb.core.WebpbCompiler;
+import com.github.jg513.webpb.log.Logger;
+import com.github.jg513.webpb.log.LoggerImpl;
 import com.github.jg513.webpb.writers.wire.WireArgs;
 import com.github.jg513.webpb.writers.wire.WireCompiler;
-import com.squareup.javapoet.JavaFile;
-import com.squareup.kotlinpoet.FileSpec;
-import com.squareup.wire.WireLogger;
-import com.squareup.wire.schema.ProtoType;
+import com.github.jg513.webpb.writers.wire.WireLoggerImpl;
 import com.squareup.wire.schema.PruningRules;
-import org.jetbrains.annotations.NotNull;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.stream.Collectors;
 
 @Command(name = "webpb", mixinStandardHelpOptions = true, version = "Picocli example 4.0")
 public class Main implements Runnable {
     @Option(names = "--proto_path", arity = "1..*", description = "Paths to resolving proto files.", required = true)
     private String[] protoPaths;
 
-    @Option(names = "--type", arity = "1", description = "TS, JAVA", required = true)
+    @Option(names = "--type", arity = "1", description = "TS, JAVA, WIRE", required = true)
     private String type;
 
     @Option(names = "--out", arity = "1", description = "Generated code output directory.", required = true)
@@ -45,34 +45,37 @@ public class Main implements Runnable {
     private static CommandLine commandLine;
 
     public void run() {
+        try {
+            if ("WIRE".equals(type)) {
+                useWireCompiler();
+            } else {
+                useWebpbCompiler();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            commandLine.getErr().printf(e.getMessage());
+        }
+    }
+
+    private void useWebpbCompiler() throws Exception {
+        Logger log = LoggerImpl.of(commandLine.getOut(), commandLine.getErr(), quiet);
+        PruningRules pruningRules = new PruningRules.Builder()
+            .include(includes == null ? Collections.emptyList() : Arrays.asList(includes))
+            .exclude(excludes == null ? Collections.emptyList() : Arrays.asList(excludes))
+            .build();
+        new WebpbCompiler(log, protoPaths, files, tags, type, out, pruningRules).compile();
+    }
+
+    private void useWireCompiler() throws Exception {
         WireArgs wireArgs = new WireArgs();
         wireArgs
             .setFs(Paths.get("").getFileSystem())
-            .setLog(new WireLogger() {
-                @Override
-                public void setQuiet(boolean b) {
-                }
-
-                @Override
-                public void artifact(@NotNull Path path, @NotNull JavaFile javaFile) {
-                }
-
-                @Override
-                public void artifact(@NotNull Path path, @NotNull FileSpec fileSpec) {
-                }
-
-                @Override
-                public void artifactSkipped(@NotNull ProtoType protoType) {
-                }
-
-                @Override
-                public void info(@NotNull String s) {
-                }
-            })
-            .setProtoPaths(Collections.singletonList("../example/proto"))
-            .setJavaOut("../example/out")
-//            .setJavaOut("src/main/java")
-            .setSourceFileNames(Collections.singletonList("Store.proto"))
+            .setLog(new WireLoggerImpl())
+            .setProtoPaths(Arrays.asList(protoPaths))
+            .setJavaOut(out)
+            .setSourceFileNames(WebpbCompiler.resolveFiles(
+                Arrays.stream(protoPaths).map(v -> Paths.get(v)).collect(Collectors.toList())
+            ))
             .setPruningRules(new PruningRules.Builder()
                 .build()
             );
@@ -91,11 +94,7 @@ public class Main implements Runnable {
             wireArgs.isEmitCompact(),
             wireArgs.isJavaInterop()
         );
-        try {
-            compiler.compile();
-        } catch (Exception e) {
-            commandLine.getErr().printf(e.getMessage());
-        }
+        compiler.compile();
     }
 
     public static void main(String[] args) {

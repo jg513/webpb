@@ -139,7 +139,7 @@ public class WebpbCompiler {
         return schema;
     }
 
-    private List<String> resolveFiles(List<Path> directories) throws IOException {
+    public static List<String> resolveFiles(List<Path> directories) throws IOException {
         List<String> files = new ArrayList<>();
         for (Path directory : directories) {
             Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
