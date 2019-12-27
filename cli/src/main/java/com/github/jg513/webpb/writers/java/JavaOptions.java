@@ -84,10 +84,6 @@ public class JavaOptions {
     }
 
     public Optional<Name> getName(String identifier) {
-        Name name = nameMap.get(identifier);
-        if (name == null) {
-            return Optional.empty();
-        }
-        return Optional.of(name.clone());
+        return Optional.ofNullable(nameMap.get(identifier));
     }
 }

@@ -1,5 +1,6 @@
 package com.github.jg513.webpb.core;
 
+import com.github.jg513.webpb.core.specs.PendingSpec;
 import com.github.jg513.webpb.log.Logger;
 import com.squareup.wire.schema.Schema;
 import lombok.Builder;

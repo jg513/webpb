@@ -16,202 +16,221 @@ import java.lang.Override;
 import java.lang.String;
 import java.lang.StringBuilder;
 import okio.ByteString;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
+@Getter
+@Setter
+@Accessors(chain = true)
 public final class PagingPb extends Message<PagingPb, PagingPb.Builder> {
-  public static final ProtoAdapter<PagingPb> ADAPTER = new ProtoAdapter_PagingPb();
 
-  private static final long serialVersionUID = 0L;
+    public static final ProtoAdapter<PagingPb> ADAPTER = new ProtoAdapter_PagingPb();
 
-  public static final Integer DEFAULT_PAGE = 0;
+    private static final long serialVersionUID = 0L;
 
-  public static final Integer DEFAULT_SIZE = 0;
+    public static final Integer DEFAULT_PAGE = 0;
 
-  public static final Integer DEFAULT_TOTALCOUNT = 0;
+    public static final Integer DEFAULT_SIZE = 0;
 
-  public static final Integer DEFAULT_TOTALPAGE = 0;
+    public static final Integer DEFAULT_TOTALCOUNT = 0;
 
-  @WireField(
-      tag = 1,
-      adapter = "com.squareup.wire.ProtoAdapter#INT32",
-      label = WireField.Label.REQUIRED
-  )
-  public final Integer page;
+    public static final Integer DEFAULT_TOTALPAGE = 0;
 
-  @WireField(
-      tag = 2,
-      adapter = "com.squareup.wire.ProtoAdapter#INT32",
-      label = WireField.Label.REQUIRED
-  )
-  public final Integer size;
+    @WireField(
+            tag = 1,
+            adapter = "com.squareup.wire.ProtoAdapter#INT32",
+            label = WireField.Label.REQUIRED)
+    private Integer page;
 
-  @WireField(
-      tag = 3,
-      adapter = "com.squareup.wire.ProtoAdapter#INT32",
-      label = WireField.Label.REQUIRED
-  )
-  public final Integer totalCount;
+    @WireField(
+            tag = 2,
+            adapter = "com.squareup.wire.ProtoAdapter#INT32",
+            label = WireField.Label.REQUIRED)
+    private Integer size;
 
-  @WireField(
-      tag = 4,
-      adapter = "com.squareup.wire.ProtoAdapter#INT32",
-      label = WireField.Label.REQUIRED
-  )
-  public final Integer totalPage;
+    @WireField(
+            tag = 3,
+            adapter = "com.squareup.wire.ProtoAdapter#INT32",
+            label = WireField.Label.REQUIRED)
+    private Integer totalCount;
 
-  public PagingPb(Integer page, Integer size, Integer totalCount, Integer totalPage) {
-    this(page, size, totalCount, totalPage, ByteString.EMPTY);
-  }
+    @WireField(
+            tag = 4,
+            adapter = "com.squareup.wire.ProtoAdapter#INT32",
+            label = WireField.Label.REQUIRED)
+    private Integer totalPage;
 
-  public PagingPb(Integer page, Integer size, Integer totalCount, Integer totalPage,
-      ByteString unknownFields) {
-    super(ADAPTER, unknownFields);
-    this.page = page;
-    this.size = size;
-    this.totalCount = totalCount;
-    this.totalPage = totalPage;
-  }
-
-  @Override
-  public Builder newBuilder() {
-    Builder builder = new Builder();
-    builder.page = page;
-    builder.size = size;
-    builder.totalCount = totalCount;
-    builder.totalPage = totalPage;
-    builder.addUnknownFields(unknownFields());
-    return builder;
-  }
-
-  @Override
-  public boolean equals(Object other) {
-    if (other == this) return true;
-    if (!(other instanceof PagingPb)) return false;
-    PagingPb o = (PagingPb) other;
-    return unknownFields().equals(o.unknownFields())
-        && page.equals(o.page)
-        && size.equals(o.size)
-        && totalCount.equals(o.totalCount)
-        && totalPage.equals(o.totalPage);
-  }
-
-  @Override
-  public int hashCode() {
-    int result = super.hashCode;
-    if (result == 0) {
-      result = unknownFields().hashCode();
-      result = result * 37 + page.hashCode();
-      result = result * 37 + size.hashCode();
-      result = result * 37 + totalCount.hashCode();
-      result = result * 37 + totalPage.hashCode();
-      super.hashCode = result;
-    }
-    return result;
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder builder = new StringBuilder();
-    builder.append(", page=").append(page);
-    builder.append(", size=").append(size);
-    builder.append(", totalCount=").append(totalCount);
-    builder.append(", totalPage=").append(totalPage);
-    return builder.replace(0, 2, "PagingPb{").append('}').toString();
-  }
-
-  public static final class Builder extends Message.Builder<PagingPb, Builder> {
-    public Integer page;
-
-    public Integer size;
-
-    public Integer totalCount;
-
-    public Integer totalPage;
-
-    public Builder() {
+    public PagingPb(Integer page, Integer size, Integer totalCount, Integer totalPage) {
+        this(page, size, totalCount, totalPage, ByteString.EMPTY);
     }
 
-    public Builder page(Integer page) {
-      this.page = page;
-      return this;
-    }
-
-    public Builder size(Integer size) {
-      this.size = size;
-      return this;
-    }
-
-    public Builder totalCount(Integer totalCount) {
-      this.totalCount = totalCount;
-      return this;
-    }
-
-    public Builder totalPage(Integer totalPage) {
-      this.totalPage = totalPage;
-      return this;
+    public PagingPb(
+            Integer page,
+            Integer size,
+            Integer totalCount,
+            Integer totalPage,
+            ByteString unknownFields) {
+        super(ADAPTER, unknownFields);
+        this.page = page;
+        this.size = size;
+        this.totalCount = totalCount;
+        this.totalPage = totalPage;
     }
 
     @Override
-    public PagingPb build() {
-      if (page == null
-          || size == null
-          || totalCount == null
-          || totalPage == null) {
-        throw Internal.missingRequiredFields(page, "page",
-            size, "size",
-            totalCount, "totalCount",
-            totalPage, "totalPage");
-      }
-      return new PagingPb(page, size, totalCount, totalPage, super.buildUnknownFields());
-    }
-  }
-
-  private static final class ProtoAdapter_PagingPb extends ProtoAdapter<PagingPb> {
-    public ProtoAdapter_PagingPb() {
-      super(FieldEncoding.LENGTH_DELIMITED, PagingPb.class);
+    public Builder newBuilder() {
+        Builder builder = new Builder();
+        builder.page = page;
+        builder.size = size;
+        builder.totalCount = totalCount;
+        builder.totalPage = totalPage;
+        builder.addUnknownFields(unknownFields());
+        return builder;
     }
 
     @Override
-    public int encodedSize(PagingPb value) {
-      return ProtoAdapter.INT32.encodedSizeWithTag(1, value.page)
-          + ProtoAdapter.INT32.encodedSizeWithTag(2, value.size)
-          + ProtoAdapter.INT32.encodedSizeWithTag(3, value.totalCount)
-          + ProtoAdapter.INT32.encodedSizeWithTag(4, value.totalPage)
-          + value.unknownFields().size();
+    public boolean equals(Object other) {
+        if (other == this) return true;
+        if (!(other instanceof PagingPb)) return false;
+        PagingPb o = (PagingPb) other;
+        return unknownFields().equals(o.unknownFields())
+                && page.equals(o.page)
+                && size.equals(o.size)
+                && totalCount.equals(o.totalCount)
+                && totalPage.equals(o.totalPage);
     }
 
     @Override
-    public void encode(ProtoWriter writer, PagingPb value) throws IOException {
-      ProtoAdapter.INT32.encodeWithTag(writer, 1, value.page);
-      ProtoAdapter.INT32.encodeWithTag(writer, 2, value.size);
-      ProtoAdapter.INT32.encodeWithTag(writer, 3, value.totalCount);
-      ProtoAdapter.INT32.encodeWithTag(writer, 4, value.totalPage);
-      writer.writeBytes(value.unknownFields());
-    }
-
-    @Override
-    public PagingPb decode(ProtoReader reader) throws IOException {
-      Builder builder = new Builder();
-      long token = reader.beginMessage();
-      for (int tag; (tag = reader.nextTag()) != -1;) {
-        switch (tag) {
-          case 1: builder.page(ProtoAdapter.INT32.decode(reader)); break;
-          case 2: builder.size(ProtoAdapter.INT32.decode(reader)); break;
-          case 3: builder.totalCount(ProtoAdapter.INT32.decode(reader)); break;
-          case 4: builder.totalPage(ProtoAdapter.INT32.decode(reader)); break;
-          default: {
-            reader.readUnknownField(tag);
-          }
+    public int hashCode() {
+        int result = super.hashCode;
+        if (result == 0) {
+            result = unknownFields().hashCode();
+            result = result * 37 + page.hashCode();
+            result = result * 37 + size.hashCode();
+            result = result * 37 + totalCount.hashCode();
+            result = result * 37 + totalPage.hashCode();
+            super.hashCode = result;
         }
-      }
-      builder.addUnknownFields(reader.endMessageAndGetUnknownFields(token));
-      return builder.build();
+        return result;
     }
 
     @Override
-    public PagingPb redact(PagingPb value) {
-      Builder builder = value.newBuilder();
-      builder.clearUnknownFields();
-      return builder.build();
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(", page=").append(page);
+        builder.append(", size=").append(size);
+        builder.append(", totalCount=").append(totalCount);
+        builder.append(", totalPage=").append(totalPage);
+        return builder.replace(0, 2, "PagingPb{").append('}').toString();
     }
-  }
+
+    public static final class Builder extends Message.Builder<PagingPb, Builder> {
+
+        public Integer page;
+
+        public Integer size;
+
+        public Integer totalCount;
+
+        public Integer totalPage;
+
+        public Builder() {}
+
+        public Builder page(Integer page) {
+            this.page = page;
+            return this;
+        }
+
+        public Builder size(Integer size) {
+            this.size = size;
+            return this;
+        }
+
+        public Builder totalCount(Integer totalCount) {
+            this.totalCount = totalCount;
+            return this;
+        }
+
+        public Builder totalPage(Integer totalPage) {
+            this.totalPage = totalPage;
+            return this;
+        }
+
+        @Override
+        public PagingPb build() {
+            if (page == null || size == null || totalCount == null || totalPage == null) {
+                throw Internal.missingRequiredFields(
+                        page,
+                        "page",
+                        size,
+                        "size",
+                        totalCount,
+                        "totalCount",
+                        totalPage,
+                        "totalPage");
+            }
+            return new PagingPb(page, size, totalCount, totalPage, super.buildUnknownFields());
+        }
+    }
+
+    private static final class ProtoAdapter_PagingPb extends ProtoAdapter<PagingPb> {
+
+        public ProtoAdapter_PagingPb() {
+            super(FieldEncoding.LENGTH_DELIMITED, PagingPb.class);
+        }
+
+        @Override
+        public int encodedSize(PagingPb value) {
+            return ProtoAdapter.INT32.encodedSizeWithTag(1, value.page)
+                    + ProtoAdapter.INT32.encodedSizeWithTag(2, value.size)
+                    + ProtoAdapter.INT32.encodedSizeWithTag(3, value.totalCount)
+                    + ProtoAdapter.INT32.encodedSizeWithTag(4, value.totalPage)
+                    + value.unknownFields().size();
+        }
+
+        @Override
+        public void encode(ProtoWriter writer, PagingPb value) throws IOException {
+            ProtoAdapter.INT32.encodeWithTag(writer, 1, value.page);
+            ProtoAdapter.INT32.encodeWithTag(writer, 2, value.size);
+            ProtoAdapter.INT32.encodeWithTag(writer, 3, value.totalCount);
+            ProtoAdapter.INT32.encodeWithTag(writer, 4, value.totalPage);
+            writer.writeBytes(value.unknownFields());
+        }
+
+        @Override
+        public PagingPb decode(ProtoReader reader) throws IOException {
+            Builder builder = new Builder();
+            long token = reader.beginMessage();
+            for (int tag; (tag = reader.nextTag()) != -1; ) {
+                switch (tag) {
+                    case 1:
+                        builder.page(ProtoAdapter.INT32.decode(reader));
+                        break;
+                    case 2:
+                        builder.size(ProtoAdapter.INT32.decode(reader));
+                        break;
+                    case 3:
+                        builder.totalCount(ProtoAdapter.INT32.decode(reader));
+                        break;
+                    case 4:
+                        builder.totalPage(ProtoAdapter.INT32.decode(reader));
+                        break;
+                    default:
+                        {
+                            reader.readUnknownField(tag);
+                        }
+                }
+            }
+            builder.addUnknownFields(reader.endMessageAndGetUnknownFields(token));
+            return builder.build();
+        }
+
+        @Override
+        public PagingPb redact(PagingPb value) {
+            Builder builder = value.newBuilder();
+            builder.clearUnknownFields();
+            return builder.build();
+        }
+    }
 }

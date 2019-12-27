@@ -1,9 +1,9 @@
 package com.github.jg513.webpb;
 
 import com.github.jg513.webpb.writers.wire.WireArgs;
+import com.github.jg513.webpb.writers.wire.WireCompiler;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.kotlinpoet.FileSpec;
-import com.squareup.wire.WireCompiler;
 import com.squareup.wire.WireLogger;
 import com.squareup.wire.schema.ProtoType;
 import com.squareup.wire.schema.PruningRules;
@@ -71,6 +71,7 @@ public class Main implements Runnable {
             })
             .setProtoPaths(Collections.singletonList("../example/proto"))
             .setJavaOut("../example/out")
+//            .setJavaOut("src/main/java")
             .setSourceFileNames(Collections.singletonList("Store.proto"))
             .setPruningRules(new PruningRules.Builder()
                 .build()
@@ -93,7 +94,7 @@ public class Main implements Runnable {
         try {
             compiler.compile();
         } catch (Exception e) {
-            commandLine.getOut().println(e.getMessage());
+            commandLine.getErr().printf(e.getMessage());
         }
     }
 

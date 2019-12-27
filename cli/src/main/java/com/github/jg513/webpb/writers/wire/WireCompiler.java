@@ -1,8 +1,9 @@
 package com.github.jg513.webpb.writers.wire;
 
-import com.github.jg513.webpb.writers.wire.specs.PendingFileSpec;
-import com.github.jg513.webpb.writers.wire.specs.PendingServiceFileSpec;
-import com.github.jg513.webpb.writers.wire.specs.PendingTypeFileSpec;
+import com.github.jg513.webpb.core.context.SchemaContext;
+import com.github.jg513.webpb.core.specs.PendingServiceSpec;
+import com.github.jg513.webpb.core.specs.PendingSpec;
+import com.github.jg513.webpb.core.specs.PendingTypeSpec;
 import com.squareup.wire.WireLogger;
 import com.squareup.wire.java.JavaGenerator;
 import com.squareup.wire.java.Profile;
@@ -115,7 +116,7 @@ public class WireCompiler {
             pruningRules.unusedExcludes().forEach(v -> log.info("Unused exclude: " + v));
         }
 
-        AbstractQueue<PendingFileSpec> queue = new ConcurrentLinkedQueue<>();
+        AbstractQueue<PendingSpec> queue = new ConcurrentLinkedQueue<>();
         for (ProtoFile protoFile : schema.getProtoFiles()) {
             String path = protoFile.getLocation().getPath();
             if (!sourceFileNames.isEmpty() && !sourceFileNames.contains(path)) {
@@ -124,11 +125,11 @@ public class WireCompiler {
                 }
             }
             queue.addAll(protoFile.getTypes().stream()
-                .map(PendingTypeFileSpec::new)
+                .map(type -> new PendingTypeSpec(protoFile, type))
                 .collect(Collectors.toList())
             );
             queue.addAll(protoFile.getServices().stream()
-                .map(PendingServiceFileSpec::new)
+                .map(service -> new PendingServiceSpec(protoFile, service))
                 .collect(Collectors.toList())
             );
         }
@@ -148,12 +149,13 @@ public class WireCompiler {
                 .withAndroidAnnotations(emitAndroidAnnotations)
                 .withCompact(emitCompact);
 
-            ConcurrentLinkedQueue<PendingTypeFileSpec> types = queue.stream()
-                .filter(v -> v instanceof PendingTypeFileSpec)
-                .map(v -> (PendingTypeFileSpec) v)
+            ConcurrentLinkedQueue<PendingTypeSpec> types = queue.stream()
+                .filter(v -> v instanceof PendingTypeSpec)
+                .map(v -> (PendingTypeSpec) v)
                 .collect(Collectors.toCollection(ConcurrentLinkedQueue::new));
+            SchemaContext context = new SchemaContext(schema);
             for (int i = 0; i < MAX_WRITE_CONCURRENCY; i++) {
-                Callable<Unit> task = new JavaFileWriter(javaOut, javaGenerator, types, dryRun, fs, log);
+                Callable<Unit> task = new JavaFileWriter(context, javaOut, javaGenerator, types, dryRun, fs, log);
                 futures.add(executor.submit(task));
             }
         } else {

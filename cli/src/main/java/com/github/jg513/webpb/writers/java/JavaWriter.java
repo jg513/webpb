@@ -4,7 +4,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.PackageDeclaration;
 import com.github.jg513.webpb.core.CodeWriter;
 import com.github.jg513.webpb.core.CodeWriterContext;
-import com.github.jg513.webpb.core.PendingSpec;
+import com.github.jg513.webpb.core.specs.PendingSpec;
 import com.github.jg513.webpb.core.Utils;
 import com.github.jg513.webpb.core.options.MessageOptions;
 import com.github.jg513.webpb.core.specs.PendingTypeSpec;
@@ -38,7 +38,7 @@ public class JavaWriter extends CodeWriter {
             if (!(spec instanceof PendingTypeSpec)) {
                 continue;
             }
-            ProtoFile file = ((PendingTypeSpec) spec).getFile();
+            ProtoFile file = ((PendingTypeSpec) spec).getProtoFile();
             Type type = ((PendingTypeSpec) spec).getType();
             if (type instanceof MessageType && !context.getTags().isEmpty()) {
                 List<String> tags = (List<String>) type.getOptions().get(MessageOptions.TAG);

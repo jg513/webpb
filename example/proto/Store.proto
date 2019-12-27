@@ -22,6 +22,7 @@ message StoreRequest {
 
     required int32 id = 1 [(omitted) = true];
     required string email = 2 [(java_anno) = '@Pattern(regexp = Const.EMAIL_REGEX)'];
+    required bool valid = 3;
 }
 
 message StoreResponse {

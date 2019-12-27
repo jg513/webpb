@@ -2,7 +2,8 @@ package com.github.jg513.webpb.writers.wire;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.PackageDeclaration;
-import com.github.jg513.webpb.writers.wire.specs.PendingTypeFileSpec;
+import com.github.jg513.webpb.core.context.SchemaContext;
+import com.github.jg513.webpb.core.specs.PendingTypeSpec;
 import com.google.googlejavaformat.java.Formatter;
 import com.google.googlejavaformat.java.JavaFormatterOptions;
 import com.squareup.javapoet.ClassName;
@@ -18,16 +19,19 @@ import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 @RequiredArgsConstructor
 public class JavaFileWriter implements Callable<Unit> {
+    private final SchemaContext context;
+
     private final String destination;
 
     private final JavaGenerator javaGenerator;
 
-    private final ConcurrentLinkedQueue<PendingTypeFileSpec> queue;
+    private final ConcurrentLinkedQueue<PendingTypeSpec> queue;
 
     private final boolean dryRun;
 
@@ -44,7 +48,7 @@ public class JavaFileWriter implements Callable<Unit> {
     @Override
     public Unit call() throws Exception {
         while (true) {
-            PendingTypeFileSpec spec = queue.poll();
+            PendingTypeSpec spec = queue.poll();
             if (spec == null || spec.getType() == null) {
                 return null;
             }
@@ -62,16 +66,14 @@ public class JavaFileWriter implements Callable<Unit> {
                 return null;
             }
             try {
-                CompilationUnit unit = javaParserFilter.filter(javaFile.toString());
+                CompilationUnit unit = this.context.fileContext(spec.getProtoFile())
+                    .flatMap(fileContext -> fileContext.typeContext(type))
+                    .flatMap(typeContext -> Optional.of(
+                        javaParserFilter.filter(typeContext, javaFile.toString())
+                    ))
+                    .get();
                 if (unit.getPackageDeclaration().isPresent()) {
-                    PackageDeclaration declaration = unit.getPackageDeclaration().get();
-                    String packageName = declaration.getName().asString();
-                    if (!packageName.isEmpty()) {
-                        for (String packageComponent : packageName.split("\\.")) {
-                            path = path.resolve(packageComponent);
-                        }
-                        Files.createDirectories(path);
-                    }
+                    path = createDirectories(path, unit.getPackageDeclaration().get());
                 }
                 Path out = path.resolve(typeSpec.name + ".java");
                 String content = formatter.formatSource(unit.toString());
@@ -82,5 +84,16 @@ public class JavaFileWriter implements Callable<Unit> {
                         javaFile.packageName, javaFile.typeSpec.name, destination), e);
             }
         }
+    }
+
+    private Path createDirectories(Path path, PackageDeclaration declaration) throws IOException {
+        String packageName = declaration.getName().asString();
+        if (!packageName.isEmpty()) {
+            for (String packageComponent : packageName.split("\\.")) {
+                path = path.resolve(packageComponent);
+            }
+            Files.createDirectories(path);
+        }
+        return path;
     }
 }

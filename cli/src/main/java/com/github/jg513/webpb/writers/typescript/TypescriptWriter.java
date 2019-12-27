@@ -2,7 +2,7 @@ package com.github.jg513.webpb.writers.typescript;
 
 import com.github.jg513.webpb.core.CodeWriter;
 import com.github.jg513.webpb.core.CodeWriterContext;
-import com.github.jg513.webpb.core.PendingSpec;
+import com.github.jg513.webpb.core.specs.PendingSpec;
 import com.github.jg513.webpb.core.specs.PendingFileSpec;
 import com.squareup.wire.schema.ProtoFile;
 

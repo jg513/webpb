@@ -2,6 +2,7 @@ package com.github.jg513.webpb.core;
 
 import com.github.jg513.webpb.core.specs.PendingFileSpec;
 import com.github.jg513.webpb.core.specs.PendingServiceSpec;
+import com.github.jg513.webpb.core.specs.PendingSpec;
 import com.github.jg513.webpb.core.specs.PendingTypeSpec;
 import com.github.jg513.webpb.log.Logger;
 import com.github.jg513.webpb.writers.java.JavaWriter;
@@ -100,7 +101,7 @@ public class WebpbCompiler {
         executor.shutdown();
 
         try {
-            for (Future future : futures) {
+            for (Future<?> future : futures) {
                 future.get();
             }
         } catch (ExecutionException e) {
