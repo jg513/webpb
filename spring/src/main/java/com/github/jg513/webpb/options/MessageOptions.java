@@ -1,30 +1,27 @@
-package com.google.protobuf;
+package com.github.jg513.webpb.options;
 
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 public class MessageOptions {
-    private boolean omitted;
-
     private String method;
 
     private String path;
 
-    private String javaAnnotation;
+    private List<String> tags;
+
+    private List<String> javaAnnotations;
 
     public static class Builder {
-        private boolean omitted;
-
         private String method;
 
         private String path;
 
-        private String javaAnnotation;
+        private List<String> tags;
 
-        public Builder omitted(boolean omitted) {
-            this.omitted = omitted;
-            return this;
-        }
+        private List<String> javaAnnotations;
 
         public Builder method(String method) {
             this.method = method;
@@ -36,17 +33,22 @@ public class MessageOptions {
             return this;
         }
 
-        public Builder java_anno(String javaAnnotation) {
-            this.javaAnnotation = javaAnnotation;
+        public Builder tags(List<String> tags) {
+            this.tags = tags;
+            return this;
+        }
+
+        public Builder javaAnnotations(List<String> javaAnnotations) {
+            this.javaAnnotations = javaAnnotations;
             return this;
         }
 
         public MessageOptions build() {
             MessageOptions v = new MessageOptions();
-            v.omitted = this.omitted;
             v.method = this.method;
             v.path = this.path;
-            v.javaAnnotation = this.javaAnnotation;
+            v.tags = this.tags;
+            v.javaAnnotations = this.javaAnnotations;
             return v;
         }
     }

@@ -2,8 +2,8 @@
 // Source file: Store.proto
 package com.github.jg513.example.store;
 
-import com.google.protobuf.FieldOptions;
-import com.google.protobuf.MessageOptions;
+import com.github.jg513.webpb.options.FieldOptions;
+import com.github.jg513.webpb.options.MessageOptions;
 import com.squareup.wire.FieldEncoding;
 import com.squareup.wire.Message;
 import com.squareup.wire.ProtoAdapter;
@@ -43,7 +43,7 @@ public final class StoreRequest extends Message<StoreRequest, StoreRequest.Build
 
     public static final FieldOptions FIELD_OPTIONS_EMAIL =
             new FieldOptions.Builder()
-                    .java_anno(Arrays.asList("@Pattern(regexp = Const.EMAIL_REGEX)"))
+                    .javaAnnotation(Arrays.asList("@Pattern(regexp = Const.EMAIL_REGEX)"))
                     .build();
 
     public static final Integer DEFAULT_ID = 0;

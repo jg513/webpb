@@ -3,8 +3,8 @@
 package com.github.jg513.example.store;
 
 import com.github.jg513.example.resource.PageablePb;
-import com.google.protobuf.FieldOptions;
-import com.google.protobuf.MessageOptions;
+import com.github.jg513.webpb.options.FieldOptions;
+import com.github.jg513.webpb.options.MessageOptions;
 import com.squareup.wire.FieldEncoding;
 import com.squareup.wire.Message;
 import com.squareup.wire.ProtoAdapter;
@@ -49,7 +49,7 @@ public final class StoresRequest extends Message<StoresRequest, StoresRequest.Bu
 
     public static final FieldOptions FIELD_OPTIONS_CITY =
             new FieldOptions.Builder()
-                    .java_anno(
+                    .javaAnnotation(
                             Arrays.asList(
                                     "@NotNull(message = \"City is required\")", "@Range(min = 0)"))
                     .build();

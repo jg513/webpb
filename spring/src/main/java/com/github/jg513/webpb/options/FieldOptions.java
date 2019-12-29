@@ -1,4 +1,4 @@
-package com.google.protobuf;
+package com.github.jg513.webpb.options;
 
 import lombok.Getter;
 
@@ -20,8 +20,8 @@ public class FieldOptions {
             return this;
         }
 
-        public Builder java_anno(List<String> java_anno) {
-            this.javaAnnotations = java_anno;
+        public Builder javaAnnotations(List<String> javaAnnotations) {
+            this.javaAnnotations = javaAnnotations;
             return this;
         }
 

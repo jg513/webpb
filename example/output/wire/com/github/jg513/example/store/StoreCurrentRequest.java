@@ -2,7 +2,7 @@
 // Source file: Store.proto
 package com.github.jg513.example.store;
 
-import com.google.protobuf.MessageOptions;
+import com.github.jg513.webpb.options.MessageOptions;
 import com.squareup.wire.FieldEncoding;
 import com.squareup.wire.Message;
 import com.squareup.wire.ProtoAdapter;

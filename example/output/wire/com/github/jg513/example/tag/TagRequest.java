@@ -2,7 +2,7 @@
 // Source file: Tag.proto
 package com.github.jg513.example.tag;
 
-import com.google.protobuf.MessageOptions;
+import com.github.jg513.webpb.options.MessageOptions;
 import com.squareup.wire.FieldEncoding;
 import com.squareup.wire.Message;
 import com.squareup.wire.ProtoAdapter;
@@ -32,7 +32,7 @@ public final class TagRequest extends Message<TagRequest, TagRequest.Builder> {
             new MessageOptions.Builder()
                     .method("GET")
                     .path("/tag")
-                    .tag(Arrays.asList("java", "other"))
+                    .tags(Arrays.asList("java", "other"))
                     .build();
 
     public TagRequest() {

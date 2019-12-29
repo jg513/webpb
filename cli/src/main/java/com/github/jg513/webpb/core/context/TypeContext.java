@@ -15,6 +15,8 @@ import java.util.Optional;
 
 @Getter
 public class TypeContext {
+    private Type type;
+
     private Map<String, FieldContext> fieldContexts = new HashMap<>();
 
     private SchemaContext context;
@@ -32,6 +34,7 @@ public class TypeContext {
     private boolean setter;
 
     public TypeContext(FileContext fileContext, Type type) {
+        this.type = type;
         this.context = fileContext.getContext();
         this.fileContext = fileContext;
         this.getter = fileContext.isGetter();

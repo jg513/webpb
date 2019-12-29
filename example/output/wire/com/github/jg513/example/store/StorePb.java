@@ -2,7 +2,7 @@
 // Source file: Store.proto
 package com.github.jg513.example.store;
 
-import com.google.protobuf.MessageOptions;
+import com.github.jg513.webpb.options.MessageOptions;
 import com.squareup.wire.FieldEncoding;
 import com.squareup.wire.Message;
 import com.squareup.wire.ProtoAdapter;
@@ -36,7 +36,7 @@ public final class StorePb extends Message<StorePb, StorePb.Builder> {
 
     public static final MessageOptions MESSAGE_OPTIONS =
             new MessageOptions.Builder()
-                    .java_anno(Arrays.asList("@JsonInclude(Include.NON_NULL)"))
+                    .javaAnnotation(Arrays.asList("@JsonInclude(Include.NON_NULL)"))
                     .build();
 
     public static final Integer DEFAULT_ID = 0;

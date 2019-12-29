@@ -6,13 +6,7 @@ import com.squareup.wire.EnumAdapter;
 import com.squareup.wire.ProtoAdapter;
 import com.squareup.wire.WireEnum;
 import java.lang.Override;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 
-@Getter
-@Setter
-@Accessors(chain = true)
 public enum ErrorCode implements WireEnum {
     OK(0),
     ERROR(1);
