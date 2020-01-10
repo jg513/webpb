@@ -16,13 +16,13 @@ import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.StringBuilder;
-import java.util.Arrays;
 import okio.ByteString;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import java.util.Collections;
 
 @Getter
 @Setter
@@ -36,7 +36,7 @@ public final class StorePb extends Message<StorePb, StorePb.Builder> {
 
     public static final MessageOptions MESSAGE_OPTIONS =
             new MessageOptions.Builder()
-                    .javaAnnotation(Arrays.asList("@JsonInclude(Include.NON_NULL)"))
+                    .javaAnnotations(Collections.singletonList("@JsonInclude(Include.NON_NULL)"))
                     .build();
 
     public static final Integer DEFAULT_ID = 0;
@@ -62,6 +62,10 @@ public final class StorePb extends Message<StorePb, StorePb.Builder> {
             adapter = "com.squareup.wire.ProtoAdapter#INT32",
             label = WireField.Label.REQUIRED)
     private Integer city;
+
+    public StorePb() {
+        super(ADAPTER, ByteString.EMPTY);
+    }
 
     public StorePb(Integer id, String name, Integer city) {
         this(id, name, city, ByteString.EMPTY);

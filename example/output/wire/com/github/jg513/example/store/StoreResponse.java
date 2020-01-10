@@ -40,6 +40,10 @@ public final class StoreResponse extends Message<StoreResponse, StoreResponse.Bu
             label = WireField.Label.REQUIRED)
     private StoreNestedPb nested;
 
+    public StoreResponse() {
+        super(ADAPTER, ByteString.EMPTY);
+    }
+
     public StoreResponse(StorePb store, StoreNestedPb nested) {
         this(store, nested, ByteString.EMPTY);
     }

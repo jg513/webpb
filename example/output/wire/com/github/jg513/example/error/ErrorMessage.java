@@ -41,6 +41,10 @@ public final class ErrorMessage extends Message<ErrorMessage, ErrorMessage.Build
     @WireField(tag = 2, adapter = "com.squareup.wire.ProtoAdapter#STRING")
     private String message;
 
+    public ErrorMessage() {
+        super(ADAPTER, ByteString.EMPTY);
+    }
+
     public ErrorMessage(ErrorCode code, String message) {
         this(code, message, ByteString.EMPTY);
     }

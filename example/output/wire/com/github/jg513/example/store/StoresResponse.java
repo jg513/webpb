@@ -41,6 +41,10 @@ public final class StoresResponse extends Message<StoresResponse, StoresResponse
             label = WireField.Label.REQUIRED)
     private PagingPb paging;
 
+    public StoresResponse() {
+        super(ADAPTER, ByteString.EMPTY);
+    }
+
     public StoresResponse(StorePb stores, PagingPb paging) {
         this(stores, paging, ByteString.EMPTY);
     }

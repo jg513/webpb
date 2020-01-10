@@ -1,5 +1,6 @@
-package com.github.jg513.webpb;
+package com.github.jg513.webpb.mvc;
 
+import com.squareup.wire.Message;
 import org.springframework.core.annotation.AliasFor;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -13,7 +14,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @RequestMapping
-public @interface WebpbMapping {
+public @interface WebpbRequestMapping {
     @AliasFor(annotation = RequestMapping.class)
     String name() default "";
 
@@ -32,5 +33,5 @@ public @interface WebpbMapping {
     @AliasFor(annotation = RequestMapping.class)
     String[] produces() default {};
 
-    Class<? extends WebpbMessage> request() default WebpbMessage.class;
+    Class<? extends Message> message() default Message.class;
 }

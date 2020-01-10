@@ -50,6 +50,10 @@ public final class PageablePb extends Message<PageablePb, PageablePb.Builder> {
     @WireField(tag = 4, adapter = "com.squareup.wire.ProtoAdapter#STRING")
     private String sort;
 
+    public PageablePb() {
+        super(ADAPTER, ByteString.EMPTY);
+    }
+
     public PageablePb(Boolean pagination, Integer page, Integer size, String sort) {
         this(pagination, page, size, sort, ByteString.EMPTY);
     }

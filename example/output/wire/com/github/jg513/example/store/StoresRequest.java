@@ -18,13 +18,13 @@ import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.StringBuilder;
-import java.util.Arrays;
 import okio.ByteString;
 import javax.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Range;
+import java.util.Arrays;
 
 @Getter
 @Setter
@@ -49,7 +49,7 @@ public final class StoresRequest extends Message<StoresRequest, StoresRequest.Bu
 
     public static final FieldOptions FIELD_OPTIONS_CITY =
             new FieldOptions.Builder()
-                    .javaAnnotation(
+                    .javaAnnotations(
                             Arrays.asList(
                                     "@NotNull(message = \"City is required\")", "@Range(min = 0)"))
                     .build();
@@ -77,6 +77,10 @@ public final class StoresRequest extends Message<StoresRequest, StoresRequest.Bu
     @NotNull(message = "City is required")
     @Range(min = 0)
     private Integer city;
+
+    public StoresRequest() {
+        super(ADAPTER, ByteString.EMPTY);
+    }
 
     public StoresRequest(PageablePb pageable, Integer type, Integer city) {
         this(pageable, type, city, ByteString.EMPTY);

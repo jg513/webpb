@@ -61,6 +61,10 @@ public final class PagingPb extends Message<PagingPb, PagingPb.Builder> {
             label = WireField.Label.REQUIRED)
     private Integer totalPage;
 
+    public PagingPb() {
+        super(ADAPTER, ByteString.EMPTY);
+    }
+
     public PagingPb(Integer page, Integer size, Integer totalCount, Integer totalPage) {
         this(page, size, totalCount, totalPage, ByteString.EMPTY);
     }

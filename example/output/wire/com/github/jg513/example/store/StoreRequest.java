@@ -18,13 +18,13 @@ import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.StringBuilder;
-import java.util.Arrays;
 import okio.ByteString;
 import com.somewhere.Const;
 import javax.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import java.util.Collections;
 
 @Getter
 @Setter
@@ -43,7 +43,8 @@ public final class StoreRequest extends Message<StoreRequest, StoreRequest.Build
 
     public static final FieldOptions FIELD_OPTIONS_EMAIL =
             new FieldOptions.Builder()
-                    .javaAnnotation(Arrays.asList("@Pattern(regexp = Const.EMAIL_REGEX)"))
+                    .javaAnnotations(
+                            Collections.singletonList("@Pattern(regexp = Const.EMAIL_REGEX)"))
                     .build();
 
     public static final Integer DEFAULT_ID = 0;
@@ -70,6 +71,10 @@ public final class StoreRequest extends Message<StoreRequest, StoreRequest.Build
             adapter = "com.squareup.wire.ProtoAdapter#BOOL",
             label = WireField.Label.REQUIRED)
     private Boolean valid;
+
+    public StoreRequest() {
+        super(ADAPTER, ByteString.EMPTY);
+    }
 
     public StoreRequest(Integer id, String email, Boolean valid) {
         this(id, email, valid, ByteString.EMPTY);

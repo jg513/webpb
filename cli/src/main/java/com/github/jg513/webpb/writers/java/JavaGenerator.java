@@ -32,11 +32,11 @@ import com.github.javaparser.ast.type.ArrayType;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.type.Type;
-import com.github.jg513.webpb.WebpbMessage;
 import com.github.jg513.webpb.core.Const;
 import com.github.jg513.webpb.core.ParamGroup;
 import com.github.jg513.webpb.core.options.FieldOptions;
 import com.github.jg513.webpb.core.options.MessageOptions;
+import com.squareup.wire.Message;
 import com.squareup.wire.schema.EnclosingType;
 import com.squareup.wire.schema.EnumConstant;
 import com.squareup.wire.schema.EnumType;
@@ -126,8 +126,8 @@ public final class JavaGenerator {
         ClassOrInterfaceDeclaration declaration = new ClassOrInterfaceDeclaration();
         declaration.setName(type.getType().getSimpleName());
         declaration.addModifier(Modifier.Keyword.PUBLIC);
-        parser.parseName(WebpbMessage.class.getName()).ifSuccessful(imports::add);
-        declaration.addImplementedType(WebpbMessage.class);
+        parser.parseName(Message.class.getName()).ifSuccessful(imports::add);
+        declaration.addImplementedType(Message.class);
 
         generateTypeAnnotations(type, declaration, imports);
 
