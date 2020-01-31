@@ -4,13 +4,16 @@ import "google/protobuf/descriptor.proto";
 
 extend google.protobuf.FileOptions {
     repeated string java_import = 2000;
-    repeated string java_message_anno = 2001;
+
+    repeated string java_common_anno = 2001;
+
     optional bool java_setter = 2002;
+
     optional bool java_getter = 2003;
 }
 
 extend google.protobuf.MessageOptions {
-    optional bool omitted = 1000;
+    optional bool message_omitted = 1000;
 
     optional string method = 1001;
 
@@ -18,7 +21,7 @@ extend google.protobuf.MessageOptions {
 
     repeated string tag = 1003;
 
-    repeated string java_anno = 2000;
+    repeated string java_message_anno = 2000;
 }
 
 extend google.protobuf.FieldOptions {

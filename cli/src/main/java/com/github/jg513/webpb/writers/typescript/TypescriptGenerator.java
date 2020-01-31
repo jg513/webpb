@@ -35,11 +35,11 @@ final class TypescriptGenerator {
 
     private final List<String> tags;
 
-    private final StringBuilder builder;
-
     private Set<String> imports = new HashSet<>();
 
     private int level = 0;
+
+    private final StringBuilder builder;
 
     private static final Map<ProtoType, String> TYPES_MAP = new HashMap<ProtoType, String>() {{
         put(ProtoType.BOOL, "boolean");
@@ -59,6 +59,63 @@ final class TypescriptGenerator {
         put(ProtoType.UINT64, "number");
     }};
 
+    static Map<ProtoType, Integer> mapKeyTypes = new HashMap<ProtoType, Integer>() {{
+        put(ProtoType.INT32, 0);
+        put(ProtoType.UINT32, 0);
+        put(ProtoType.SINT32, 0);
+        put(ProtoType.FIXED32, 5);
+        put(ProtoType.SFIXED32, 5);
+        put(ProtoType.INT64, 0);
+        put(ProtoType.UINT64, 0);
+        put(ProtoType.SINT64, 0);
+        put(ProtoType.FIXED64, 1);
+        put(ProtoType.SFIXED64, 1);
+        put(ProtoType.BOOL, 0);
+        put(ProtoType.STRING, 2);
+    }};
+
+    static Map<ProtoType, Integer> basicTypes = new HashMap<ProtoType, Integer>() {{
+        put(ProtoType.DOUBLE, 1);
+        put(ProtoType.FLOAT, 5);
+        put(ProtoType.INT32, 0);
+        put(ProtoType.UINT32, 0);
+        put(ProtoType.SINT32, 0);
+        put(ProtoType.FIXED32, 5);
+        put(ProtoType.SFIXED32, 5);
+        put(ProtoType.INT64, 0);
+        put(ProtoType.UINT64, 0);
+        put(ProtoType.SINT64, 0);
+        put(ProtoType.FIXED64, 1);
+        put(ProtoType.SFIXED64, 1);
+        put(ProtoType.BOOL, 0);
+        put(ProtoType.STRING, 2);
+        put(ProtoType.BYTES, 2);
+    }};
+
+    static Map<ProtoType, Integer> packedTypes = new HashMap<ProtoType, Integer>() {{
+        put(ProtoType.DOUBLE, 1);
+        put(ProtoType.FLOAT, 5);
+        put(ProtoType.INT32, 0);
+        put(ProtoType.UINT32, 0);
+        put(ProtoType.SINT32, 0);
+        put(ProtoType.FIXED32, 5);
+        put(ProtoType.SFIXED32, 5);
+        put(ProtoType.INT64, 0);
+        put(ProtoType.UINT64, 0);
+        put(ProtoType.SINT64, 0);
+        put(ProtoType.FIXED64, 1);
+        put(ProtoType.SFIXED64, 1);
+        put(ProtoType.BOOL, 0);
+    }};
+
+    static Map<ProtoType, Integer> longTypes = new HashMap<ProtoType, Integer>() {{
+        put(ProtoType.INT64, 0);
+        put(ProtoType.UINT64, 0);
+        put(ProtoType.SINT64, 0);
+        put(ProtoType.FIXED64, 1);
+        put(ProtoType.SFIXED64, 1);
+    }};
+
     public boolean generate(ProtoFile protoFile) {
         String packageName = protoFile.getPackageName();
         if (generateTypes(packageName, protoFile.getTypes())) {
@@ -67,7 +124,9 @@ final class TypescriptGenerator {
                     builder.insert(0, "import { " + type + " } from './" + type + "';\n\n");
                 }
             }
+            builder.insert(0, "const $Reader = $protobuf.Reader, $Writer = $protobuf.Writer, $util = $protobuf.util;\n\n");
             builder.insert(0, "import { Webpb } from 'webpb';\n\n");
+            builder.insert(0, "import * as $protobuf from \"protobufjs\";\n");
             builder.insert(0, "// " + Const.GIT_URL + "\n\n");
             builder.insert(0, "// " + Const.HEADER + "\n");
             return true;
@@ -150,6 +209,8 @@ final class TypescriptGenerator {
                 generateMessageFields(type, false);
                 indent().append("META: () => Webpb.WebpbMeta;\n\n");
                 generateConstructor(type, className);
+                new Encoder(this, builder).generateEncode(type, className);
+                new Decoder(this, builder).generateEncode(type, className);
             });
             closeBracket();
         });
@@ -190,7 +251,6 @@ final class TypescriptGenerator {
             closeBracket();
             indent().append("static create(): ").append(className).append(" {\n");
             level(() -> indent().append("return new ").append(className).append("();\n"));
-            closeBracket();
         } else {
             String interfaceName = interfaceName(className);
             indent().append("private constructor(p: ").append(interfaceName).append(") {\n");
@@ -204,8 +264,8 @@ final class TypescriptGenerator {
             level(() -> indent().append("return new ")
                 .append(type.getType().getSimpleName())
                 .append("(properties").append(");\n"));
-            closeBracket();
         }
+        closeBracket();
     }
 
     private void initializeMeta(MessageType type) {
@@ -290,23 +350,6 @@ final class TypescriptGenerator {
         indent().append(key).append(": ").append(value == null ? "" : value).append(",\n");
     }
 
-    private void trimDuplicatedNewline() {
-        while (builder.length() > 1) {
-            if (builder.charAt(builder.length() - 1) != '\n') {
-                break;
-            }
-            if (builder.charAt(builder.length() - 2) != '\n') {
-                break;
-            }
-            builder.deleteCharAt(builder.length() - 1);
-        }
-    }
-
-    private void closeBracket() {
-        trimDuplicatedNewline();
-        indent().append("}\n\n");
-    }
-
     private String toTypeName(ProtoType protoType) {
         if (TYPES_MAP.containsKey(protoType)) {
             return TYPES_MAP.get(protoType);
@@ -320,20 +363,37 @@ final class TypescriptGenerator {
         }
     }
 
-    private void level(Handler handler) {
+    private void trimDuplicatedNewline() {
+        while (builder.length() > 1) {
+            if (builder.charAt(builder.length() - 1) != '\n') {
+                break;
+            }
+            if (builder.charAt(builder.length() - 2) != '\n') {
+                break;
+            }
+            builder.deleteCharAt(builder.length() - 1);
+        }
+    }
+
+    void closeBracket() {
+        trimDuplicatedNewline();
+        indent().append("}\n\n");
+    }
+
+    void level(Handler handler) {
         this.level++;
         handler.handle();
         this.level--;
     }
 
-    private StringBuilder indent() {
+    StringBuilder indent() {
         for (int i = 0; i < level; i++) {
             builder.append(INDENT);
         }
         return builder;
     }
 
-    private String interfaceName(String className) {
+    String interfaceName(String className) {
         return "I" + className;
     }
 }

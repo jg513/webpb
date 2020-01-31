@@ -12,9 +12,9 @@ option (java_import) = 'com.somewhere.Const';
 option (java_import) = 'com.fasterxml.jackson.annotation.JsonInclude';
 option (java_import) = 'com.fasterxml.jackson.annotation.JsonInclude.Include';
 
-option (java_message_anno) = '@Getter';
-option (java_message_anno) = '@Setter';
-option (java_message_anno) = '@Accessors(chain = true)';
+option (java_common_anno) = '@Getter';
+option (java_common_anno) = '@Setter';
+option (java_common_anno) = '@Accessors(chain = true)';
 
 option (java_getter) = false;
 option (java_setter) = false;

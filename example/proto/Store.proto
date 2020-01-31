@@ -8,11 +8,14 @@ import "Resource.proto";
 import "WebpbOptions.proto";
 
 message StorePb {
-    option (java_anno) = '@JsonInclude(Include.NON_NULL)';
+    option (java_message_anno) = '@JsonInclude(Include.NON_NULL)';
 
     required int32 id = 1;
     required string name = 2 [default = 'store'];
     required int32 city = 3 [default = 100];
+}
+
+message Project {
 }
 
 message StoreRequest {
@@ -22,7 +25,16 @@ message StoreRequest {
 
     required int32 id = 1 [(omitted) = true];
     required string email = 2 [(java_anno) = '@Pattern(regexp = Const.EMAIL_REGEX)'];
-    required bool valid = 3;
+    optional bool valid = 3;
+    map<string, int32> data = 4;
+    map<string, Project> projects = 5;
+    repeated int32 unpacked = 6 [packed = false];
+    repeated int32 packed = 7 [packed = true];
+    repeated Project projectList = 8;
+    required Project project = 9;
+    required int64 max = 10;
+    map<int64, int32> longData = 11;
+    map<int64, Project> projectData = 12;
 }
 
 message StoreResponse {
