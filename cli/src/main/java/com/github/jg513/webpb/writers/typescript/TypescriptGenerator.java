@@ -19,11 +19,9 @@ import com.squareup.wire.schema.Type;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -41,94 +39,22 @@ final class TypescriptGenerator {
 
     private final StringBuilder builder;
 
-    private static final Map<ProtoType, String> TYPES_MAP = new HashMap<ProtoType, String>() {{
-        put(ProtoType.BOOL, "boolean");
-        put(ProtoType.BYTES, "Uint8Array");
-        put(ProtoType.DOUBLE, "number");
-        put(ProtoType.FLOAT, "number");
-        put(ProtoType.FIXED32, "number");
-        put(ProtoType.FIXED64, "number");
-        put(ProtoType.INT32, "number");
-        put(ProtoType.INT64, "number");
-        put(ProtoType.SFIXED32, "number");
-        put(ProtoType.SFIXED64, "number");
-        put(ProtoType.SINT32, "number");
-        put(ProtoType.SINT64, "number");
-        put(ProtoType.STRING, "string");
-        put(ProtoType.UINT32, "number");
-        put(ProtoType.UINT64, "number");
-    }};
-
-    static Map<ProtoType, Integer> mapKeyTypes = new HashMap<ProtoType, Integer>() {{
-        put(ProtoType.INT32, 0);
-        put(ProtoType.UINT32, 0);
-        put(ProtoType.SINT32, 0);
-        put(ProtoType.FIXED32, 5);
-        put(ProtoType.SFIXED32, 5);
-        put(ProtoType.INT64, 0);
-        put(ProtoType.UINT64, 0);
-        put(ProtoType.SINT64, 0);
-        put(ProtoType.FIXED64, 1);
-        put(ProtoType.SFIXED64, 1);
-        put(ProtoType.BOOL, 0);
-        put(ProtoType.STRING, 2);
-    }};
-
-    static Map<ProtoType, Integer> basicTypes = new HashMap<ProtoType, Integer>() {{
-        put(ProtoType.DOUBLE, 1);
-        put(ProtoType.FLOAT, 5);
-        put(ProtoType.INT32, 0);
-        put(ProtoType.UINT32, 0);
-        put(ProtoType.SINT32, 0);
-        put(ProtoType.FIXED32, 5);
-        put(ProtoType.SFIXED32, 5);
-        put(ProtoType.INT64, 0);
-        put(ProtoType.UINT64, 0);
-        put(ProtoType.SINT64, 0);
-        put(ProtoType.FIXED64, 1);
-        put(ProtoType.SFIXED64, 1);
-        put(ProtoType.BOOL, 0);
-        put(ProtoType.STRING, 2);
-        put(ProtoType.BYTES, 2);
-    }};
-
-    static Map<ProtoType, Integer> packedTypes = new HashMap<ProtoType, Integer>() {{
-        put(ProtoType.DOUBLE, 1);
-        put(ProtoType.FLOAT, 5);
-        put(ProtoType.INT32, 0);
-        put(ProtoType.UINT32, 0);
-        put(ProtoType.SINT32, 0);
-        put(ProtoType.FIXED32, 5);
-        put(ProtoType.SFIXED32, 5);
-        put(ProtoType.INT64, 0);
-        put(ProtoType.UINT64, 0);
-        put(ProtoType.SINT64, 0);
-        put(ProtoType.FIXED64, 1);
-        put(ProtoType.SFIXED64, 1);
-        put(ProtoType.BOOL, 0);
-    }};
-
-    static Map<ProtoType, Integer> longTypes = new HashMap<ProtoType, Integer>() {{
-        put(ProtoType.INT64, 0);
-        put(ProtoType.UINT64, 0);
-        put(ProtoType.SINT64, 0);
-        put(ProtoType.FIXED64, 1);
-        put(ProtoType.SFIXED64, 1);
-    }};
-
     public boolean generate(ProtoFile protoFile) {
         String packageName = protoFile.getPackageName();
         if (generateTypes(packageName, protoFile.getTypes())) {
+            StringBuilder builder = new StringBuilder();
+            builder.append("// " + Const.HEADER + "\n");
+            builder.append("// " + Const.GIT_URL + "\n\n");
+            builder.append("import * as $protobuf from \"protobufjs\";\n");
+            builder.append("import { Webpb } from 'webpb';\n\n");
+            builder.append("const $Reader = $protobuf.Reader, $Writer = $protobuf.Writer, $util = $protobuf.util;\n\n");
             for (String type : imports) {
                 if (!StringUtils.startsWith(type, packageName)) {
-                    builder.insert(0, "import { " + type + " } from './" + type + "';\n\n");
+                    builder.append("import { ").append(type)
+                        .append(" } from './").append(type).append("';\n\n");
                 }
             }
-            builder.insert(0, "const $Reader = $protobuf.Reader, $Writer = $protobuf.Writer, $util = $protobuf.util;\n\n");
-            builder.insert(0, "import { Webpb } from 'webpb';\n\n");
-            builder.insert(0, "import * as $protobuf from \"protobufjs\";\n");
-            builder.insert(0, "// " + Const.GIT_URL + "\n\n");
-            builder.insert(0, "// " + Const.HEADER + "\n");
+            this.builder.insert(0, builder);
             return true;
         }
         return false;
@@ -209,8 +135,18 @@ final class TypescriptGenerator {
                 generateMessageFields(type, false);
                 indent().append("META: () => Webpb.WebpbMeta;\n\n");
                 generateConstructor(type, className);
-                new Encoder(this, builder).generateEncode(type, className);
-                new Decoder(this, builder).generateEncode(type, className);
+
+                Encoder encoder = new Encoder(this, builder);
+                encoder.generateEncode(type, className);
+                encoder.generateEncodeDelimited(type, className);
+
+                Decoder decoder = new Decoder(this, builder);
+                decoder.generateDecode(type);
+                decoder.generateDecodeDelimited(type);
+
+                ToObject toObject = new ToObject(this, builder);
+                toObject.generateToObject(type, className);
+                toObject.generateToJSON(type, className);
             });
             closeBracket();
         });
@@ -218,26 +154,36 @@ final class TypescriptGenerator {
 
     private void generateMessageFields(MessageType type, boolean isInterface) {
         for (Field field : type.getFieldsAndOneOfFields()) {
-            if (!Objects.requireNonNull(field.getType()).isScalar()) {
-                imports.add(field.getType().getEnclosingTypeOrPackage());
+            ProtoType protoType = field.getType();
+            assert protoType != null;
+            if (!protoType.isScalar()) {
+                addImport(field.getType());
             }
-            String typeName = toTypeName(field.getType());
             indent().append(field.getName());
             if (field.isOptional()) {
                 builder.append('?');
             } else if (!isInterface & field.getDefault() == null) {
                 builder.append('!');
             }
-            builder.append(": ").append(typeName);
-            if (field.isRepeated()) {
-                builder.append("[]");
-            }
-            if (!isInterface && field.getDefault() != null) {
-                builder.append(" = ");
-                if ("string".equals(typeName)) {
-                    builder.append('"').append(field.getDefault()).append('"');
-                } else {
-                    builder.append(field.getDefault());
+            if (protoType.isMap()) {
+                ProtoType keyType = protoType.getKeyType();
+                ProtoType valueType = protoType.getValueType();
+                assert keyType != null && valueType != null;
+                builder.append(": ").append("{ [k: string]: ")
+                    .append(toTypeName(valueType)).append(" }");
+            } else {
+                String typeName = toTypeName(protoType);
+                builder.append(": ").append(typeName);
+                if (field.isRepeated()) {
+                    builder.append("[]");
+                }
+                if (!isInterface && field.getDefault() != null) {
+                    builder.append(" = ");
+                    if ("string".equals(typeName)) {
+                        builder.append('"').append(field.getDefault()).append('"');
+                    } else {
+                        builder.append(field.getDefault());
+                    }
                 }
             }
             builder.append(";\n");
@@ -247,15 +193,20 @@ final class TypescriptGenerator {
     private void generateConstructor(MessageType type, String className) {
         if (type.getFieldsAndOneOfFields().isEmpty()) {
             indent().append("private constructor() {\n");
-            level(() -> initializeMeta(type));
+            level(() -> {
+                indent().append("this.META = () => ({\n");
+                initializeMeta(type);
+            });
             closeBracket();
             indent().append("static create(): ").append(className).append(" {\n");
             level(() -> indent().append("return new ").append(className).append("();\n"));
         } else {
             String interfaceName = interfaceName(className);
-            indent().append("private constructor(p: ").append(interfaceName).append(") {\n");
+            indent().append("private constructor(p?: ").append(interfaceName).append(") {\n");
             level(() -> {
-                indent().append("Webpb.assign(p, this, ").append(generateOmitted(type)).append(");\n");
+                indent().append("Webpb.assign(p, this, ")
+                    .append(generateOmitted(type)).append(");\n");
+                indent().append("this.META = () => (p && {\n");
                 initializeMeta(type);
             });
             closeBracket();
@@ -269,7 +220,6 @@ final class TypescriptGenerator {
     }
 
     private void initializeMeta(MessageType type) {
-        indent().append("this.META = () => ({\n");
         level(() -> {
             generateMetaField("class", "'" + type.getType().getSimpleName() + "'");
             Options options = type.getOptions();
@@ -351,8 +301,8 @@ final class TypescriptGenerator {
     }
 
     private String toTypeName(ProtoType protoType) {
-        if (TYPES_MAP.containsKey(protoType)) {
-            return TYPES_MAP.get(protoType);
+        if (Types.types.containsKey(protoType)) {
+            return Types.types.get(protoType);
         }
 
         Type type = this.schema.getType(protoType);
@@ -375,6 +325,18 @@ final class TypescriptGenerator {
         }
     }
 
+    boolean isEnum(ProtoType type) {
+        return schema.getType(type) instanceof EnumType;
+    }
+
+    EnumConstant enumDefault(ProtoType type) {
+        EnumType wireEnum = (EnumType) schema.getType(type);
+        if (wireEnum.getConstants().size() == 0) {
+            return null;
+        }
+        return wireEnum.getConstants().get(0);
+    }
+
     void closeBracket() {
         trimDuplicatedNewline();
         indent().append("}\n\n");
@@ -395,5 +357,12 @@ final class TypescriptGenerator {
 
     String interfaceName(String className) {
         return "I" + className;
+    }
+
+    void addImport(ProtoType protoType) {
+        if (protoType.isMap()) {
+            return;
+        }
+        imports.add(protoType.getEnclosingTypeOrPackage());
     }
 }

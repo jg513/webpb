@@ -188,6 +188,11 @@ export namespace StoreProto {
         public toJSON(): { [k: string]: any };
     }
 
+    /** StoreType enum. */
+    enum StoreType {
+        NORMAL = 0
+    }
+
     /** Properties of a StoreRequest. */
     interface IStoreRequest {
 
@@ -217,6 +222,27 @@ export namespace StoreProto {
 
         /** StoreRequest project */
         project: StoreProto.IProject;
+
+        /** StoreRequest max */
+        max: (number|Long);
+
+        /** StoreRequest longMap */
+        longMap?: ({ [k: string]: number }|null);
+
+        /** StoreRequest projectMap */
+        projectMap?: ({ [k: string]: StoreProto.IProject }|null);
+
+        /** StoreRequest typeMap */
+        typeMap?: ({ [k: string]: StoreProto.StoreType }|null);
+
+        /** StoreRequest binary */
+        binary: Uint8Array;
+
+        /** StoreRequest type */
+        type: StoreProto.StoreType;
+
+        /** StoreRequest floatData */
+        floatData: number;
     }
 
     /** Represents a StoreRequest. */
@@ -254,6 +280,27 @@ export namespace StoreProto {
 
         /** StoreRequest project. */
         public project: StoreProto.IProject;
+
+        /** StoreRequest max. */
+        public max: (number|Long);
+
+        /** StoreRequest longMap. */
+        public longMap: { [k: string]: number };
+
+        /** StoreRequest projectMap. */
+        public projectMap: { [k: string]: StoreProto.IProject };
+
+        /** StoreRequest typeMap. */
+        public typeMap: { [k: string]: StoreProto.StoreType };
+
+        /** StoreRequest binary. */
+        public binary: Uint8Array;
+
+        /** StoreRequest type. */
+        public type: StoreProto.StoreType;
+
+        /** StoreRequest floatData. */
+        public floatData: number;
 
         /**
          * Creates a new StoreRequest instance using the specified properties.
@@ -1595,9 +1642,6 @@ export namespace google {
 
                 /** ExtensionRange end */
                 end?: (number|null);
-
-                /** ExtensionRange options */
-                options?: (google.protobuf.IExtensionRangeOptions|null);
             }
 
             /** Represents an ExtensionRange. */
@@ -1614,9 +1658,6 @@ export namespace google {
 
                 /** ExtensionRange end. */
                 public end: number;
-
-                /** ExtensionRange options. */
-                public options?: (google.protobuf.IExtensionRangeOptions|null);
 
                 /**
                  * Creates a new ExtensionRange instance using the specified properties.
@@ -1784,96 +1825,6 @@ export namespace google {
                  */
                 public toJSON(): { [k: string]: any };
             }
-        }
-
-        /** Properties of an ExtensionRangeOptions. */
-        interface IExtensionRangeOptions {
-
-            /** ExtensionRangeOptions uninterpretedOption */
-            uninterpretedOption?: (google.protobuf.IUninterpretedOption[]|null);
-        }
-
-        /** Represents an ExtensionRangeOptions. */
-        class ExtensionRangeOptions implements IExtensionRangeOptions {
-
-            /**
-             * Constructs a new ExtensionRangeOptions.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: google.protobuf.IExtensionRangeOptions);
-
-            /** ExtensionRangeOptions uninterpretedOption. */
-            public uninterpretedOption: google.protobuf.IUninterpretedOption[];
-
-            /**
-             * Creates a new ExtensionRangeOptions instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns ExtensionRangeOptions instance
-             */
-            public static create(properties?: google.protobuf.IExtensionRangeOptions): google.protobuf.ExtensionRangeOptions;
-
-            /**
-             * Encodes the specified ExtensionRangeOptions message. Does not implicitly {@link google.protobuf.ExtensionRangeOptions.verify|verify} messages.
-             * @param message ExtensionRangeOptions message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: google.protobuf.IExtensionRangeOptions, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Encodes the specified ExtensionRangeOptions message, length delimited. Does not implicitly {@link google.protobuf.ExtensionRangeOptions.verify|verify} messages.
-             * @param message ExtensionRangeOptions message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encodeDelimited(message: google.protobuf.IExtensionRangeOptions, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes an ExtensionRangeOptions message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns ExtensionRangeOptions
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): google.protobuf.ExtensionRangeOptions;
-
-            /**
-             * Decodes an ExtensionRangeOptions message from the specified reader or buffer, length delimited.
-             * @param reader Reader or buffer to decode from
-             * @returns ExtensionRangeOptions
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): google.protobuf.ExtensionRangeOptions;
-
-            /**
-             * Verifies an ExtensionRangeOptions message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-
-            /**
-             * Creates an ExtensionRangeOptions message from a plain object. Also converts values to their respective internal types.
-             * @param object Plain object
-             * @returns ExtensionRangeOptions
-             */
-            public static fromObject(object: { [k: string]: any }): google.protobuf.ExtensionRangeOptions;
-
-            /**
-             * Creates a plain object from an ExtensionRangeOptions message. Also converts values to other types if specified.
-             * @param message ExtensionRangeOptions
-             * @param [options] Conversion options
-             * @returns Plain object
-             */
-            public static toObject(message: google.protobuf.ExtensionRangeOptions, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-            /**
-             * Converts this ExtensionRangeOptions to JSON.
-             * @returns JSON object
-             */
-            public toJSON(): { [k: string]: any };
         }
 
         /** Properties of a FieldDescriptorProto. */
@@ -2159,12 +2110,6 @@ export namespace google {
 
             /** EnumDescriptorProto options */
             options?: (google.protobuf.IEnumOptions|null);
-
-            /** EnumDescriptorProto reservedRange */
-            reservedRange?: (google.protobuf.EnumDescriptorProto.IEnumReservedRange[]|null);
-
-            /** EnumDescriptorProto reservedName */
-            reservedName?: (string[]|null);
         }
 
         /** Represents an EnumDescriptorProto. */
@@ -2184,12 +2129,6 @@ export namespace google {
 
             /** EnumDescriptorProto options. */
             public options?: (google.protobuf.IEnumOptions|null);
-
-            /** EnumDescriptorProto reservedRange. */
-            public reservedRange: google.protobuf.EnumDescriptorProto.IEnumReservedRange[];
-
-            /** EnumDescriptorProto reservedName. */
-            public reservedName: string[];
 
             /**
              * Creates a new EnumDescriptorProto instance using the specified properties.
@@ -2260,105 +2199,6 @@ export namespace google {
              * @returns JSON object
              */
             public toJSON(): { [k: string]: any };
-        }
-
-        namespace EnumDescriptorProto {
-
-            /** Properties of an EnumReservedRange. */
-            interface IEnumReservedRange {
-
-                /** EnumReservedRange start */
-                start?: (number|null);
-
-                /** EnumReservedRange end */
-                end?: (number|null);
-            }
-
-            /** Represents an EnumReservedRange. */
-            class EnumReservedRange implements IEnumReservedRange {
-
-                /**
-                 * Constructs a new EnumReservedRange.
-                 * @param [properties] Properties to set
-                 */
-                constructor(properties?: google.protobuf.EnumDescriptorProto.IEnumReservedRange);
-
-                /** EnumReservedRange start. */
-                public start: number;
-
-                /** EnumReservedRange end. */
-                public end: number;
-
-                /**
-                 * Creates a new EnumReservedRange instance using the specified properties.
-                 * @param [properties] Properties to set
-                 * @returns EnumReservedRange instance
-                 */
-                public static create(properties?: google.protobuf.EnumDescriptorProto.IEnumReservedRange): google.protobuf.EnumDescriptorProto.EnumReservedRange;
-
-                /**
-                 * Encodes the specified EnumReservedRange message. Does not implicitly {@link google.protobuf.EnumDescriptorProto.EnumReservedRange.verify|verify} messages.
-                 * @param message EnumReservedRange message or plain object to encode
-                 * @param [writer] Writer to encode to
-                 * @returns Writer
-                 */
-                public static encode(message: google.protobuf.EnumDescriptorProto.IEnumReservedRange, writer?: $protobuf.Writer): $protobuf.Writer;
-
-                /**
-                 * Encodes the specified EnumReservedRange message, length delimited. Does not implicitly {@link google.protobuf.EnumDescriptorProto.EnumReservedRange.verify|verify} messages.
-                 * @param message EnumReservedRange message or plain object to encode
-                 * @param [writer] Writer to encode to
-                 * @returns Writer
-                 */
-                public static encodeDelimited(message: google.protobuf.EnumDescriptorProto.IEnumReservedRange, writer?: $protobuf.Writer): $protobuf.Writer;
-
-                /**
-                 * Decodes an EnumReservedRange message from the specified reader or buffer.
-                 * @param reader Reader or buffer to decode from
-                 * @param [length] Message length if known beforehand
-                 * @returns EnumReservedRange
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): google.protobuf.EnumDescriptorProto.EnumReservedRange;
-
-                /**
-                 * Decodes an EnumReservedRange message from the specified reader or buffer, length delimited.
-                 * @param reader Reader or buffer to decode from
-                 * @returns EnumReservedRange
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): google.protobuf.EnumDescriptorProto.EnumReservedRange;
-
-                /**
-                 * Verifies an EnumReservedRange message.
-                 * @param message Plain object to verify
-                 * @returns `null` if valid, otherwise the reason why it is not
-                 */
-                public static verify(message: { [k: string]: any }): (string|null);
-
-                /**
-                 * Creates an EnumReservedRange message from a plain object. Also converts values to their respective internal types.
-                 * @param object Plain object
-                 * @returns EnumReservedRange
-                 */
-                public static fromObject(object: { [k: string]: any }): google.protobuf.EnumDescriptorProto.EnumReservedRange;
-
-                /**
-                 * Creates a plain object from an EnumReservedRange message. Also converts values to other types if specified.
-                 * @param message EnumReservedRange
-                 * @param [options] Conversion options
-                 * @returns Plain object
-                 */
-                public static toObject(message: google.protobuf.EnumDescriptorProto.EnumReservedRange, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-                /**
-                 * Converts this EnumReservedRange to JSON.
-                 * @returns JSON object
-                 */
-                public toJSON(): { [k: string]: any };
-            }
         }
 
         /** Properties of an EnumValueDescriptorProto. */
@@ -2718,9 +2558,6 @@ export namespace google {
             /** FileOptions pyGenericServices */
             pyGenericServices?: (boolean|null);
 
-            /** FileOptions phpGenericServices */
-            phpGenericServices?: (boolean|null);
-
             /** FileOptions deprecated */
             deprecated?: (boolean|null);
 
@@ -2733,29 +2570,14 @@ export namespace google {
             /** FileOptions csharpNamespace */
             csharpNamespace?: (string|null);
 
-            /** FileOptions swiftPrefix */
-            swiftPrefix?: (string|null);
-
-            /** FileOptions phpClassPrefix */
-            phpClassPrefix?: (string|null);
-
-            /** FileOptions phpNamespace */
-            phpNamespace?: (string|null);
-
-            /** FileOptions phpMetadataNamespace */
-            phpMetadataNamespace?: (string|null);
-
-            /** FileOptions rubyPackage */
-            rubyPackage?: (string|null);
-
             /** FileOptions uninterpretedOption */
             uninterpretedOption?: (google.protobuf.IUninterpretedOption[]|null);
 
             /** FileOptions .javaImport */
             ".javaImport"?: (string[]|null);
 
-            /** FileOptions .javaMessageAnno */
-            ".javaMessageAnno"?: (string[]|null);
+            /** FileOptions .javaCommonAnno */
+            ".javaCommonAnno"?: (string[]|null);
 
             /** FileOptions .javaSetter */
             ".javaSetter"?: (boolean|null);
@@ -2803,9 +2625,6 @@ export namespace google {
             /** FileOptions pyGenericServices. */
             public pyGenericServices: boolean;
 
-            /** FileOptions phpGenericServices. */
-            public phpGenericServices: boolean;
-
             /** FileOptions deprecated. */
             public deprecated: boolean;
 
@@ -2818,29 +2637,14 @@ export namespace google {
             /** FileOptions csharpNamespace. */
             public csharpNamespace: string;
 
-            /** FileOptions swiftPrefix. */
-            public swiftPrefix: string;
-
-            /** FileOptions phpClassPrefix. */
-            public phpClassPrefix: string;
-
-            /** FileOptions phpNamespace. */
-            public phpNamespace: string;
-
-            /** FileOptions phpMetadataNamespace. */
-            public phpMetadataNamespace: string;
-
-            /** FileOptions rubyPackage. */
-            public rubyPackage: string;
-
             /** FileOptions uninterpretedOption. */
             public uninterpretedOption: google.protobuf.IUninterpretedOption[];
 
             /** FileOptions .javaImport. */
             public javaImport: string[];
 
-            /** FileOptions .javaMessageAnno. */
-            public javaMessageAnno: string[];
+            /** FileOptions .javaCommonAnno. */
+            public javaCommonAnno: string[];
 
             /** FileOptions .javaSetter. */
             public javaSetter: boolean;
@@ -2947,8 +2751,8 @@ export namespace google {
             /** MessageOptions uninterpretedOption */
             uninterpretedOption?: (google.protobuf.IUninterpretedOption[]|null);
 
-            /** MessageOptions .omitted */
-            ".omitted"?: (boolean|null);
+            /** MessageOptions .messageOmitted */
+            ".messageOmitted"?: (boolean|null);
 
             /** MessageOptions .method */
             ".method"?: (string|null);
@@ -2959,8 +2763,8 @@ export namespace google {
             /** MessageOptions .tag */
             ".tag"?: (string[]|null);
 
-            /** MessageOptions .javaAnno */
-            ".javaAnno"?: (string[]|null);
+            /** MessageOptions .javaMessageAnno */
+            ".javaMessageAnno"?: (string[]|null);
         }
 
         /** Represents a MessageOptions. */
@@ -2987,8 +2791,8 @@ export namespace google {
             /** MessageOptions uninterpretedOption. */
             public uninterpretedOption: google.protobuf.IUninterpretedOption[];
 
-            /** MessageOptions .omitted. */
-            public omitted: boolean;
+            /** MessageOptions .messageOmitted. */
+            public messageOmitted: boolean;
 
             /** MessageOptions .method. */
             public method: string;
@@ -2999,8 +2803,8 @@ export namespace google {
             /** MessageOptions .tag. */
             public tag: string[];
 
-            /** MessageOptions .javaAnno. */
-            public javaAnno: string[];
+            /** MessageOptions .javaMessageAnno. */
+            public javaMessageAnno: string[];
 
             /**
              * Creates a new MessageOptions instance using the specified properties.
@@ -3096,6 +2900,12 @@ export namespace google {
 
             /** FieldOptions uninterpretedOption */
             uninterpretedOption?: (google.protobuf.IUninterpretedOption[]|null);
+
+            /** FieldOptions .omitted */
+            ".omitted"?: (boolean|null);
+
+            /** FieldOptions .javaAnno */
+            ".javaAnno"?: (string[]|null);
         }
 
         /** Represents a FieldOptions. */
@@ -3127,6 +2937,12 @@ export namespace google {
 
             /** FieldOptions uninterpretedOption. */
             public uninterpretedOption: google.protobuf.IUninterpretedOption[];
+
+            /** FieldOptions .omitted. */
+            public omitted: boolean;
+
+            /** FieldOptions .javaAnno. */
+            public javaAnno: string[];
 
             /**
              * Creates a new FieldOptions instance using the specified properties.
@@ -3606,9 +3422,6 @@ export namespace google {
             /** MethodOptions deprecated */
             deprecated?: (boolean|null);
 
-            /** MethodOptions idempotencyLevel */
-            idempotencyLevel?: (google.protobuf.MethodOptions.IdempotencyLevel|null);
-
             /** MethodOptions uninterpretedOption */
             uninterpretedOption?: (google.protobuf.IUninterpretedOption[]|null);
         }
@@ -3624,9 +3437,6 @@ export namespace google {
 
             /** MethodOptions deprecated. */
             public deprecated: boolean;
-
-            /** MethodOptions idempotencyLevel. */
-            public idempotencyLevel: google.protobuf.MethodOptions.IdempotencyLevel;
 
             /** MethodOptions uninterpretedOption. */
             public uninterpretedOption: google.protobuf.IUninterpretedOption[];
@@ -3700,16 +3510,6 @@ export namespace google {
              * @returns JSON object
              */
             public toJSON(): { [k: string]: any };
-        }
-
-        namespace MethodOptions {
-
-            /** IdempotencyLevel enum. */
-            enum IdempotencyLevel {
-                IDEMPOTENCY_UNKNOWN = 0,
-                NO_SIDE_EFFECTS = 1,
-                IDEMPOTENT = 2
-            }
         }
 
         /** Properties of an UninterpretedOption. */

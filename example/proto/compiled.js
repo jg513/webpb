@@ -410,6 +410,18 @@ $root.StoreProto = (function() {
         return Project;
     })();
 
+    /**
+     * StoreType enum.
+     * @name StoreProto.StoreType
+     * @enum {string}
+     * @property {number} NORMAL=0 NORMAL value
+     */
+    StoreProto.StoreType = (function() {
+        var valuesById = {}, values = Object.create(valuesById);
+        values[valuesById[0] = "NORMAL"] = 0;
+        return values;
+    })();
+
     StoreProto.StoreRequest = (function() {
 
         /**
@@ -426,8 +438,15 @@ $root.StoreProto = (function() {
          * @property {Array.<StoreProto.IProject>|null} [projectList] StoreRequest projectList
          * @property {StoreProto.IProject} project StoreRequest project
          * @property {number|Long} max StoreRequest max
-         * @property {Object.<string,number>|null} [longData] StoreRequest longData
-         * @property {Object.<string,StoreProto.IProject>|null} [projectData] StoreRequest projectData
+         * @property {Object.<string,number>|null} [longMap] StoreRequest longMap
+         * @property {Object.<string,StoreProto.IProject>|null} [projectMap] StoreRequest projectMap
+         * @property {Object.<string,StoreProto.StoreType>|null} [typeMap] StoreRequest typeMap
+         * @property {Uint8Array} binary StoreRequest binary
+         * @property {StoreProto.StoreType} type StoreRequest type
+         * @property {number} floatData StoreRequest floatData
+         * @property {string|null} [anyName] StoreRequest anyName
+         * @property {StoreProto.IProject|null} [anyProject] StoreRequest anyProject
+         * @property {StoreProto.StoreType|null} [anyStore] StoreRequest anyStore
          */
 
         /**
@@ -444,8 +463,9 @@ $root.StoreProto = (function() {
             this.unpacked = [];
             this.packed = [];
             this.projectList = [];
-            this.longData = {};
-            this.projectData = {};
+            this.longMap = {};
+            this.projectMap = {};
+            this.typeMap = {};
             if (properties)
                 for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -530,23 +550,93 @@ $root.StoreProto = (function() {
          * @memberof StoreProto.StoreRequest
          * @instance
          */
-        StoreRequest.prototype.max = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+        StoreRequest.prototype.max = $util.Long ? $util.Long.fromBits(-1,1048575,false) : 4503599627370495;
 
         /**
-         * StoreRequest longData.
-         * @member {Object.<string,number>} longData
+         * StoreRequest longMap.
+         * @member {Object.<string,number>} longMap
          * @memberof StoreProto.StoreRequest
          * @instance
          */
-        StoreRequest.prototype.longData = $util.emptyObject;
+        StoreRequest.prototype.longMap = $util.emptyObject;
 
         /**
-         * StoreRequest projectData.
-         * @member {Object.<string,StoreProto.IProject>} projectData
+         * StoreRequest projectMap.
+         * @member {Object.<string,StoreProto.IProject>} projectMap
          * @memberof StoreProto.StoreRequest
          * @instance
          */
-        StoreRequest.prototype.projectData = $util.emptyObject;
+        StoreRequest.prototype.projectMap = $util.emptyObject;
+
+        /**
+         * StoreRequest typeMap.
+         * @member {Object.<string,StoreProto.StoreType>} typeMap
+         * @memberof StoreProto.StoreRequest
+         * @instance
+         */
+        StoreRequest.prototype.typeMap = $util.emptyObject;
+
+        /**
+         * StoreRequest binary.
+         * @member {Uint8Array} binary
+         * @memberof StoreProto.StoreRequest
+         * @instance
+         */
+        StoreRequest.prototype.binary = $util.newBuffer([]);
+
+        /**
+         * StoreRequest type.
+         * @member {StoreProto.StoreType} type
+         * @memberof StoreProto.StoreRequest
+         * @instance
+         */
+        StoreRequest.prototype.type = 0;
+
+        /**
+         * StoreRequest floatData.
+         * @member {number} floatData
+         * @memberof StoreProto.StoreRequest
+         * @instance
+         */
+        StoreRequest.prototype.floatData = 0;
+
+        /**
+         * StoreRequest anyName.
+         * @member {string} anyName
+         * @memberof StoreProto.StoreRequest
+         * @instance
+         */
+        StoreRequest.prototype.anyName = "";
+
+        /**
+         * StoreRequest anyProject.
+         * @member {StoreProto.IProject|null|undefined} anyProject
+         * @memberof StoreProto.StoreRequest
+         * @instance
+         */
+        StoreRequest.prototype.anyProject = null;
+
+        /**
+         * StoreRequest anyStore.
+         * @member {StoreProto.StoreType} anyStore
+         * @memberof StoreProto.StoreRequest
+         * @instance
+         */
+        StoreRequest.prototype.anyStore = 0;
+
+        // OneOf field names bound to virtual getters and setters
+        var $oneOfFields;
+
+        /**
+         * StoreRequest anyData.
+         * @member {"anyName"|"anyProject"|"anyStore"|undefined} anyData
+         * @memberof StoreProto.StoreRequest
+         * @instance
+         */
+        Object.defineProperty(StoreRequest.prototype, "anyData", {
+            get: $util.oneOfGetter($oneOfFields = ["anyName", "anyProject", "anyStore"]),
+            set: $util.oneOfSetter($oneOfFields)
+        });
 
         /**
          * Creates a new StoreRequest instance using the specified properties.
@@ -598,14 +688,26 @@ $root.StoreProto = (function() {
                     $root.StoreProto.Project.encode(message.projectList[i], writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
             $root.StoreProto.Project.encode(message.project, writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
             writer.uint32(/* id 10, wireType 0 =*/80).int64(message.max);
-            if (message.longData != null && message.hasOwnProperty("longData"))
-                for (var keys = Object.keys(message.longData), i = 0; i < keys.length; ++i)
-                    writer.uint32(/* id 11, wireType 2 =*/90).fork().uint32(/* id 1, wireType 0 =*/8).int64(keys[i]).uint32(/* id 2, wireType 0 =*/16).int32(message.longData[keys[i]]).ldelim();
-            if (message.projectData != null && message.hasOwnProperty("projectData"))
-                for (var keys = Object.keys(message.projectData), i = 0; i < keys.length; ++i) {
+            if (message.longMap != null && message.hasOwnProperty("longMap"))
+                for (var keys = Object.keys(message.longMap), i = 0; i < keys.length; ++i)
+                    writer.uint32(/* id 11, wireType 2 =*/90).fork().uint32(/* id 1, wireType 0 =*/8).int64(keys[i]).uint32(/* id 2, wireType 0 =*/16).int32(message.longMap[keys[i]]).ldelim();
+            if (message.projectMap != null && message.hasOwnProperty("projectMap"))
+                for (var keys = Object.keys(message.projectMap), i = 0; i < keys.length; ++i) {
                     writer.uint32(/* id 12, wireType 2 =*/98).fork().uint32(/* id 1, wireType 0 =*/8).int64(keys[i]);
-                    $root.StoreProto.Project.encode(message.projectData[keys[i]], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim().ldelim();
+                    $root.StoreProto.Project.encode(message.projectMap[keys[i]], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim().ldelim();
                 }
+            if (message.typeMap != null && message.hasOwnProperty("typeMap"))
+                for (var keys = Object.keys(message.typeMap), i = 0; i < keys.length; ++i)
+                    writer.uint32(/* id 13, wireType 2 =*/106).fork().uint32(/* id 1, wireType 0 =*/8).int64(keys[i]).uint32(/* id 2, wireType 0 =*/16).int32(message.typeMap[keys[i]]).ldelim();
+            writer.uint32(/* id 14, wireType 2 =*/114).bytes(message.binary);
+            writer.uint32(/* id 15, wireType 0 =*/120).int32(message.type);
+            writer.uint32(/* id 16, wireType 5 =*/133).float(message.floatData);
+            if (message.anyName != null && message.hasOwnProperty("anyName"))
+                writer.uint32(/* id 20, wireType 2 =*/162).string(message.anyName);
+            if (message.anyProject != null && message.hasOwnProperty("anyProject"))
+                $root.StoreProto.Project.encode(message.anyProject, writer.uint32(/* id 21, wireType 2 =*/170).fork()).ldelim();
+            if (message.anyStore != null && message.hasOwnProperty("anyStore"))
+                writer.uint32(/* id 22, wireType 0 =*/176).int32(message.anyStore);
             return writer;
         };
 
@@ -698,19 +800,45 @@ $root.StoreProto = (function() {
                     break;
                 case 11:
                     reader.skip().pos++;
-                    if (message.longData === $util.emptyObject)
-                        message.longData = {};
+                    if (message.longMap === $util.emptyObject)
+                        message.longMap = {};
                     key = reader.int64();
                     reader.pos++;
-                    message.longData[typeof key === "object" ? $util.longToHash(key) : key] = reader.int32();
+                    message.longMap[typeof key === "object" ? $util.longToHash(key) : key] = reader.int32();
                     break;
                 case 12:
                     reader.skip().pos++;
-                    if (message.projectData === $util.emptyObject)
-                        message.projectData = {};
+                    if (message.projectMap === $util.emptyObject)
+                        message.projectMap = {};
                     key = reader.int64();
                     reader.pos++;
-                    message.projectData[typeof key === "object" ? $util.longToHash(key) : key] = $root.StoreProto.Project.decode(reader, reader.uint32());
+                    message.projectMap[typeof key === "object" ? $util.longToHash(key) : key] = $root.StoreProto.Project.decode(reader, reader.uint32());
+                    break;
+                case 13:
+                    reader.skip().pos++;
+                    if (message.typeMap === $util.emptyObject)
+                        message.typeMap = {};
+                    key = reader.int64();
+                    reader.pos++;
+                    message.typeMap[typeof key === "object" ? $util.longToHash(key) : key] = reader.int32();
+                    break;
+                case 14:
+                    message.binary = reader.bytes();
+                    break;
+                case 15:
+                    message.type = reader.int32();
+                    break;
+                case 16:
+                    message.floatData = reader.float();
+                    break;
+                case 20:
+                    message.anyName = reader.string();
+                    break;
+                case 21:
+                    message.anyProject = $root.StoreProto.Project.decode(reader, reader.uint32());
+                    break;
+                case 22:
+                    message.anyStore = reader.int32();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -725,6 +853,12 @@ $root.StoreProto = (function() {
                 throw $util.ProtocolError("missing required 'project'", { instance: message });
             if (!message.hasOwnProperty("max"))
                 throw $util.ProtocolError("missing required 'max'", { instance: message });
+            if (!message.hasOwnProperty("binary"))
+                throw $util.ProtocolError("missing required 'binary'", { instance: message });
+            if (!message.hasOwnProperty("type"))
+                throw $util.ProtocolError("missing required 'type'", { instance: message });
+            if (!message.hasOwnProperty("floatData"))
+                throw $util.ProtocolError("missing required 'floatData'", { instance: message });
             return message;
         };
 
@@ -755,6 +889,7 @@ $root.StoreProto = (function() {
         StoreRequest.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
+            var properties = {};
             if (!$util.isInteger(message.id))
                 return "id: integer expected";
             if (!$util.isString(message.email))
@@ -810,29 +945,80 @@ $root.StoreProto = (function() {
             }
             if (!$util.isInteger(message.max) && !(message.max && $util.isInteger(message.max.low) && $util.isInteger(message.max.high)))
                 return "max: integer|Long expected";
-            if (message.longData != null && message.hasOwnProperty("longData")) {
-                if (!$util.isObject(message.longData))
-                    return "longData: object expected";
-                var key = Object.keys(message.longData);
+            if (message.longMap != null && message.hasOwnProperty("longMap")) {
+                if (!$util.isObject(message.longMap))
+                    return "longMap: object expected";
+                var key = Object.keys(message.longMap);
                 for (var i = 0; i < key.length; ++i) {
                     if (!$util.key64Re.test(key[i]))
-                        return "longData: integer|Long key{k:int64} expected";
-                    if (!$util.isInteger(message.longData[key[i]]))
-                        return "longData: integer{k:int64} expected";
+                        return "longMap: integer|Long key{k:int64} expected";
+                    if (!$util.isInteger(message.longMap[key[i]]))
+                        return "longMap: integer{k:int64} expected";
                 }
             }
-            if (message.projectData != null && message.hasOwnProperty("projectData")) {
-                if (!$util.isObject(message.projectData))
-                    return "projectData: object expected";
-                var key = Object.keys(message.projectData);
+            if (message.projectMap != null && message.hasOwnProperty("projectMap")) {
+                if (!$util.isObject(message.projectMap))
+                    return "projectMap: object expected";
+                var key = Object.keys(message.projectMap);
                 for (var i = 0; i < key.length; ++i) {
                     if (!$util.key64Re.test(key[i]))
-                        return "projectData: integer|Long key{k:int64} expected";
+                        return "projectMap: integer|Long key{k:int64} expected";
                     {
-                        var error = $root.StoreProto.Project.verify(message.projectData[key[i]]);
+                        var error = $root.StoreProto.Project.verify(message.projectMap[key[i]]);
                         if (error)
-                            return "projectData." + error;
+                            return "projectMap." + error;
                     }
+                }
+            }
+            if (message.typeMap != null && message.hasOwnProperty("typeMap")) {
+                if (!$util.isObject(message.typeMap))
+                    return "typeMap: object expected";
+                var key = Object.keys(message.typeMap);
+                for (var i = 0; i < key.length; ++i) {
+                    if (!$util.key64Re.test(key[i]))
+                        return "typeMap: integer|Long key{k:int64} expected";
+                    switch (message.typeMap[key[i]]) {
+                    default:
+                        return "typeMap: enum value{k:int64} expected";
+                    case 0:
+                        break;
+                    }
+                }
+            }
+            if (!(message.binary && typeof message.binary.length === "number" || $util.isString(message.binary)))
+                return "binary: buffer expected";
+            switch (message.type) {
+            default:
+                return "type: enum value expected";
+            case 0:
+                break;
+            }
+            if (typeof message.floatData !== "number")
+                return "floatData: number expected";
+            if (message.anyName != null && message.hasOwnProperty("anyName")) {
+                properties.anyData = 1;
+                if (!$util.isString(message.anyName))
+                    return "anyName: string expected";
+            }
+            if (message.anyProject != null && message.hasOwnProperty("anyProject")) {
+                if (properties.anyData === 1)
+                    return "anyData: multiple values";
+                properties.anyData = 1;
+                {
+                    var error = $root.StoreProto.Project.verify(message.anyProject);
+                    if (error)
+                        return "anyProject." + error;
+                }
+            }
+            if (message.anyStore != null && message.hasOwnProperty("anyStore")) {
+                if (properties.anyData === 1)
+                    return "anyData: multiple values";
+                properties.anyData = 1;
+                switch (message.anyStore) {
+                default:
+                    return "anyStore: enum value expected";
+                case 0:
+                    break;
                 }
             }
             return null;
@@ -911,22 +1097,60 @@ $root.StoreProto = (function() {
                     message.max = object.max;
                 else if (typeof object.max === "object")
                     message.max = new $util.LongBits(object.max.low >>> 0, object.max.high >>> 0).toNumber();
-            if (object.longData) {
-                if (typeof object.longData !== "object")
-                    throw TypeError(".StoreProto.StoreRequest.longData: object expected");
-                message.longData = {};
-                for (var keys = Object.keys(object.longData), i = 0; i < keys.length; ++i)
-                    message.longData[keys[i]] = object.longData[keys[i]] | 0;
+            if (object.longMap) {
+                if (typeof object.longMap !== "object")
+                    throw TypeError(".StoreProto.StoreRequest.longMap: object expected");
+                message.longMap = {};
+                for (var keys = Object.keys(object.longMap), i = 0; i < keys.length; ++i)
+                    message.longMap[keys[i]] = object.longMap[keys[i]] | 0;
             }
-            if (object.projectData) {
-                if (typeof object.projectData !== "object")
-                    throw TypeError(".StoreProto.StoreRequest.projectData: object expected");
-                message.projectData = {};
-                for (var keys = Object.keys(object.projectData), i = 0; i < keys.length; ++i) {
-                    if (typeof object.projectData[keys[i]] !== "object")
-                        throw TypeError(".StoreProto.StoreRequest.projectData: object expected");
-                    message.projectData[keys[i]] = $root.StoreProto.Project.fromObject(object.projectData[keys[i]]);
+            if (object.projectMap) {
+                if (typeof object.projectMap !== "object")
+                    throw TypeError(".StoreProto.StoreRequest.projectMap: object expected");
+                message.projectMap = {};
+                for (var keys = Object.keys(object.projectMap), i = 0; i < keys.length; ++i) {
+                    if (typeof object.projectMap[keys[i]] !== "object")
+                        throw TypeError(".StoreProto.StoreRequest.projectMap: object expected");
+                    message.projectMap[keys[i]] = $root.StoreProto.Project.fromObject(object.projectMap[keys[i]]);
                 }
+            }
+            if (object.typeMap) {
+                if (typeof object.typeMap !== "object")
+                    throw TypeError(".StoreProto.StoreRequest.typeMap: object expected");
+                message.typeMap = {};
+                for (var keys = Object.keys(object.typeMap), i = 0; i < keys.length; ++i)
+                    switch (object.typeMap[keys[i]]) {
+                    case "NORMAL":
+                    case 0:
+                        message.typeMap[keys[i]] = 0;
+                        break;
+                    }
+            }
+            if (object.binary != null)
+                if (typeof object.binary === "string")
+                    $util.base64.decode(object.binary, message.binary = $util.newBuffer($util.base64.length(object.binary)), 0);
+                else if (object.binary.length)
+                    message.binary = object.binary;
+            switch (object.type) {
+            case "NORMAL":
+            case 0:
+                message.type = 0;
+                break;
+            }
+            if (object.floatData != null)
+                message.floatData = Number(object.floatData);
+            if (object.anyName != null)
+                message.anyName = String(object.anyName);
+            if (object.anyProject != null) {
+                if (typeof object.anyProject !== "object")
+                    throw TypeError(".StoreProto.StoreRequest.anyProject: object expected");
+                message.anyProject = $root.StoreProto.Project.fromObject(object.anyProject);
+            }
+            switch (object.anyStore) {
+            case "NORMAL":
+            case 0:
+                message.anyStore = 0;
+                break;
             }
             return message;
         };
@@ -952,8 +1176,9 @@ $root.StoreProto = (function() {
             if (options.objects || options.defaults) {
                 object.data = {};
                 object.projects = {};
-                object.longData = {};
-                object.projectData = {};
+                object.longMap = {};
+                object.projectMap = {};
+                object.typeMap = {};
             }
             if (options.defaults) {
                 object.id = 0;
@@ -961,10 +1186,19 @@ $root.StoreProto = (function() {
                 object.valid = false;
                 object.project = null;
                 if ($util.Long) {
-                    var long = new $util.Long(0, 0, false);
+                    var long = new $util.Long(-1, 1048575, false);
                     object.max = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
                 } else
-                    object.max = options.longs === String ? "0" : 0;
+                    object.max = options.longs === String ? "4503599627370495" : 4503599627370495;
+                if (options.bytes === String)
+                    object.binary = "";
+                else {
+                    object.binary = [];
+                    if (options.bytes !== Array)
+                        object.binary = $util.newBuffer(object.binary);
+                }
+                object.type = options.enums === String ? "NORMAL" : 0;
+                object.floatData = 0;
             }
             if (message.id != null && message.hasOwnProperty("id"))
                 object.id = message.id;
@@ -1005,15 +1239,41 @@ $root.StoreProto = (function() {
                     object.max = options.longs === String ? String(message.max) : message.max;
                 else
                     object.max = options.longs === String ? $util.Long.prototype.toString.call(message.max) : options.longs === Number ? new $util.LongBits(message.max.low >>> 0, message.max.high >>> 0).toNumber() : message.max;
-            if (message.longData && (keys2 = Object.keys(message.longData)).length) {
-                object.longData = {};
+            if (message.longMap && (keys2 = Object.keys(message.longMap)).length) {
+                object.longMap = {};
                 for (var j = 0; j < keys2.length; ++j)
-                    object.longData[keys2[j]] = message.longData[keys2[j]];
+                    object.longMap[keys2[j]] = message.longMap[keys2[j]];
             }
-            if (message.projectData && (keys2 = Object.keys(message.projectData)).length) {
-                object.projectData = {};
+            if (message.projectMap && (keys2 = Object.keys(message.projectMap)).length) {
+                object.projectMap = {};
                 for (var j = 0; j < keys2.length; ++j)
-                    object.projectData[keys2[j]] = $root.StoreProto.Project.toObject(message.projectData[keys2[j]], options);
+                    object.projectMap[keys2[j]] = $root.StoreProto.Project.toObject(message.projectMap[keys2[j]], options);
+            }
+            if (message.typeMap && (keys2 = Object.keys(message.typeMap)).length) {
+                object.typeMap = {};
+                for (var j = 0; j < keys2.length; ++j)
+                    object.typeMap[keys2[j]] = options.enums === String ? $root.StoreProto.StoreType[message.typeMap[keys2[j]]] : message.typeMap[keys2[j]];
+            }
+            if (message.binary != null && message.hasOwnProperty("binary"))
+                object.binary = options.bytes === String ? $util.base64.encode(message.binary, 0, message.binary.length) : options.bytes === Array ? Array.prototype.slice.call(message.binary) : message.binary;
+            if (message.type != null && message.hasOwnProperty("type"))
+                object.type = options.enums === String ? $root.StoreProto.StoreType[message.type] : message.type;
+            if (message.floatData != null && message.hasOwnProperty("floatData"))
+                object.floatData = options.json && !isFinite(message.floatData) ? String(message.floatData) : message.floatData;
+            if (message.anyName != null && message.hasOwnProperty("anyName")) {
+                object.anyName = message.anyName;
+                if (options.oneofs)
+                    object.anyData = "anyName";
+            }
+            if (message.anyProject != null && message.hasOwnProperty("anyProject")) {
+                object.anyProject = $root.StoreProto.Project.toObject(message.anyProject, options);
+                if (options.oneofs)
+                    object.anyData = "anyProject";
+            }
+            if (message.anyStore != null && message.hasOwnProperty("anyStore")) {
+                object.anyStore = options.enums === String ? $root.StoreProto.StoreType[message.anyStore] : message.anyStore;
+                if (options.oneofs)
+                    object.anyData = "anyStore";
             }
             return object;
         };

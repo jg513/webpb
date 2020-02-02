@@ -18,6 +18,10 @@ message StorePb {
 message Project {
 }
 
+enum StoreType {
+    NORMAL = 0;
+}
+
 message StoreRequest {
     option (method) = "GET";
 
@@ -32,9 +36,18 @@ message StoreRequest {
     repeated int32 packed = 7 [packed = true];
     repeated Project projectList = 8;
     required Project project = 9;
-    required int64 max = 10;
-    map<int64, int32> longData = 11;
-    map<int64, Project> projectData = 12;
+    required int64 max = 10 [default = 0xfffffFFFFFFFF];
+    map<int64, int32> longMap = 11;
+    map<int64, Project> projectMap = 12;
+    map<int64, StoreType> typeMap = 13;
+    required bytes binary = 14;
+    required StoreType type = 15;
+    required float floatData = 16;
+    oneof anyData {
+        string anyName = 20;
+        Project anyProject = 21;
+        StoreType anyStore = 22;
+    }
 }
 
 message StoreResponse {

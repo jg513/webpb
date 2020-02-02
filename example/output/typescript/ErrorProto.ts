@@ -22,9 +22,9 @@ export namespace ErrorProto {
         message?: string;
         META: () => Webpb.WebpbMeta;
 
-        private constructor(p: IErrorMessage) {
+        private constructor(p?: IErrorMessage) {
             Webpb.assign(p, this, []);
-            this.META = () => ({
+            this.META = () => (p && {
                 class: 'ErrorMessage',
                 method: '',
                 path: ''
@@ -36,28 +36,27 @@ export namespace ErrorProto {
         }
 
         static encode(message: IErrorMessage, writer?: $protobuf.Writer): $protobuf.Writer {
-            if (!writer) {
-                writer = $Writer.create();
-            }
-            ErrorProto.ErrorCode.encode(message.code, writer.uint32(10).fork()).ldelim();
+            writer || (writer = $Writer.create());
+            writer.uint32(8).int32(message.code);
             if (message.message != null && message.hasOwnProperty("message")) {
                 writer.uint32(18).string(message.message);
             }
-
             return writer;
         }
 
+        static encodeDelimited(message: IErrorMessage, writer?: $protobuf.Writer): $protobuf.Writer {
+            return this.encode(message, writer).ldelim();
+        }
+
         static decode(reader: ($protobuf.Reader | Uint8Array), length?: number): ErrorProto.ErrorMessage {
-            if (!(reader instanceof $Reader)) {
-                reader = $Reader.create(reader);
-            }
+            (reader instanceof $Reader) || (reader = $Reader.create(reader));
             let end = length === undefined ? reader.len : reader.pos + length;
             let message = new ErrorProto.ErrorMessage();
             while (reader.pos < end) {
                 const tag = reader.uint32();
                 switch (tag >>> 3) {
                     case 1: {
-                        message.code = ErrorProto.ErrorCode.decode(reader, reader.uint32());
+                        message.code = reader.int32();
                         break;
                     }
                     case 2: {
@@ -73,6 +72,31 @@ export namespace ErrorProto {
                 }
             }
             return message;
+        }
+
+        static decodeDelimited(reader: ($protobuf.Reader | Uint8Array)): ErrorProto.ErrorMessage {
+            (reader instanceof $Reader) || (reader = new $Reader(reader));
+            return this.decode(reader, reader.uint32());
+        }
+
+        static toObject(message: IErrorMessage, options?: $protobuf.IConversionOptions): { [k: string]: any } {
+            options || (options = {});
+            let obj : { [k: string]: any } = {};
+            if (options.defaults) {
+                obj.code = options.enums === String ? "OK" : 0;
+                obj.message = "";
+            }
+            if (message.code != null && message.hasOwnProperty("code")) {
+                obj.code = options.enums === String ? ErrorProto.ErrorCode[message.code] : message.code;
+            }
+            if (message.message != null && message.hasOwnProperty("message")) {
+                obj.message = message.message;
+            }
+            return obj;
+        }
+
+        toJSON(): { [k: string]: any } {
+            return ErrorProto.ErrorMessage.toObject(this, $protobuf.util.toJSONOptions);
         }
     }
 }

@@ -8,8 +8,6 @@ const $Reader = $protobuf.Reader, $Writer = $protobuf.Writer, $util = $protobuf.
 
 import { ResourceProto } from './ResourceProto';
 
-import { null } from './null';
-
 export namespace StoreProto {
     export interface IStorePb {
         id: number;
@@ -23,9 +21,9 @@ export namespace StoreProto {
         city: number = 100;
         META: () => Webpb.WebpbMeta;
 
-        private constructor(p: IStorePb) {
+        private constructor(p?: IStorePb) {
             Webpb.assign(p, this, []);
-            this.META = () => ({
+            this.META = () => (p && {
                 class: 'StorePb',
                 method: '',
                 path: ''
@@ -37,19 +35,19 @@ export namespace StoreProto {
         }
 
         static encode(message: IStorePb, writer?: $protobuf.Writer): $protobuf.Writer {
-            if (!writer) {
-                writer = $Writer.create();
-            }
+            writer || (writer = $Writer.create());
             writer.uint32(8).int32(message.id);
             writer.uint32(18).string(message.name);
             writer.uint32(24).int32(message.city);
             return writer;
         }
 
+        static encodeDelimited(message: IStorePb, writer?: $protobuf.Writer): $protobuf.Writer {
+            return this.encode(message, writer).ldelim();
+        }
+
         static decode(reader: ($protobuf.Reader | Uint8Array), length?: number): StoreProto.StorePb {
-            if (!(reader instanceof $Reader)) {
-                reader = $Reader.create(reader);
-            }
+            (reader instanceof $Reader) || (reader = $Reader.create(reader));
             let end = length === undefined ? reader.len : reader.pos + length;
             let message = new StoreProto.StorePb();
             while (reader.pos < end) {
@@ -83,6 +81,35 @@ export namespace StoreProto {
             }
             return message;
         }
+
+        static decodeDelimited(reader: ($protobuf.Reader | Uint8Array)): StoreProto.StorePb {
+            (reader instanceof $Reader) || (reader = new $Reader(reader));
+            return this.decode(reader, reader.uint32());
+        }
+
+        static toObject(message: IStorePb, options?: $protobuf.IConversionOptions): { [k: string]: any } {
+            options || (options = {});
+            let obj : { [k: string]: any } = {};
+            if (options.defaults) {
+                obj.id = 0;
+                obj.name = "";
+                obj.city = 0;
+            }
+            if (message.id != null && message.hasOwnProperty("id")) {
+                obj.id = message.id;
+            }
+            if (message.name != null && message.hasOwnProperty("name")) {
+                obj.name = message.name;
+            }
+            if (message.city != null && message.hasOwnProperty("city")) {
+                obj.city = message.city;
+            }
+            return obj;
+        }
+
+        toJSON(): { [k: string]: any } {
+            return StoreProto.StorePb.toObject(this, $protobuf.util.toJSONOptions);
+        }
     }
 
     export interface IProject {
@@ -104,63 +131,90 @@ export namespace StoreProto {
         }
 
         static encode(message: IProject, writer?: $protobuf.Writer): $protobuf.Writer {
-            if (!writer) {
-                writer = $Writer.create();
-            }
+            writer || (writer = $Writer.create());
             return writer;
         }
 
+        static encodeDelimited(message: IProject, writer?: $protobuf.Writer): $protobuf.Writer {
+            return this.encode(message, writer).ldelim();
+        }
+
         static decode(reader: ($protobuf.Reader | Uint8Array), length?: number): StoreProto.Project {
-            if (!(reader instanceof $Reader)) {
-                reader = $Reader.create(reader);
-            }
+            (reader instanceof $Reader) || (reader = $Reader.create(reader));
             let end = length === undefined ? reader.len : reader.pos + length;
             let message = new StoreProto.Project();
             while (reader.pos < end) {
                 const tag = reader.uint32();
-                switch (tag >>> 3) {
-                    default:
-                        reader.skipType(tag & 7);
-                        break;
-                }
+                reader.skipType(tag & 7);
             }
             return message;
         }
+
+        static decodeDelimited(reader: ($protobuf.Reader | Uint8Array)): StoreProto.Project {
+            (reader instanceof $Reader) || (reader = new $Reader(reader));
+            return this.decode(reader, reader.uint32());
+        }
+
+        static toObject(message: IProject, options?: $protobuf.IConversionOptions): { [k: string]: any } {
+            return {};
+        }
+
+        toJSON(): { [k: string]: any } {
+            return StoreProto.Project.toObject(this, $protobuf.util.toJSONOptions);
+        }
+    }
+
+    export enum StoreType {
+        NORMAL = 0,
     }
 
     export interface IStoreRequest {
         id: number;
         email: string;
         valid?: boolean;
-        data: map<string, int32>;
-        projects: map<string, Project>;
+        data: { [k: string]: number };
+        projects: { [k: string]: StoreProto.IProject };
         unpacked: number[];
         packed: number[];
         projectList: StoreProto.IProject[];
         project: StoreProto.IProject;
         max: number;
-        longData: map<int64, int32>;
-        projectData: map<int64, Project>;
+        longMap: { [k: string]: number };
+        projectMap: { [k: string]: StoreProto.IProject };
+        typeMap: { [k: string]: StoreProto.StoreType };
+        binary: Uint8Array;
+        type: StoreProto.StoreType;
+        floatData: number;
+        anyName: string;
+        anyProject: StoreProto.IProject;
+        anyStore: StoreProto.StoreType;
     }
 
     export class StoreRequest implements IStoreRequest, Webpb.WebpbMessage {
         id!: number;
         email!: string;
         valid?: boolean;
-        data!: map<string, int32>;
-        projects!: map<string, Project>;
+        data!: { [k: string]: number };
+        projects!: { [k: string]: StoreProto.IProject };
         unpacked!: number[];
         packed!: number[];
         projectList!: StoreProto.IProject[];
         project!: StoreProto.IProject;
-        max!: number;
-        longData!: map<int64, int32>;
-        projectData!: map<int64, Project>;
+        max: number = 0xfffffFFFFFFFF;
+        longMap!: { [k: string]: number };
+        projectMap!: { [k: string]: StoreProto.IProject };
+        typeMap!: { [k: string]: StoreProto.StoreType };
+        binary!: Uint8Array;
+        type!: StoreProto.StoreType;
+        floatData!: number;
+        anyName!: string;
+        anyProject!: StoreProto.IProject;
+        anyStore!: StoreProto.StoreType;
         META: () => Webpb.WebpbMeta;
 
-        private constructor(p: IStoreRequest) {
+        private constructor(p?: IStoreRequest) {
             Webpb.assign(p, this, ["id"]);
-            this.META = () => ({
+            this.META = () => (p && {
                 class: 'StoreRequest',
                 method: 'GET',
                 path: `/stores/${p.id}`
@@ -172,73 +226,81 @@ export namespace StoreProto {
         }
 
         static encode(message: IStoreRequest, writer?: $protobuf.Writer): $protobuf.Writer {
-            if (!writer) {
-                writer = $Writer.create();
-            }
+            writer || (writer = $Writer.create());
             writer.uint32(8).int32(message.id);
             writer.uint32(18).string(message.email);
             if (message.valid != null && message.hasOwnProperty("valid")) {
                 writer.uint32(24).bool(message.valid);
             }
-
             if (message.data != null && message.hasOwnProperty("data")) {
                 for (let keys = Object.keys(message.data), i = 0; i < keys.length; ++i) {
                     writer.uint32(34).fork().uint32(10).string(keys[i]).uint32(16).int32(message.data[keys[i]]).ldelim();
                 }
             }
-
             if (message.projects != null && message.hasOwnProperty("projects")) {
                 for (let keys = Object.keys(message.projects), i = 0; i < keys.length; ++i) {
                     writer.uint32(42).fork().uint32(10).string(keys[i]);
                     StoreProto.Project.encode(message.projects[keys[i]], writer.project(18).fork()).ldelim().ldelim();
                 }
             }
-
             if (message.unpacked != null && message.unpacked.length) {
                 for (let i = 0; i < message.unpacked.length; ++i) {
                     writer.uint32(48).int32(message.unpacked[i]);
                 }
             }
-
             if (message.packed != null && message.packed.length) {
                 for (let i = 0; i < message.packed.length; ++i) {
                     writer.uint32(58).fork();
                     for (let i = 0; i < message.packed.length; ++i) {
                         writer.int32(message.packed[i]);
                     }
-
                     writer.ldelim();
                 }
             }
-
             if (message.projectList != null && message.projectList.length) {
                 for (let i = 0; i < message.projectList.length; ++i) {
                     StoreProto.Project.encode(message.projectList[i], writer.uint32(66).fork()).ldelim();
                 }
             }
-
             StoreProto.Project.encode(message.project, writer.uint32(74).fork()).ldelim();
             writer.uint32(80).int64(message.max);
-            if (message.longData != null && message.hasOwnProperty("longData")) {
-                for (let keys = Object.keys(message.longData), i = 0; i < keys.length; ++i) {
-                    writer.uint32(90).fork().uint32(8).int64(keys[i]).uint32(16).int32(message.longData[keys[i]]).ldelim();
+            if (message.longMap != null && message.hasOwnProperty("longMap")) {
+                for (let keys = Object.keys(message.longMap), i = 0; i < keys.length; ++i) {
+                    writer.uint32(90).fork().uint32(8).int64(keys[i]).uint32(16).int32(message.longMap[keys[i]]).ldelim();
                 }
             }
-
-            if (message.projectData != null && message.hasOwnProperty("projectData")) {
-                for (let keys = Object.keys(message.projectData), i = 0; i < keys.length; ++i) {
+            if (message.projectMap != null && message.hasOwnProperty("projectMap")) {
+                for (let keys = Object.keys(message.projectMap), i = 0; i < keys.length; ++i) {
                     writer.uint32(98).fork().uint32(8).int64(keys[i]);
-                    StoreProto.Project.encode(message.projectData[keys[i]], writer.project(18).fork()).ldelim().ldelim();
+                    StoreProto.Project.encode(message.projectMap[keys[i]], writer.project(18).fork()).ldelim().ldelim();
                 }
             }
-
+            if (message.typeMap != null && message.hasOwnProperty("typeMap")) {
+                for (let keys = Object.keys(message.typeMap), i = 0; i < keys.length; ++i) {
+                    writer.uint32(106).fork().uint32(8).int64(keys[i]).uint32(16).int32(message.typeMap[keys[i]]).ldelim();
+                }
+            }
+            writer.uint32(114).bytes(message.binary);
+            writer.uint32(120).int32(message.type);
+            writer.uint32(133).float(message.floatData);
+            if (message.anyName != null && message.hasOwnProperty("anyName")) {
+                writer.uint32(162).string(message.anyName);
+            }
+            if (message.anyProject != null && message.hasOwnProperty("anyProject")) {
+                StoreProto.Project.encode(message.anyProject, writer.uint32(170).fork()).ldelim();
+            }
+            if (message.anyStore != null && message.hasOwnProperty("anyStore")) {
+                writer.uint32(176).int32(message.anyStore);
+            }
             return writer;
         }
 
+        static encodeDelimited(message: IStoreRequest, writer?: $protobuf.Writer): $protobuf.Writer {
+            return this.encode(message, writer).ldelim();
+        }
+
         static decode(reader: ($protobuf.Reader | Uint8Array), length?: number): StoreProto.StoreRequest {
-            if (!(reader instanceof $Reader)) {
-                reader = $Reader.create(reader);
-            }
+            (reader instanceof $Reader) || (reader = $Reader.create(reader));
             let end = length === undefined ? reader.len : reader.pos + length;
             let message = new StoreProto.StoreRequest();
             while (reader.pos < end) {
@@ -320,22 +382,56 @@ export namespace StoreProto {
                     }
                     case 11: {
                         reader.skip().pos++;
-                        if (message.longData === $util.emptyObject) {
-                            message.longData = {};
+                        if (message.longMap === $util.emptyObject) {
+                            message.longMap = {};
                         }
                         const key = reader.int64();
                         reader.pos++;
-                        message.longData[typeof key === "object" ? $util.longToHash(key) : key] = reader.int32();
+                        message.longMap[typeof key === "object" ? $util.longToHash(key) : key] = reader.int32();
                         break;
                     }
                     case 12: {
                         reader.skip().pos++;
-                        if (message.projectData === $util.emptyObject) {
-                            message.projectData = {};
+                        if (message.projectMap === $util.emptyObject) {
+                            message.projectMap = {};
                         }
                         const key = reader.int64();
                         reader.pos++;
-                        message.projectData[typeof key === "object" ? $util.longToHash(key) : key] = StoreProto.Project.decode(reader, reader.uint32());
+                        message.projectMap[typeof key === "object" ? $util.longToHash(key) : key] = StoreProto.Project.decode(reader, reader.uint32());
+                        break;
+                    }
+                    case 13: {
+                        reader.skip().pos++;
+                        if (message.typeMap === $util.emptyObject) {
+                            message.typeMap = {};
+                        }
+                        const key = reader.int64();
+                        reader.pos++;
+                        message.typeMap[typeof key === "object" ? $util.longToHash(key) : key] = reader.int32();
+                        break;
+                    }
+                    case 14: {
+                        message.binary = reader.bytes();
+                        break;
+                    }
+                    case 15: {
+                        message.type = reader.int32();
+                        break;
+                    }
+                    case 16: {
+                        message.floatData = reader.float();
+                        break;
+                    }
+                    case 20: {
+                        message.anyName = reader.string();
+                        break;
+                    }
+                    case 21: {
+                        message.anyProject = StoreProto.Project.decode(reader, reader.uint32());
+                        break;
+                    }
+                    case 22: {
+                        message.anyStore = reader.int32();
                         break;
                     }
                     default:
@@ -354,8 +450,148 @@ export namespace StoreProto {
                 if (!message.hasOwnProperty("max")) {
                     throw $util.ProtocolError("missing required 'max'", { instance: message });
                 }
+                if (!message.hasOwnProperty("binary")) {
+                    throw $util.ProtocolError("missing required 'binary'", { instance: message });
+                }
+                if (!message.hasOwnProperty("type")) {
+                    throw $util.ProtocolError("missing required 'type'", { instance: message });
+                }
+                if (!message.hasOwnProperty("floatData")) {
+                    throw $util.ProtocolError("missing required 'floatData'", { instance: message });
+                }
             }
             return message;
+        }
+
+        static decodeDelimited(reader: ($protobuf.Reader | Uint8Array)): StoreProto.StoreRequest {
+            (reader instanceof $Reader) || (reader = new $Reader(reader));
+            return this.decode(reader, reader.uint32());
+        }
+
+        static toObject(message: IStoreRequest, options?: $protobuf.IConversionOptions): { [k: string]: any } {
+            options || (options = {});
+            let obj : { [k: string]: any } = {};
+            if (options.arrays || options.defaults) {
+                obj.unpacked = [];
+                obj.packed = [];
+                obj.projectList = [];
+            }
+            if (options.objects || options.defaults) {
+                obj.data = {};
+                obj.projects = {};
+                obj.longMap = {};
+                obj.projectMap = {};
+                obj.typeMap = {};
+            }
+            if (options.defaults) {
+                obj.id = 0;
+                obj.email = "";
+                obj.valid = false;
+                obj.project = null;
+                if ($util.Long) {
+                    const long = new $util.Long(-1, 1048575, false);
+                    obj.max = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                } else {
+                    obj.max = options.longs === String ? "4503599627370495" : 4503599627370495;
+                }
+                obj.binary = options.bytes === String ? "" : options.bytes !== Array ? $util.newBuffer(obj.binary) : [];
+                obj.type = options.enums === String ? "NORMAL" : 0;
+                obj.floatData = 0;
+            }
+            let keys: string[];
+            if (message.id != null && message.hasOwnProperty("id")) {
+                obj.id = message.id;
+            }
+            if (message.email != null && message.hasOwnProperty("email")) {
+                obj.email = message.email;
+            }
+            if (message.valid != null && message.hasOwnProperty("valid")) {
+                obj.valid = message.valid;
+            }
+            if (message.data && (keys = Object.keys(message.data)).length) {
+                obj.data = {};
+                for (let i = 0; i < keys.length; ++i) {
+                    obj.data[keys[i]] = message.data[keys[i]];
+                }
+            }
+            if (message.projects && (keys = Object.keys(message.projects)).length) {
+                obj.projects = {};
+                for (let i = 0; i < keys.length; ++i) {
+                    obj.projects[keys[i]] = StoreProto.Project.toObject(message.projects[keys[i]], options);
+                }
+            }
+            if (message.unpacked && message.unpacked.length) {
+                obj.unpacked = [];
+                for (let i = 0; i < message.unpacked.length; ++i) {
+                    obj.unpacked[i] = message.unpacked[i];
+                }
+            }
+            if (message.packed && message.packed.length) {
+                obj.packed = [];
+                for (let i = 0; i < message.packed.length; ++i) {
+                    obj.packed[i] = message.packed[i];
+                }
+            }
+            if (message.projectList && message.projectList.length) {
+                obj.projectList = [];
+                for (let i = 0; i < message.projectList.length; ++i) {
+                    obj.projectList[i] = StoreProto.Project.toObject(message.projectList[i], options);
+                }
+            }
+            if (message.project != null && message.hasOwnProperty("project")) {
+                obj.project = StoreProto.Project.toObject(message.project, options);
+            }
+            if (message.max != null && message.hasOwnProperty("max")) {
+                if (typeof message.max === "number") {
+                    obj.max = options.longs === String ? String(message.max) : message.max;
+                } else {
+                    obj.max = options.longs === String ? $util.Long.prototype.toString.call(message.max) : options.longs === Number ? new $util.LongBits(message.max.low >>> 0, message.max.high >>> 0).toNumber() : message.max;
+                }
+            }
+            if (message.longMap && (keys = Object.keys(message.longMap)).length) {
+                obj.longMap = {};
+                for (let i = 0; i < keys.length; ++i) {
+                    obj.longMap[keys[i]] = message.longMap[keys[i]];
+                }
+            }
+            if (message.projectMap && (keys = Object.keys(message.projectMap)).length) {
+                obj.projectMap = {};
+                for (let i = 0; i < keys.length; ++i) {
+                    obj.projectMap[keys[i]] = StoreProto.Project.toObject(message.projectMap[keys[i]], options);
+                }
+            }
+            if (message.typeMap && (keys = Object.keys(message.typeMap)).length) {
+                obj.typeMap = {};
+                for (let i = 0; i < keys.length; ++i) {
+                    obj.typeMap[keys[i]] = options.enums === String ? StoreProto.StoreType[message.typeMap[keys[i]]] : message.typeMap[keys[i]];
+                }
+            }
+            if (message.binary != null && message.hasOwnProperty("binary")) {
+                obj.binary = options.bytes === String ? $util.base64.encode(message.binary, 0, message.binary.length) : options.bytes === Array ? Array.prototype.slice.call(message.binary) : message.binary;
+            }
+            if (message.type != null && message.hasOwnProperty("type")) {
+                obj.type = options.enums === String ? StoreProto.StoreType[message.type] : message.type;
+            }
+            if (message.floatData != null && message.hasOwnProperty("floatData")) {
+                obj.floatData = options.json && !isFinite(message.floatData) ? String(message.floatData) : message.floatData;
+            }
+            if (message.anyName != null && message.hasOwnProperty("anyName")) {
+                obj.anyName = message.anyName;
+                options.oneofs && (obj.anyData = "anyName");
+            }
+            if (message.anyProject != null && message.hasOwnProperty("anyProject")) {
+                obj.anyProject = StoreProto.Project.toObject(message.anyProject, options);
+                options.oneofs && (obj.anyData = "anyProject");
+            }
+            if (message.anyStore != null && message.hasOwnProperty("anyStore")) {
+                obj.anyStore = options.enums === String ? StoreProto.StoreType[message.anyStore] : message.anyStore;
+                options.oneofs && (obj.anyData = "anyStore");
+            }
+            return obj;
+        }
+
+        toJSON(): { [k: string]: any } {
+            return StoreProto.StoreRequest.toObject(this, $protobuf.util.toJSONOptions);
         }
     }
 
@@ -369,9 +605,9 @@ export namespace StoreProto {
         nested!: StoreProto.StoreResponse.IStoreNestedPb;
         META: () => Webpb.WebpbMeta;
 
-        private constructor(p: IStoreResponse) {
+        private constructor(p?: IStoreResponse) {
             Webpb.assign(p, this, []);
-            this.META = () => ({
+            this.META = () => (p && {
                 class: 'StoreResponse',
                 method: '',
                 path: ''
@@ -383,18 +619,18 @@ export namespace StoreProto {
         }
 
         static encode(message: IStoreResponse, writer?: $protobuf.Writer): $protobuf.Writer {
-            if (!writer) {
-                writer = $Writer.create();
-            }
+            writer || (writer = $Writer.create());
             StoreProto.StorePb.encode(message.store, writer.uint32(10).fork()).ldelim();
             StoreProto.StoreResponse.StoreNestedPb.encode(message.nested, writer.uint32(18).fork()).ldelim();
             return writer;
         }
 
+        static encodeDelimited(message: IStoreResponse, writer?: $protobuf.Writer): $protobuf.Writer {
+            return this.encode(message, writer).ldelim();
+        }
+
         static decode(reader: ($protobuf.Reader | Uint8Array), length?: number): StoreProto.StoreResponse {
-            if (!(reader instanceof $Reader)) {
-                reader = $Reader.create(reader);
-            }
+            (reader instanceof $Reader) || (reader = $Reader.create(reader));
             let end = length === undefined ? reader.len : reader.pos + length;
             let message = new StoreProto.StoreResponse();
             while (reader.pos < end) {
@@ -421,6 +657,31 @@ export namespace StoreProto {
             }
             return message;
         }
+
+        static decodeDelimited(reader: ($protobuf.Reader | Uint8Array)): StoreProto.StoreResponse {
+            (reader instanceof $Reader) || (reader = new $Reader(reader));
+            return this.decode(reader, reader.uint32());
+        }
+
+        static toObject(message: IStoreResponse, options?: $protobuf.IConversionOptions): { [k: string]: any } {
+            options || (options = {});
+            let obj : { [k: string]: any } = {};
+            if (options.defaults) {
+                obj.store = null;
+                obj.nested = null;
+            }
+            if (message.store != null && message.hasOwnProperty("store")) {
+                obj.store = StoreProto.StorePb.toObject(message.store, options);
+            }
+            if (message.nested != null && message.hasOwnProperty("nested")) {
+                obj.nested = StoreProto.StoreResponse.StoreNestedPb.toObject(message.nested, options);
+            }
+            return obj;
+        }
+
+        toJSON(): { [k: string]: any } {
+            return StoreProto.StoreResponse.toObject(this, $protobuf.util.toJSONOptions);
+        }
     }
 
     export namespace StoreResponse {
@@ -432,9 +693,9 @@ export namespace StoreProto {
             employee!: string;
             META: () => Webpb.WebpbMeta;
 
-            private constructor(p: IStoreNestedPb) {
+            private constructor(p?: IStoreNestedPb) {
                 Webpb.assign(p, this, []);
-                this.META = () => ({
+                this.META = () => (p && {
                     class: 'StoreNestedPb',
                     method: '',
                     path: ''
@@ -446,17 +707,17 @@ export namespace StoreProto {
             }
 
             static encode(message: IStoreNestedPb, writer?: $protobuf.Writer): $protobuf.Writer {
-                if (!writer) {
-                    writer = $Writer.create();
-                }
+                writer || (writer = $Writer.create());
                 writer.uint32(10).string(message.employee);
                 return writer;
             }
 
+            static encodeDelimited(message: IStoreNestedPb, writer?: $protobuf.Writer): $protobuf.Writer {
+                return this.encode(message, writer).ldelim();
+            }
+
             static decode(reader: ($protobuf.Reader | Uint8Array), length?: number): StoreProto.StoreResponse.StoreNestedPb {
-                if (!(reader instanceof $Reader)) {
-                    reader = $Reader.create(reader);
-                }
+                (reader instanceof $Reader) || (reader = $Reader.create(reader));
                 let end = length === undefined ? reader.len : reader.pos + length;
                 let message = new StoreProto.StoreResponse.StoreNestedPb();
                 while (reader.pos < end) {
@@ -475,6 +736,27 @@ export namespace StoreProto {
                     }
                 }
                 return message;
+            }
+
+            static decodeDelimited(reader: ($protobuf.Reader | Uint8Array)): StoreProto.StoreResponse.StoreNestedPb {
+                (reader instanceof $Reader) || (reader = new $Reader(reader));
+                return this.decode(reader, reader.uint32());
+            }
+
+            static toObject(message: IStoreNestedPb, options?: $protobuf.IConversionOptions): { [k: string]: any } {
+                options || (options = {});
+                let obj : { [k: string]: any } = {};
+                if (options.defaults) {
+                    obj.employee = "";
+                }
+                if (message.employee != null && message.hasOwnProperty("employee")) {
+                    obj.employee = message.employee;
+                }
+                return obj;
+            }
+
+            toJSON(): { [k: string]: any } {
+                return StoreProto.StoreResponse.StoreNestedPb.toObject(this, $protobuf.util.toJSONOptions);
             }
         }
     }
@@ -498,27 +780,36 @@ export namespace StoreProto {
         }
 
         static encode(message: IStoreCurrentRequest, writer?: $protobuf.Writer): $protobuf.Writer {
-            if (!writer) {
-                writer = $Writer.create();
-            }
+            writer || (writer = $Writer.create());
             return writer;
         }
 
+        static encodeDelimited(message: IStoreCurrentRequest, writer?: $protobuf.Writer): $protobuf.Writer {
+            return this.encode(message, writer).ldelim();
+        }
+
         static decode(reader: ($protobuf.Reader | Uint8Array), length?: number): StoreProto.StoreCurrentRequest {
-            if (!(reader instanceof $Reader)) {
-                reader = $Reader.create(reader);
-            }
+            (reader instanceof $Reader) || (reader = $Reader.create(reader));
             let end = length === undefined ? reader.len : reader.pos + length;
             let message = new StoreProto.StoreCurrentRequest();
             while (reader.pos < end) {
                 const tag = reader.uint32();
-                switch (tag >>> 3) {
-                    default:
-                        reader.skipType(tag & 7);
-                        break;
-                }
+                reader.skipType(tag & 7);
             }
             return message;
+        }
+
+        static decodeDelimited(reader: ($protobuf.Reader | Uint8Array)): StoreProto.StoreCurrentRequest {
+            (reader instanceof $Reader) || (reader = new $Reader(reader));
+            return this.decode(reader, reader.uint32());
+        }
+
+        static toObject(message: IStoreCurrentRequest, options?: $protobuf.IConversionOptions): { [k: string]: any } {
+            return {};
+        }
+
+        toJSON(): { [k: string]: any } {
+            return StoreProto.StoreCurrentRequest.toObject(this, $protobuf.util.toJSONOptions);
         }
     }
 
@@ -541,27 +832,36 @@ export namespace StoreProto {
         }
 
         static encode(message: IEmptyPb, writer?: $protobuf.Writer): $protobuf.Writer {
-            if (!writer) {
-                writer = $Writer.create();
-            }
+            writer || (writer = $Writer.create());
             return writer;
         }
 
+        static encodeDelimited(message: IEmptyPb, writer?: $protobuf.Writer): $protobuf.Writer {
+            return this.encode(message, writer).ldelim();
+        }
+
         static decode(reader: ($protobuf.Reader | Uint8Array), length?: number): StoreProto.EmptyPb {
-            if (!(reader instanceof $Reader)) {
-                reader = $Reader.create(reader);
-            }
+            (reader instanceof $Reader) || (reader = $Reader.create(reader));
             let end = length === undefined ? reader.len : reader.pos + length;
             let message = new StoreProto.EmptyPb();
             while (reader.pos < end) {
                 const tag = reader.uint32();
-                switch (tag >>> 3) {
-                    default:
-                        reader.skipType(tag & 7);
-                        break;
-                }
+                reader.skipType(tag & 7);
             }
             return message;
+        }
+
+        static decodeDelimited(reader: ($protobuf.Reader | Uint8Array)): StoreProto.EmptyPb {
+            (reader instanceof $Reader) || (reader = new $Reader(reader));
+            return this.decode(reader, reader.uint32());
+        }
+
+        static toObject(message: IEmptyPb, options?: $protobuf.IConversionOptions): { [k: string]: any } {
+            return {};
+        }
+
+        toJSON(): { [k: string]: any } {
+            return StoreProto.EmptyPb.toObject(this, $protobuf.util.toJSONOptions);
         }
     }
 
@@ -585,27 +885,36 @@ export namespace StoreProto {
             }
 
             static encode(message: IEnclosingPb, writer?: $protobuf.Writer): $protobuf.Writer {
-                if (!writer) {
-                    writer = $Writer.create();
-                }
+                writer || (writer = $Writer.create());
                 return writer;
             }
 
+            static encodeDelimited(message: IEnclosingPb, writer?: $protobuf.Writer): $protobuf.Writer {
+                return this.encode(message, writer).ldelim();
+            }
+
             static decode(reader: ($protobuf.Reader | Uint8Array), length?: number): StoreProto.EmptyPb.EnclosingPb {
-                if (!(reader instanceof $Reader)) {
-                    reader = $Reader.create(reader);
-                }
+                (reader instanceof $Reader) || (reader = $Reader.create(reader));
                 let end = length === undefined ? reader.len : reader.pos + length;
                 let message = new StoreProto.EmptyPb.EnclosingPb();
                 while (reader.pos < end) {
                     const tag = reader.uint32();
-                    switch (tag >>> 3) {
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                    }
+                    reader.skipType(tag & 7);
                 }
                 return message;
+            }
+
+            static decodeDelimited(reader: ($protobuf.Reader | Uint8Array)): StoreProto.EmptyPb.EnclosingPb {
+                (reader instanceof $Reader) || (reader = new $Reader(reader));
+                return this.decode(reader, reader.uint32());
+            }
+
+            static toObject(message: IEnclosingPb, options?: $protobuf.IConversionOptions): { [k: string]: any } {
+                return {};
+            }
+
+            toJSON(): { [k: string]: any } {
+                return StoreProto.EmptyPb.EnclosingPb.toObject(this, $protobuf.util.toJSONOptions);
             }
         }
     }
@@ -622,9 +931,9 @@ export namespace StoreProto {
         city!: number;
         META: () => Webpb.WebpbMeta;
 
-        private constructor(p: IStoresRequest) {
+        private constructor(p?: IStoresRequest) {
             Webpb.assign(p, this, ["pageable", "type"]);
-            this.META = () => ({
+            this.META = () => (p && {
                 class: 'StoresRequest',
                 method: 'POST',
                 path: `/stores/${p.type}${Webpb.query({
@@ -639,19 +948,19 @@ export namespace StoreProto {
         }
 
         static encode(message: IStoresRequest, writer?: $protobuf.Writer): $protobuf.Writer {
-            if (!writer) {
-                writer = $Writer.create();
-            }
+            writer || (writer = $Writer.create());
             ResourceProto.PageablePb.encode(message.pageable, writer.uint32(10).fork()).ldelim();
             writer.uint32(16).int32(message.type);
             writer.uint32(24).int32(message.city);
             return writer;
         }
 
+        static encodeDelimited(message: IStoresRequest, writer?: $protobuf.Writer): $protobuf.Writer {
+            return this.encode(message, writer).ldelim();
+        }
+
         static decode(reader: ($protobuf.Reader | Uint8Array), length?: number): StoreProto.StoresRequest {
-            if (!(reader instanceof $Reader)) {
-                reader = $Reader.create(reader);
-            }
+            (reader instanceof $Reader) || (reader = $Reader.create(reader));
             let end = length === undefined ? reader.len : reader.pos + length;
             let message = new StoreProto.StoresRequest();
             while (reader.pos < end) {
@@ -685,6 +994,35 @@ export namespace StoreProto {
             }
             return message;
         }
+
+        static decodeDelimited(reader: ($protobuf.Reader | Uint8Array)): StoreProto.StoresRequest {
+            (reader instanceof $Reader) || (reader = new $Reader(reader));
+            return this.decode(reader, reader.uint32());
+        }
+
+        static toObject(message: IStoresRequest, options?: $protobuf.IConversionOptions): { [k: string]: any } {
+            options || (options = {});
+            let obj : { [k: string]: any } = {};
+            if (options.defaults) {
+                obj.pageable = null;
+                obj.type = 0;
+                obj.city = 0;
+            }
+            if (message.pageable != null && message.hasOwnProperty("pageable")) {
+                obj.pageable = ResourceProto.PageablePb.toObject(message.pageable, options);
+            }
+            if (message.type != null && message.hasOwnProperty("type")) {
+                obj.type = message.type;
+            }
+            if (message.city != null && message.hasOwnProperty("city")) {
+                obj.city = message.city;
+            }
+            return obj;
+        }
+
+        toJSON(): { [k: string]: any } {
+            return StoreProto.StoresRequest.toObject(this, $protobuf.util.toJSONOptions);
+        }
     }
 
     export interface IStoresResponse {
@@ -697,9 +1035,9 @@ export namespace StoreProto {
         paging!: ResourceProto.IPagingPb;
         META: () => Webpb.WebpbMeta;
 
-        private constructor(p: IStoresResponse) {
+        private constructor(p?: IStoresResponse) {
             Webpb.assign(p, this, []);
-            this.META = () => ({
+            this.META = () => (p && {
                 class: 'StoresResponse',
                 method: '',
                 path: ''
@@ -711,18 +1049,18 @@ export namespace StoreProto {
         }
 
         static encode(message: IStoresResponse, writer?: $protobuf.Writer): $protobuf.Writer {
-            if (!writer) {
-                writer = $Writer.create();
-            }
+            writer || (writer = $Writer.create());
             StoreProto.StorePb.encode(message.stores, writer.uint32(10).fork()).ldelim();
             ResourceProto.PagingPb.encode(message.paging, writer.uint32(18).fork()).ldelim();
             return writer;
         }
 
+        static encodeDelimited(message: IStoresResponse, writer?: $protobuf.Writer): $protobuf.Writer {
+            return this.encode(message, writer).ldelim();
+        }
+
         static decode(reader: ($protobuf.Reader | Uint8Array), length?: number): StoreProto.StoresResponse {
-            if (!(reader instanceof $Reader)) {
-                reader = $Reader.create(reader);
-            }
+            (reader instanceof $Reader) || (reader = $Reader.create(reader));
             let end = length === undefined ? reader.len : reader.pos + length;
             let message = new StoreProto.StoresResponse();
             while (reader.pos < end) {
@@ -748,6 +1086,31 @@ export namespace StoreProto {
                 }
             }
             return message;
+        }
+
+        static decodeDelimited(reader: ($protobuf.Reader | Uint8Array)): StoreProto.StoresResponse {
+            (reader instanceof $Reader) || (reader = new $Reader(reader));
+            return this.decode(reader, reader.uint32());
+        }
+
+        static toObject(message: IStoresResponse, options?: $protobuf.IConversionOptions): { [k: string]: any } {
+            options || (options = {});
+            let obj : { [k: string]: any } = {};
+            if (options.defaults) {
+                obj.stores = null;
+                obj.paging = null;
+            }
+            if (message.stores != null && message.hasOwnProperty("stores")) {
+                obj.stores = StoreProto.StorePb.toObject(message.stores, options);
+            }
+            if (message.paging != null && message.hasOwnProperty("paging")) {
+                obj.paging = ResourceProto.PagingPb.toObject(message.paging, options);
+            }
+            return obj;
+        }
+
+        toJSON(): { [k: string]: any } {
+            return StoreProto.StoresResponse.toObject(this, $protobuf.util.toJSONOptions);
         }
     }
 }

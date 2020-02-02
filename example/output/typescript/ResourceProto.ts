@@ -21,9 +21,9 @@ export namespace ResourceProto {
         sort?: string;
         META: () => Webpb.WebpbMeta;
 
-        private constructor(p: IPageablePb) {
+        private constructor(p?: IPageablePb) {
             Webpb.assign(p, this, []);
-            this.META = () => ({
+            this.META = () => (p && {
                 class: 'PageablePb',
                 method: '',
                 path: ''
@@ -35,32 +35,28 @@ export namespace ResourceProto {
         }
 
         static encode(message: IPageablePb, writer?: $protobuf.Writer): $protobuf.Writer {
-            if (!writer) {
-                writer = $Writer.create();
-            }
+            writer || (writer = $Writer.create());
             if (message.pagination != null && message.hasOwnProperty("pagination")) {
                 writer.uint32(8).bool(message.pagination);
             }
-
             if (message.page != null && message.hasOwnProperty("page")) {
                 writer.uint32(16).int32(message.page);
             }
-
             if (message.size != null && message.hasOwnProperty("size")) {
                 writer.uint32(24).int32(message.size);
             }
-
             if (message.sort != null && message.hasOwnProperty("sort")) {
                 writer.uint32(34).string(message.sort);
             }
-
             return writer;
         }
 
+        static encodeDelimited(message: IPageablePb, writer?: $protobuf.Writer): $protobuf.Writer {
+            return this.encode(message, writer).ldelim();
+        }
+
         static decode(reader: ($protobuf.Reader | Uint8Array), length?: number): ResourceProto.PageablePb {
-            if (!(reader instanceof $Reader)) {
-                reader = $Reader.create(reader);
-            }
+            (reader instanceof $Reader) || (reader = $Reader.create(reader));
             let end = length === undefined ? reader.len : reader.pos + length;
             let message = new ResourceProto.PageablePb();
             while (reader.pos < end) {
@@ -89,6 +85,39 @@ export namespace ResourceProto {
             }
             return message;
         }
+
+        static decodeDelimited(reader: ($protobuf.Reader | Uint8Array)): ResourceProto.PageablePb {
+            (reader instanceof $Reader) || (reader = new $Reader(reader));
+            return this.decode(reader, reader.uint32());
+        }
+
+        static toObject(message: IPageablePb, options?: $protobuf.IConversionOptions): { [k: string]: any } {
+            options || (options = {});
+            let obj : { [k: string]: any } = {};
+            if (options.defaults) {
+                obj.pagination = false;
+                obj.page = 0;
+                obj.size = 0;
+                obj.sort = "";
+            }
+            if (message.pagination != null && message.hasOwnProperty("pagination")) {
+                obj.pagination = message.pagination;
+            }
+            if (message.page != null && message.hasOwnProperty("page")) {
+                obj.page = message.page;
+            }
+            if (message.size != null && message.hasOwnProperty("size")) {
+                obj.size = message.size;
+            }
+            if (message.sort != null && message.hasOwnProperty("sort")) {
+                obj.sort = message.sort;
+            }
+            return obj;
+        }
+
+        toJSON(): { [k: string]: any } {
+            return ResourceProto.PageablePb.toObject(this, $protobuf.util.toJSONOptions);
+        }
     }
 
     export interface IPagingPb {
@@ -105,9 +134,9 @@ export namespace ResourceProto {
         totalPage!: number;
         META: () => Webpb.WebpbMeta;
 
-        private constructor(p: IPagingPb) {
+        private constructor(p?: IPagingPb) {
             Webpb.assign(p, this, []);
-            this.META = () => ({
+            this.META = () => (p && {
                 class: 'PagingPb',
                 method: '',
                 path: ''
@@ -119,9 +148,7 @@ export namespace ResourceProto {
         }
 
         static encode(message: IPagingPb, writer?: $protobuf.Writer): $protobuf.Writer {
-            if (!writer) {
-                writer = $Writer.create();
-            }
+            writer || (writer = $Writer.create());
             writer.uint32(8).int32(message.page);
             writer.uint32(16).int32(message.size);
             writer.uint32(24).int32(message.totalCount);
@@ -129,10 +156,12 @@ export namespace ResourceProto {
             return writer;
         }
 
+        static encodeDelimited(message: IPagingPb, writer?: $protobuf.Writer): $protobuf.Writer {
+            return this.encode(message, writer).ldelim();
+        }
+
         static decode(reader: ($protobuf.Reader | Uint8Array), length?: number): ResourceProto.PagingPb {
-            if (!(reader instanceof $Reader)) {
-                reader = $Reader.create(reader);
-            }
+            (reader instanceof $Reader) || (reader = $Reader.create(reader));
             let end = length === undefined ? reader.len : reader.pos + length;
             let message = new ResourceProto.PagingPb();
             while (reader.pos < end) {
@@ -172,6 +201,39 @@ export namespace ResourceProto {
                 }
             }
             return message;
+        }
+
+        static decodeDelimited(reader: ($protobuf.Reader | Uint8Array)): ResourceProto.PagingPb {
+            (reader instanceof $Reader) || (reader = new $Reader(reader));
+            return this.decode(reader, reader.uint32());
+        }
+
+        static toObject(message: IPagingPb, options?: $protobuf.IConversionOptions): { [k: string]: any } {
+            options || (options = {});
+            let obj : { [k: string]: any } = {};
+            if (options.defaults) {
+                obj.page = 0;
+                obj.size = 0;
+                obj.totalCount = 0;
+                obj.totalPage = 0;
+            }
+            if (message.page != null && message.hasOwnProperty("page")) {
+                obj.page = message.page;
+            }
+            if (message.size != null && message.hasOwnProperty("size")) {
+                obj.size = message.size;
+            }
+            if (message.totalCount != null && message.hasOwnProperty("totalCount")) {
+                obj.totalCount = message.totalCount;
+            }
+            if (message.totalPage != null && message.hasOwnProperty("totalPage")) {
+                obj.totalPage = message.totalPage;
+            }
+            return obj;
+        }
+
+        toJSON(): { [k: string]: any } {
+            return ResourceProto.PagingPb.toObject(this, $protobuf.util.toJSONOptions);
         }
     }
 }
