@@ -17,8 +17,6 @@ import java.lang.Override;
 import java.lang.String;
 import java.lang.StringBuilder;
 import okio.ByteString;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -27,7 +25,6 @@ import java.util.Collections;
 @Getter
 @Setter
 @Accessors(chain = true)
-@JsonInclude(Include.NON_NULL)
 public final class StorePb extends Message<StorePb, StorePb.Builder> {
 
     public static final ProtoAdapter<StorePb> ADAPTER = new ProtoAdapter_StorePb();
@@ -36,7 +33,8 @@ public final class StorePb extends Message<StorePb, StorePb.Builder> {
 
     public static final MessageOptions MESSAGE_OPTIONS =
             new MessageOptions.Builder()
-                    .javaAnnotations(Collections.singletonList("@JsonInclude(Include.NON_NULL)"))
+                    .javaMessageAnnotations(
+                            Collections.singletonList("@JsonInclude(Include.NON_NULL)"))
                     .build();
 
     public static final Integer DEFAULT_ID = 0;

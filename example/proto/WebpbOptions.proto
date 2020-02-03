@@ -18,3 +18,7 @@ option (java_common_anno) = '@Accessors(chain = true)';
 
 option (java_getter) = false;
 option (java_setter) = false;
+
+option (ts_long) = false;
+option (ts_json) = false;
+option (ts_stream) = false;

@@ -10,6 +10,12 @@ extend google.protobuf.FileOptions {
     optional bool java_setter = 2002;
 
     optional bool java_getter = 2003;
+
+    optional bool ts_long = 2100;
+
+    optional bool ts_json = 2101;
+
+    optional bool ts_stream = 2102;
 }
 
 extend google.protobuf.MessageOptions {

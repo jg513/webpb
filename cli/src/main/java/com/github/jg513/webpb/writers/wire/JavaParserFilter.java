@@ -130,7 +130,7 @@ public class JavaParserFilter {
         boolean isBool = StringUtils.equalsAny(type, "Boolean", "boolean");
         filed.getVariables().forEach(v -> {
             String name = StringUtils.capitalize(v.getNameAsString());
-            if (typeContext.isGetter()) {
+            if (typeContext.isJavaGetter()) {
                 declaration
                     .addMethod((isBool ? "is" : "get") + name, Keyword.PUBLIC)
                     .setType(filed.getElementType())
@@ -138,7 +138,7 @@ public class JavaParserFilter {
                         new ReturnStmt(new FieldAccessExpr(new ThisExpr(), v.getNameAsString()))
                     )));
             }
-            if (typeContext.isSetter()) {
+            if (typeContext.isJavaSetter()) {
                 declaration
                     .addMethod("set" + name, Keyword.PUBLIC)
                     .setType(type)

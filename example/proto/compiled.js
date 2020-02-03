@@ -437,7 +437,7 @@ $root.StoreProto = (function() {
          * @property {Array.<number>|null} [packed] StoreRequest packed
          * @property {Array.<StoreProto.IProject>|null} [projectList] StoreRequest projectList
          * @property {StoreProto.IProject} project StoreRequest project
-         * @property {number|Long} max StoreRequest max
+         * @property {Long} max StoreRequest max
          * @property {Object.<string,number>|null} [longMap] StoreRequest longMap
          * @property {Object.<string,StoreProto.IProject>|null} [projectMap] StoreRequest projectMap
          * @property {Object.<string,StoreProto.StoreType>|null} [typeMap] StoreRequest typeMap
@@ -546,7 +546,7 @@ $root.StoreProto = (function() {
 
         /**
          * StoreRequest max.
-         * @member {number|Long} max
+         * @member {Long} max
          * @memberof StoreProto.StoreRequest
          * @instance
          */
@@ -2639,6 +2639,216 @@ $root.StoreProto = (function() {
         };
 
         return StoresResponse;
+    })();
+
+    StoreProto.UserMpLoginRequest = (function() {
+
+        /**
+         * Properties of a UserMpLoginRequest.
+         * @memberof StoreProto
+         * @interface IUserMpLoginRequest
+         * @property {string} appId UserMpLoginRequest appId
+         * @property {string} code UserMpLoginRequest code
+         */
+
+        /**
+         * Constructs a new UserMpLoginRequest.
+         * @memberof StoreProto
+         * @classdesc Represents a UserMpLoginRequest.
+         * @implements IUserMpLoginRequest
+         * @constructor
+         * @param {StoreProto.IUserMpLoginRequest=} [properties] Properties to set
+         */
+        function UserMpLoginRequest(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * UserMpLoginRequest appId.
+         * @member {string} appId
+         * @memberof StoreProto.UserMpLoginRequest
+         * @instance
+         */
+        UserMpLoginRequest.prototype.appId = "";
+
+        /**
+         * UserMpLoginRequest code.
+         * @member {string} code
+         * @memberof StoreProto.UserMpLoginRequest
+         * @instance
+         */
+        UserMpLoginRequest.prototype.code = "";
+
+        /**
+         * Creates a new UserMpLoginRequest instance using the specified properties.
+         * @function create
+         * @memberof StoreProto.UserMpLoginRequest
+         * @static
+         * @param {StoreProto.IUserMpLoginRequest=} [properties] Properties to set
+         * @returns {StoreProto.UserMpLoginRequest} UserMpLoginRequest instance
+         */
+        UserMpLoginRequest.create = function create(properties) {
+            return new UserMpLoginRequest(properties);
+        };
+
+        /**
+         * Encodes the specified UserMpLoginRequest message. Does not implicitly {@link StoreProto.UserMpLoginRequest.verify|verify} messages.
+         * @function encode
+         * @memberof StoreProto.UserMpLoginRequest
+         * @static
+         * @param {StoreProto.IUserMpLoginRequest} message UserMpLoginRequest message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        UserMpLoginRequest.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            writer.uint32(/* id 1, wireType 2 =*/10).string(message.appId);
+            writer.uint32(/* id 2, wireType 2 =*/18).string(message.code);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified UserMpLoginRequest message, length delimited. Does not implicitly {@link StoreProto.UserMpLoginRequest.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof StoreProto.UserMpLoginRequest
+         * @static
+         * @param {StoreProto.IUserMpLoginRequest} message UserMpLoginRequest message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        UserMpLoginRequest.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a UserMpLoginRequest message from the specified reader or buffer.
+         * @function decode
+         * @memberof StoreProto.UserMpLoginRequest
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {StoreProto.UserMpLoginRequest} UserMpLoginRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        UserMpLoginRequest.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.StoreProto.UserMpLoginRequest();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    message.appId = reader.string();
+                    break;
+                case 2:
+                    message.code = reader.string();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            if (!message.hasOwnProperty("appId"))
+                throw $util.ProtocolError("missing required 'appId'", { instance: message });
+            if (!message.hasOwnProperty("code"))
+                throw $util.ProtocolError("missing required 'code'", { instance: message });
+            return message;
+        };
+
+        /**
+         * Decodes a UserMpLoginRequest message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof StoreProto.UserMpLoginRequest
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {StoreProto.UserMpLoginRequest} UserMpLoginRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        UserMpLoginRequest.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a UserMpLoginRequest message.
+         * @function verify
+         * @memberof StoreProto.UserMpLoginRequest
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        UserMpLoginRequest.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (!$util.isString(message.appId))
+                return "appId: string expected";
+            if (!$util.isString(message.code))
+                return "code: string expected";
+            return null;
+        };
+
+        /**
+         * Creates a UserMpLoginRequest message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof StoreProto.UserMpLoginRequest
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {StoreProto.UserMpLoginRequest} UserMpLoginRequest
+         */
+        UserMpLoginRequest.fromObject = function fromObject(object) {
+            if (object instanceof $root.StoreProto.UserMpLoginRequest)
+                return object;
+            var message = new $root.StoreProto.UserMpLoginRequest();
+            if (object.appId != null)
+                message.appId = String(object.appId);
+            if (object.code != null)
+                message.code = String(object.code);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a UserMpLoginRequest message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof StoreProto.UserMpLoginRequest
+         * @static
+         * @param {StoreProto.UserMpLoginRequest} message UserMpLoginRequest
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        UserMpLoginRequest.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                object.appId = "";
+                object.code = "";
+            }
+            if (message.appId != null && message.hasOwnProperty("appId"))
+                object.appId = message.appId;
+            if (message.code != null && message.hasOwnProperty("code"))
+                object.code = message.code;
+            return object;
+        };
+
+        /**
+         * Converts this UserMpLoginRequest to JSON.
+         * @function toJSON
+         * @memberof StoreProto.UserMpLoginRequest
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        UserMpLoginRequest.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return UserMpLoginRequest;
     })();
 
     return StoreProto;
@@ -6812,6 +7022,7 @@ $root.google = (function() {
              * @property {Array.<string>|null} [".javaCommonAnno"] FileOptions .javaCommonAnno
              * @property {boolean|null} [".javaSetter"] FileOptions .javaSetter
              * @property {boolean|null} [".javaGetter"] FileOptions .javaGetter
+             * @property {boolean|null} [".longJs"] FileOptions .longJs
              */
 
             /**
@@ -6985,6 +7196,14 @@ $root.google = (function() {
             FileOptions.prototype[".javaGetter"] = false;
 
             /**
+             * FileOptions .longJs.
+             * @member {boolean} .longJs
+             * @memberof google.protobuf.FileOptions
+             * @instance
+             */
+            FileOptions.prototype[".longJs"] = false;
+
+            /**
              * Creates a new FileOptions instance using the specified properties.
              * @function create
              * @memberof google.protobuf.FileOptions
@@ -7049,6 +7268,8 @@ $root.google = (function() {
                     writer.uint32(/* id 2002, wireType 0 =*/16016).bool(message[".javaSetter"]);
                 if (message[".javaGetter"] != null && message.hasOwnProperty(".javaGetter"))
                     writer.uint32(/* id 2003, wireType 0 =*/16024).bool(message[".javaGetter"]);
+                if (message[".longJs"] != null && message.hasOwnProperty(".longJs"))
+                    writer.uint32(/* id 2004, wireType 0 =*/16032).bool(message[".longJs"]);
                 return writer;
             };
 
@@ -7145,6 +7366,9 @@ $root.google = (function() {
                         break;
                     case 2003:
                         message[".javaGetter"] = reader.bool();
+                        break;
+                    case 2004:
+                        message[".longJs"] = reader.bool();
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -7258,6 +7482,9 @@ $root.google = (function() {
                 if (message[".javaGetter"] != null && message.hasOwnProperty(".javaGetter"))
                     if (typeof message[".javaGetter"] !== "boolean")
                         return ".javaGetter: boolean expected";
+                if (message[".longJs"] != null && message.hasOwnProperty(".longJs"))
+                    if (typeof message[".longJs"] !== "boolean")
+                        return ".longJs: boolean expected";
                 return null;
             };
 
@@ -7341,6 +7568,8 @@ $root.google = (function() {
                     message[".javaSetter"] = Boolean(object[".javaSetter"]);
                 if (object[".javaGetter"] != null)
                     message[".javaGetter"] = Boolean(object[".javaGetter"]);
+                if (object[".longJs"] != null)
+                    message[".longJs"] = Boolean(object[".longJs"]);
                 return message;
             };
 
@@ -7379,6 +7608,7 @@ $root.google = (function() {
                     object.csharpNamespace = "";
                     object[".javaSetter"] = false;
                     object[".javaGetter"] = false;
+                    object[".longJs"] = false;
                 }
                 if (message.javaPackage != null && message.hasOwnProperty("javaPackage"))
                     object.javaPackage = message.javaPackage;
@@ -7427,6 +7657,8 @@ $root.google = (function() {
                     object[".javaSetter"] = message[".javaSetter"];
                 if (message[".javaGetter"] != null && message.hasOwnProperty(".javaGetter"))
                     object[".javaGetter"] = message[".javaGetter"];
+                if (message[".longJs"] != null && message.hasOwnProperty(".longJs"))
+                    object[".longJs"] = message[".longJs"];
                 return object;
             };
 
@@ -9535,8 +9767,8 @@ $root.google = (function() {
              * @interface IUninterpretedOption
              * @property {Array.<google.protobuf.UninterpretedOption.INamePart>|null} [name] UninterpretedOption name
              * @property {string|null} [identifierValue] UninterpretedOption identifierValue
-             * @property {number|Long|null} [positiveIntValue] UninterpretedOption positiveIntValue
-             * @property {number|Long|null} [negativeIntValue] UninterpretedOption negativeIntValue
+             * @property {Long|null} [positiveIntValue] UninterpretedOption positiveIntValue
+             * @property {Long|null} [negativeIntValue] UninterpretedOption negativeIntValue
              * @property {number|null} [doubleValue] UninterpretedOption doubleValue
              * @property {Uint8Array|null} [stringValue] UninterpretedOption stringValue
              * @property {string|null} [aggregateValue] UninterpretedOption aggregateValue
@@ -9576,7 +9808,7 @@ $root.google = (function() {
 
             /**
              * UninterpretedOption positiveIntValue.
-             * @member {number|Long} positiveIntValue
+             * @member {Long} positiveIntValue
              * @memberof google.protobuf.UninterpretedOption
              * @instance
              */
@@ -9584,7 +9816,7 @@ $root.google = (function() {
 
             /**
              * UninterpretedOption negativeIntValue.
-             * @member {number|Long} negativeIntValue
+             * @member {Long} negativeIntValue
              * @memberof google.protobuf.UninterpretedOption
              * @instance
              */

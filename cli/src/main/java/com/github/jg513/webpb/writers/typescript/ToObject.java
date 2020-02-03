@@ -15,10 +15,11 @@ public class ToObject extends AbstractGenerator {
     }
 
     void generateToObject(MessageType type, String className) {
-        indent().append("static toObject(message: ")
-            .append(generator.interfaceName(className))
-            .append(", options?: $protobuf.IConversionOptions): { [k: string]: any } {\n");
-        if (type.fields().isEmpty()) {
+        boolean empty = type.fields().isEmpty() && type.getOneOfs().isEmpty();
+        indent().append("static toObject(").append(empty ? "_" : "").append("message: ")
+            .append(generator.interfaceName(className)).append(", ").append(empty ? "_" : "")
+            .append("options?: $protobuf.IConversionOptions): { [k: string]: any } {\n");
+        if (empty) {
             level(() -> indent().append("return {};\n"));
         } else {
             level(() -> {
@@ -28,7 +29,7 @@ public class ToObject extends AbstractGenerator {
                 initObjects(type);
                 initDefaults(type);
                 generateFields(type);
-                type.getOneOfs().forEach(oneOf -> generateOneOf(oneOf));
+                type.getOneOfs().forEach(this::generateOneOf);
                 indent().append("return obj;\n");
             });
         }
@@ -96,10 +97,11 @@ public class ToObject extends AbstractGenerator {
             indent().append("if ($util.Long) {\n");
             long value = defaultValue == null ? 0 : Long.decode(defaultValue);
             level(() -> {
+                generator.setWithLong(true);
                 indent().append("const long = new $util.Long(")
                     .append((int) value).append(", ")
                     .append(value >> 32).append(", ")
-                    .append(protoType == ProtoType.UINT64).append(");\n");
+                    .append(protoType == ProtoType.UINT64).append(") as $long;\n");
                 indent().append("obj.max = options.longs === String ? ")
                     .append("long.toString() : options.longs === Number ")
                     .append("? long.toNumber() : long;\n");

@@ -58,7 +58,7 @@ public class JavaOptions {
                 );
             }
         }
-        List<String> annotationList = (List<String>) file.getOptions().get(FileOptions.JAVA_MESSAGE_ANNO);
+        List<String> annotationList = (List<String>) file.getOptions().get(FileOptions.JAVA_COMMON_ANNO);
         if (annotationList != null && !annotationList.isEmpty()) {
             for (String annotation : annotationList) {
                 parser.parseAnnotation(annotation).ifSuccessful(expr -> {

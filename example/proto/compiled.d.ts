@@ -224,7 +224,7 @@ export namespace StoreProto {
         project: StoreProto.IProject;
 
         /** StoreRequest max */
-        max: (number|Long);
+        max: Long;
 
         /** StoreRequest longMap */
         longMap?: ({ [k: string]: number }|null);
@@ -243,6 +243,15 @@ export namespace StoreProto {
 
         /** StoreRequest floatData */
         floatData: number;
+
+        /** StoreRequest anyName */
+        anyName?: (string|null);
+
+        /** StoreRequest anyProject */
+        anyProject?: (StoreProto.IProject|null);
+
+        /** StoreRequest anyStore */
+        anyStore?: (StoreProto.StoreType|null);
     }
 
     /** Represents a StoreRequest. */
@@ -282,7 +291,7 @@ export namespace StoreProto {
         public project: StoreProto.IProject;
 
         /** StoreRequest max. */
-        public max: (number|Long);
+        public max: Long;
 
         /** StoreRequest longMap. */
         public longMap: { [k: string]: number };
@@ -301,6 +310,18 @@ export namespace StoreProto {
 
         /** StoreRequest floatData. */
         public floatData: number;
+
+        /** StoreRequest anyName. */
+        public anyName: string;
+
+        /** StoreRequest anyProject. */
+        public anyProject?: (StoreProto.IProject|null);
+
+        /** StoreRequest anyStore. */
+        public anyStore: StoreProto.StoreType;
+
+        /** StoreRequest anyData. */
+        public anyData?: ("anyName"|"anyProject"|"anyStore");
 
         /**
          * Creates a new StoreRequest instance using the specified properties.
@@ -1010,6 +1031,102 @@ export namespace StoreProto {
 
         /**
          * Converts this StoresResponse to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+    }
+
+    /** Properties of a UserMpLoginRequest. */
+    interface IUserMpLoginRequest {
+
+        /** UserMpLoginRequest appId */
+        appId: string;
+
+        /** UserMpLoginRequest code */
+        code: string;
+    }
+
+    /** Represents a UserMpLoginRequest. */
+    class UserMpLoginRequest implements IUserMpLoginRequest {
+
+        /**
+         * Constructs a new UserMpLoginRequest.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: StoreProto.IUserMpLoginRequest);
+
+        /** UserMpLoginRequest appId. */
+        public appId: string;
+
+        /** UserMpLoginRequest code. */
+        public code: string;
+
+        /**
+         * Creates a new UserMpLoginRequest instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns UserMpLoginRequest instance
+         */
+        public static create(properties?: StoreProto.IUserMpLoginRequest): StoreProto.UserMpLoginRequest;
+
+        /**
+         * Encodes the specified UserMpLoginRequest message. Does not implicitly {@link StoreProto.UserMpLoginRequest.verify|verify} messages.
+         * @param message UserMpLoginRequest message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: StoreProto.IUserMpLoginRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified UserMpLoginRequest message, length delimited. Does not implicitly {@link StoreProto.UserMpLoginRequest.verify|verify} messages.
+         * @param message UserMpLoginRequest message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: StoreProto.IUserMpLoginRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a UserMpLoginRequest message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns UserMpLoginRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): StoreProto.UserMpLoginRequest;
+
+        /**
+         * Decodes a UserMpLoginRequest message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns UserMpLoginRequest
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): StoreProto.UserMpLoginRequest;
+
+        /**
+         * Verifies a UserMpLoginRequest message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a UserMpLoginRequest message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns UserMpLoginRequest
+         */
+        public static fromObject(object: { [k: string]: any }): StoreProto.UserMpLoginRequest;
+
+        /**
+         * Creates a plain object from a UserMpLoginRequest message. Also converts values to other types if specified.
+         * @param message UserMpLoginRequest
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: StoreProto.UserMpLoginRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this UserMpLoginRequest to JSON.
          * @returns JSON object
          */
         public toJSON(): { [k: string]: any };
@@ -2584,6 +2701,9 @@ export namespace google {
 
             /** FileOptions .javaGetter */
             ".javaGetter"?: (boolean|null);
+
+            /** FileOptions .longJs */
+            ".longJs"?: (boolean|null);
         }
 
         /** Represents a FileOptions. */
@@ -2651,6 +2771,9 @@ export namespace google {
 
             /** FileOptions .javaGetter. */
             public javaGetter: boolean;
+
+            /** FileOptions .longJs. */
+            public longJs: boolean;
 
             /**
              * Creates a new FileOptions instance using the specified properties.
@@ -3522,10 +3645,10 @@ export namespace google {
             identifierValue?: (string|null);
 
             /** UninterpretedOption positiveIntValue */
-            positiveIntValue?: (number|Long|null);
+            positiveIntValue?: (Long|null);
 
             /** UninterpretedOption negativeIntValue */
-            negativeIntValue?: (number|Long|null);
+            negativeIntValue?: (Long|null);
 
             /** UninterpretedOption doubleValue */
             doubleValue?: (number|null);
@@ -3553,10 +3676,10 @@ export namespace google {
             public identifierValue: string;
 
             /** UninterpretedOption positiveIntValue. */
-            public positiveIntValue: (number|Long);
+            public positiveIntValue: Long;
 
             /** UninterpretedOption negativeIntValue. */
-            public negativeIntValue: (number|Long);
+            public negativeIntValue: Long;
 
             /** UninterpretedOption doubleValue. */
             public doubleValue: number;

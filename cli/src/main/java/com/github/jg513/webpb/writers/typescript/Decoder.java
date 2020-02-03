@@ -37,19 +37,19 @@ public class Decoder extends AbstractGenerator {
                     });
                     indent().append("}\n");
                 }
-                for (Field field : type.fields()) {
-                    if (!field.isRequired()) {
-                        continue;
-                    }
-                    indent().append("if (!message.hasOwnProperty(\"")
-                        .append(field.getName()).append("\")) {\n");
-                    level(() -> indent().append("throw $util.ProtocolError(\"missing required '")
-                        .append(field.getName()).append("'\", { instance: message });\n")
-                    );
-                    indent().append("}\n");
-                }
             });
             indent().append("}\n");
+            for (Field field : type.fields()) {
+                if (!field.isRequired()) {
+                    continue;
+                }
+                indent().append("if (!message.hasOwnProperty(\"")
+                    .append(field.getName()).append("\")) {\n");
+                level(() -> indent().append("throw new $util.ProtocolError(\"missing required '")
+                    .append(field.getName()).append("'\", { instance: message });\n")
+                );
+                indent().append("}\n");
+            }
             indent().append("return message;\n");
         });
         closeBracket();

@@ -1,5 +1,6 @@
 package com.github.jg513.webpb.core;
 
+import com.github.jg513.webpb.core.context.SchemaContext;
 import com.github.jg513.webpb.core.specs.PendingSpec;
 import com.github.jg513.webpb.log.Logger;
 import com.squareup.wire.schema.Schema;
@@ -17,6 +18,8 @@ public class CodeWriterContext {
     private String out;
 
     private Schema schema;
+
+    private SchemaContext schemaContext;
 
     private AbstractQueue<PendingSpec> specs;
 

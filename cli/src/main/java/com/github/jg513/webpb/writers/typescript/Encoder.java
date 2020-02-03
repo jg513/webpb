@@ -11,7 +11,8 @@ public class Encoder extends AbstractGenerator {
 
     void generateEncode(MessageType type, String className) {
         String interfaceName = generator.interfaceName(className);
-        indent().append("static encode(message: ")
+        boolean empty = type.fields().isEmpty() && type.getOneOfs().isEmpty();
+        indent().append("static encode(").append(empty ? "_" : "").append("message: ")
             .append(interfaceName)
             .append(", writer?: $protobuf.Writer")
             .append("): $protobuf.Writer").append(" {\n");

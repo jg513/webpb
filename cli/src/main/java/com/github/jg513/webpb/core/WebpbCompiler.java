@@ -1,5 +1,6 @@
 package com.github.jg513.webpb.core;
 
+import com.github.jg513.webpb.core.context.SchemaContext;
 import com.github.jg513.webpb.core.specs.PendingFileSpec;
 import com.github.jg513.webpb.core.specs.PendingServiceSpec;
 import com.github.jg513.webpb.core.specs.PendingSpec;
@@ -86,6 +87,7 @@ public class WebpbCompiler {
             .log(log)
             .out(out)
             .schema(schema)
+            .schemaContext(new SchemaContext(schema))
             .specs(createSpecs(schema))
             .tags(this.tags == null ? Collections.emptyList() : Arrays.asList(this.tags))
             .build();

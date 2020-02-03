@@ -2,7 +2,6 @@ package com.github.jg513.webpb.core.context;
 
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.expr.Name;
-import com.github.jg513.webpb.core.options.FileOptions;
 import com.github.jg513.webpb.core.options.MessageOptions;
 import com.squareup.wire.schema.MessageType;
 import com.squareup.wire.schema.Type;
@@ -29,16 +28,16 @@ public class TypeContext {
 
     private String method;
 
-    private boolean getter;
+    private boolean javaGetter;
 
-    private boolean setter;
+    private boolean javaSetter;
 
     public TypeContext(FileContext fileContext, Type type) {
         this.type = type;
         this.context = fileContext.getContext();
         this.fileContext = fileContext;
-        this.getter = fileContext.isGetter();
-        this.setter = fileContext.isSetter();
+        this.javaGetter = fileContext.isJavaGetter();
+        this.javaSetter = fileContext.isJavaSetter();
         fileContext.getMessageAnnotations().keySet().forEach(expr ->
             this.annotations.put(expr.clone(), expr.getName())
         );
@@ -57,11 +56,11 @@ public class TypeContext {
             );
         }
         ParserUtils
-            .get(type.getOptions(), FileOptions.JAVA_GETTER)
-            .ifPresent(v -> this.getter = "true".equals(v));
+            .get(type.getOptions(), MessageOptions.GETTER)
+            .ifPresent(v -> this.javaGetter = "true".equals(v));
         ParserUtils
-            .get(type.getOptions(), FileOptions.JAVA_SETTER)
-            .ifPresent(v -> this.setter = "true".equals(v));
+            .get(type.getOptions(), MessageOptions.SETTER)
+            .ifPresent(v -> this.javaSetter = "true".equals(v));
     }
 
     public Optional<FieldContext> fieldContext(String field) {

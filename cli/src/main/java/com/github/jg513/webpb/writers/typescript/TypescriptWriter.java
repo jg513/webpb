@@ -34,7 +34,7 @@ public class TypescriptWriter extends CodeWriter {
                 String packageName = protoFile.getPackageName();
                 StringBuilder builder = new StringBuilder();
                 boolean hasContent = TypescriptGenerator
-                    .of(context.getSchema(), context.getTags(), builder)
+                    .of(context.getSchemaContext(), context.getSchema(), context.getTags(), builder)
                     .generate(protoFile);
                 if (!hasContent) {
                     continue;

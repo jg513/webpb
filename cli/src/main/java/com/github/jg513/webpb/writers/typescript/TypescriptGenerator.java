@@ -4,6 +4,8 @@ import com.github.jg513.webpb.core.Const;
 import com.github.jg513.webpb.core.Handler;
 import com.github.jg513.webpb.core.ParamGroup;
 import com.github.jg513.webpb.core.Utils;
+import com.github.jg513.webpb.core.context.FileContext;
+import com.github.jg513.webpb.core.context.SchemaContext;
 import com.github.jg513.webpb.core.options.FieldOptions;
 import com.github.jg513.webpb.core.options.MessageOptions;
 import com.squareup.wire.schema.EnclosingType;
@@ -29,25 +31,39 @@ import java.util.Set;
 final class TypescriptGenerator {
     private static final String INDENT = "    ";
 
+    private final SchemaContext schemaContext;
+
     private final Schema schema;
 
     private final List<String> tags;
+
+    private final StringBuilder builder;
 
     private Set<String> imports = new HashSet<>();
 
     private int level = 0;
 
-    private final StringBuilder builder;
+    private boolean withLong = false;
+
+    private FileContext fileContext;
 
     public boolean generate(ProtoFile protoFile) {
         String packageName = protoFile.getPackageName();
+        this.schemaContext.fileContext(protoFile)
+            .ifPresent(fileContext -> this.fileContext = fileContext);
+        assert fileContext != null;
         if (generateTypes(packageName, protoFile.getTypes())) {
             StringBuilder builder = new StringBuilder();
             builder.append("// " + Const.HEADER + "\n");
             builder.append("// " + Const.GIT_URL + "\n\n");
-            builder.append("import * as $protobuf from \"protobufjs\";\n");
             builder.append("import { Webpb } from 'webpb';\n\n");
-            builder.append("const $Reader = $protobuf.Reader, $Writer = $protobuf.Writer, $util = $protobuf.util;\n\n");
+            if (fileContext.isTsJson() || fileContext.isTsStream()) {
+                builder.append("import * as $protobuf from \"protobufjs\";\n");
+                if (fileContext.isTsLong() && withLong) {
+                    builder.append("import * as $long from \"long\";\n");
+                }
+                builder.append("const $Reader = $protobuf.Reader, $Writer = $protobuf.Writer, $util = $protobuf.util;\n\n");
+            }
             for (String type : imports) {
                 if (!StringUtils.startsWith(type, packageName)) {
                     builder.append("import { ").append(type)
@@ -136,17 +152,21 @@ final class TypescriptGenerator {
                 indent().append("META: () => Webpb.WebpbMeta;\n\n");
                 generateConstructor(type, className);
 
-                Encoder encoder = new Encoder(this, builder);
-                encoder.generateEncode(type, className);
-                encoder.generateEncodeDelimited(type, className);
+                if (fileContext.isTsStream()) {
+                    Encoder encoder = new Encoder(this, builder);
+                    encoder.generateEncode(type, className);
+                    encoder.generateEncodeDelimited(type, className);
 
-                Decoder decoder = new Decoder(this, builder);
-                decoder.generateDecode(type);
-                decoder.generateDecodeDelimited(type);
+                    Decoder decoder = new Decoder(this, builder);
+                    decoder.generateDecode(type);
+                    decoder.generateDecodeDelimited(type);
+                }
 
-                ToObject toObject = new ToObject(this, builder);
-                toObject.generateToObject(type, className);
-                toObject.generateToJSON(type, className);
+                if (fileContext.isTsJson()) {
+                    ToObject toObject = new ToObject(this, builder);
+                    toObject.generateToObject(type, className);
+                    toObject.generateToJSON(type, className);
+                }
             });
             closeBracket();
         });
@@ -301,7 +321,9 @@ final class TypescriptGenerator {
     }
 
     private String toTypeName(ProtoType protoType) {
-        if (Types.types.containsKey(protoType)) {
+        if (fileContext.isTsLong() && Types.longTypes.containsKey(protoType)) {
+            return "(number | $protobuf.Long)";
+        } else if (Types.types.containsKey(protoType)) {
             return Types.types.get(protoType);
         }
 
@@ -364,5 +386,9 @@ final class TypescriptGenerator {
             return;
         }
         imports.add(protoType.getEnclosingTypeOrPackage());
+    }
+
+    void setWithLong(boolean withLong) {
+        this.withLong = withLong;
     }
 }

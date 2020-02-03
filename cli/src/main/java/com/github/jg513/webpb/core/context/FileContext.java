@@ -27,9 +27,15 @@ public class FileContext {
 
     private Map<AnnotationExpr, Name> messageAnnotations = new LinkedHashMap<>();
 
-    private boolean getter = true;
+    private boolean javaGetter = true;
 
-    private boolean setter = true;
+    private boolean javaSetter = true;
+
+    private boolean tsLong = true;
+
+    private boolean tsJson = true;
+
+    private boolean tsStream = true;
 
     public FileContext(SchemaContext context, ProtoFile protoFile) {
         this.context = context;
@@ -41,18 +47,30 @@ public class FileContext {
                 extend.messageAnnotations.keySet().forEach(expr ->
                     this.messageAnnotations.put(expr.clone(), expr.getName())
                 );
-                this.getter = extend.isGetter();
-                this.setter = extend.isSetter();
+                this.javaGetter = extend.javaGetter;
+                this.javaSetter = extend.javaSetter;
+                this.tsLong = extend.tsLong;
+                this.tsJson = extend.tsJson;
+                this.tsStream = extend.tsStream;
             });
         ParserUtils
-            .getList(protoFile.getOptions(), FileOptions.JAVA_MESSAGE_ANNO)
+            .getList(protoFile.getOptions(), FileOptions.JAVA_COMMON_ANNO)
             .ifPresent(v -> this.messageAnnotations.putAll(context.parseAnnotations(v)));
         ParserUtils
             .get(protoFile.getOptions(), FileOptions.JAVA_GETTER)
-            .ifPresent(v -> this.getter = "true".equals(v));
+            .ifPresent(v -> this.javaGetter = "true".equals(v));
         ParserUtils
             .get(protoFile.getOptions(), FileOptions.JAVA_SETTER)
-            .ifPresent(v -> this.setter = "true".equals(v));
+            .ifPresent(v -> this.javaSetter = "true".equals(v));
+        ParserUtils
+            .get(protoFile.getOptions(), FileOptions.TS_LONG)
+            .ifPresent(v -> this.tsLong = "true".equals(v));
+        ParserUtils
+            .get(protoFile.getOptions(), FileOptions.TS_JSON)
+            .ifPresent(v -> this.tsJson = "true".equals(v));
+        ParserUtils
+            .get(protoFile.getOptions(), FileOptions.TS_STREAM)
+            .ifPresent(v -> this.tsStream = "true".equals(v));
         protoFile.getTypes().forEach(type ->
             typeContexts.put(type, new TypeContext(FileContext.this, type))
         );

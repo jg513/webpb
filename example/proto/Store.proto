@@ -84,3 +84,8 @@ message StoresResponse {
     required StorePb stores = 1;
     required ResourceProto.PagingPb paging = 2;
 }
+
+message UserMpLoginRequest {
+    required string appId = 1;
+    required string code = 2;
+}
