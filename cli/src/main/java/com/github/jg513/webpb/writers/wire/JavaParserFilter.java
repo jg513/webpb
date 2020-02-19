@@ -2,12 +2,15 @@ package com.github.jg513.webpb.writers.wire;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.ImportDeclaration;
+import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
+import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.TypeDeclaration;
-import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.FieldAccessExpr;
@@ -20,10 +23,10 @@ import com.github.javaparser.ast.stmt.ExplicitConstructorInvocationStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.stmt.Statement;
+import com.github.javaparser.ast.type.Type;
+import com.github.javaparser.ast.visitor.ModifierVisitor;
+import com.github.javaparser.ast.visitor.Visitable;
 import com.github.jg513.webpb.core.context.TypeContext;
-import com.github.jg513.webpb.options.FieldOptions;
-import com.github.jg513.webpb.options.FileOptions;
-import com.github.jg513.webpb.options.MessageOptions;
 import com.squareup.wire.schema.EnumType;
 import org.apache.commons.lang3.StringUtils;
 
@@ -34,13 +37,12 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.github.javaparser.ast.Modifier.Keyword;
 
 public class JavaParserFilter {
+
     private static Map<String, String> methodsMapping = new HashMap<String, String>() {{
         put("java_import", "javaImports");
         put("java_message_anno", "javaMessageAnnotations");
@@ -64,60 +66,121 @@ public class JavaParserFilter {
             return unit;
         }
 
-        visitConstructors(unit);
-        visitWireFields(unit, typeContext);
-        visitImports(unit);
-        visitOptionsBuilder(unit);
+        unit
+            .accept(new ModifierVisitor<TypeContext>() {
+
+                ClassOrInterfaceDeclaration classDeclaration = null;
+
+                @Override
+                public Visitable visit(ClassOrInterfaceDeclaration n, TypeContext arg) {
+                    if (!isMessage(n)) {
+                        return super.visit(n, arg);
+                    }
+                    classDeclaration = n;
+                    visitWireFields(n, unit, arg);
+                    if (n.getConstructors().stream().anyMatch(ctor -> ctor.getParameters().isEmpty())) {
+                        return super.visit(n, arg);
+                    }
+                    n.getConstructors().stream()
+                        .filter(ctor -> ctor.getParameters().stream().noneMatch(
+                            parameter -> "unknownFields".equals(parameter.getNameAsString())
+                        ))
+                        .findFirst()
+                        .ifPresent(ctor -> ctor.getBody().getStatements().stream()
+                            .filter(Statement::isExplicitConstructorInvocationStmt)
+                            .findFirst()
+                            .map(Statement::asExplicitConstructorInvocationStmt)
+                            .ifPresent(stmt -> {
+                                Expression expression = stmt.getArguments().get(stmt.getArguments().size() - 1);
+                                n.getMembers().addBefore(
+                                    new ConstructorDeclaration()
+                                        .addModifier(Keyword.PUBLIC)
+                                        .setName(ctor.getName())
+                                        .setBody(new BlockStmt(new NodeList<>(
+                                            new ExplicitConstructorInvocationStmt(false, null, new NodeList<>(
+                                                new NameExpr("ADAPTER"), expression
+                                            ))
+                                        ))),
+                                    ctor);
+                            })
+                        );
+                    return super.visit(n, arg);
+                }
+
+                @Override
+                public Node visit(ImportDeclaration n, TypeContext arg) {
+                    Name importName = n.getName();
+                    importName.getQualifier().ifPresent(name -> {
+                        if ("com.google.protobuf".equals(name.asString())) {
+                            n.setName(new Name(
+                                new Name("com.github.jg513.webpb.options"),
+                                importName.getIdentifier()
+                            ));
+                        }
+                    });
+                    return super.visit(n, arg);
+                }
+
+                @Override
+                public Visitable visit(MethodCallExpr n, TypeContext arg) {
+                    if (methodsMapping.containsKey(n.getNameAsString())) {
+                        n.setName(methodsMapping.get(n.getNameAsString()));
+                        visitOptionsVariableInitializer(unit, n);
+                    }
+                    return super.visit(n, arg);
+                }
+
+                @Override
+                public Visitable visit(FieldDeclaration n, TypeContext arg) {
+                    if (n.isStatic() && n.getVariable(0).getNameAsString().equals("MESSAGE_OPTIONS")) {
+                        List<ConstructorDeclaration> constructors = classDeclaration.getConstructors();
+                        classDeclaration.getMembers().addAfter(
+                            new MethodDeclaration()
+                                .setModifiers(Keyword.PUBLIC)
+                                .setType("MessageOptions")
+                                .setName("messageOptions")
+                                .setBody(new BlockStmt(
+                                    NodeList.nodeList(new ReturnStmt("MESSAGE_OPTIONS"))
+                                )),
+                            constructors.get(constructors.size() - 1)
+                        );
+                    }
+                    return super.visit(n, arg);
+                }
+            }, typeContext);
         return unit;
     }
 
-    private void visitConstructors(CompilationUnit unit) {
-        unit.getTypes().stream()
-            .filter(type -> type.getConstructors().stream()
-                .noneMatch(ctor -> ctor.getParameters().isEmpty())
-            )
-            .forEach(type -> type.getConstructors().stream()
-                .filter(ctor -> ctor.getParameters().stream().noneMatch(
-                    parameter -> "unknownFields".equals(parameter.getNameAsString())
-                ))
-                .findFirst()
-                .ifPresent(ctor -> ctor.getBody().getStatements().stream()
-                    .filter(Statement::isExplicitConstructorInvocationStmt)
-                    .findFirst()
-                    .map(Statement::asExplicitConstructorInvocationStmt)
-                    .ifPresent(stmt -> {
-                        Expression expression = stmt.getArguments().get(stmt.getArguments().size() - 1);
-                        type.getMembers().addBefore(
-                            new ConstructorDeclaration()
-                                .addModifier(Keyword.PUBLIC)
-                                .setName(ctor.getName())
-                                .setBody(new BlockStmt(new NodeList<>(
-                                    new ExplicitConstructorInvocationStmt(false, null, new NodeList<>(
-                                        new NameExpr("ADAPTER"), expression
-                                    ))
-                                ))),
-                            ctor);
-                    })
-                )
-            );
+    private boolean isMessage(ClassOrInterfaceDeclaration declaration) {
+        return declaration.getExtendedTypes().stream()
+            .anyMatch(type -> {
+                if (!type.getNameAsString().equals("Message") || !type.getTypeArguments().isPresent()) {
+                    return false;
+                }
+                NodeList<Type> types = type.getTypeArguments().get();
+                if (types.size() != 2) {
+                    return false;
+                }
+                Type type1 = types.get(0);
+                Type type2 = types.get(1);
+                return type1.asString().equals(declaration.getNameAsString())
+                    && type2.asString().equals(declaration.getNameAsString() + ".Builder");
+            });
     }
 
-    private void visitWireFields(CompilationUnit unit, TypeContext typeContext) {
+    private void visitWireFields(TypeDeclaration<?> typeDeclaration, CompilationUnit unit, TypeContext typeContext) {
         List<Name> imports = new LinkedList<>();
-        unit.getTypes().stream()
-            .peek(typeDeclaration ->
-                typeContext.getAnnotations().keySet().forEach(node -> {
-                    typeDeclaration.addAnnotation(node);
-                    imports.addAll(typeContext.getContext().parseImports(node));
-                })
-            )
-            .forEach(type -> type.getFields().stream()
-                .filter(field -> field.isAnnotationPresent("WireField"))
-                .forEach(field -> {
-                    field.setModifiers(Keyword.PRIVATE);
-                    addGetters(typeContext, type, field);
-                    addFieldAnnotations(typeContext, field, imports);
-                }));
+        typeContext.getAnnotations().keySet().forEach(node -> {
+            typeDeclaration.addAnnotation(node);
+            imports.addAll(typeContext.getContext().parseImports(node));
+        });
+        typeDeclaration.getFields().stream()
+            .filter(field -> field.isAnnotationPresent("WireField"))
+            .forEach(field -> {
+                field.setModifiers(Keyword.PRIVATE);
+                addGetters(typeContext, typeDeclaration, field);
+                addFieldAnnotations(typeContext, field, imports);
+            });
         imports.stream()
             .sorted(Comparator.comparing(Name::asString))
             .forEach(i -> unit.addImport(i.asString()));
@@ -165,53 +228,6 @@ public class JavaParserFilter {
                     imports.addAll(typeContext.getContext().parseImports(node));
                 })
             );
-    }
-
-    private void visitImports(CompilationUnit unit) {
-        unit.getImports().forEach(importDeclaration -> {
-            Name importName = importDeclaration.getName();
-            importName.getQualifier().ifPresent(name -> {
-                if ("com.google.protobuf".equals(name.asString())) {
-                    importDeclaration.setName(new Name(
-                        new Name("com.github.jg513.webpb.options"),
-                        importName.getIdentifier()
-                    ));
-                }
-            });
-        });
-    }
-
-    private void visitOptionsBuilder(CompilationUnit unit) {
-        unit.getImports().removeIf(importDeclaration ->
-            Arrays.class.getName().equals(importDeclaration.getNameAsString())
-        );
-        unit.getTypes().forEach(type ->
-            type.getFields().forEach(field -> {
-                Stream.of(FileOptions.class, FieldOptions.class, MessageOptions.class)
-                    .map(Class::getSimpleName)
-                    .filter(typeName -> typeName.equals(field.getElementType().asString()))
-                    .forEach(s ->
-                        field.getVariables().forEach(v -> this.visitOptionsVariable(unit, v))
-                    );
-            })
-        );
-    }
-
-    private void visitOptionsVariable(CompilationUnit unit, VariableDeclarator variable) {
-        variable.getInitializer().ifPresent(new Consumer<Expression>() {
-            @Override
-            public void accept(Expression expression) {
-                if (!expression.isMethodCallExpr()) {
-                    return;
-                }
-                MethodCallExpr expr = expression.asMethodCallExpr();
-                if (methodsMapping.containsKey(expr.getNameAsString())) {
-                    expr.setName(methodsMapping.get(expr.getNameAsString()));
-                    visitOptionsVariableInitializer(unit, expr);
-                }
-                expr.getScope().ifPresent(this);
-            }
-        });
     }
 
     private void visitOptionsVariableInitializer(CompilationUnit unit, MethodCallExpr expr) {

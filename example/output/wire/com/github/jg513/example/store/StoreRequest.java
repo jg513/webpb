@@ -20,6 +20,7 @@ import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.StringBuilder;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import okio.ByteString;
@@ -197,6 +198,10 @@ public final class StoreRequest extends Message<StoreRequest, StoreRequest.Build
         this.anyName = builder.anyName;
         this.anyProject = builder.anyProject;
         this.anyStore = builder.anyStore;
+    }
+
+    public MessageOptions MESSAGE_OPTIONS() {
+        return MESSAGE_OPTIONS;
     }
 
     @Override

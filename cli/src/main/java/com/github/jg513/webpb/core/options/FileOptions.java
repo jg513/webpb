@@ -5,6 +5,7 @@ import com.squareup.wire.schema.ProtoMember;
 import static com.squareup.wire.schema.Options.FILE_OPTIONS;
 
 public class FileOptions {
+
     public static final ProtoMember JAVA_IMPORT = ProtoMember.get(FILE_OPTIONS, "java_import");
 
     public static final ProtoMember JAVA_COMMON_ANNO = ProtoMember.get(FILE_OPTIONS, "java_common_anno");

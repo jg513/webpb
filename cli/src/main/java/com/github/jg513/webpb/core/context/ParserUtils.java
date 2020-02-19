@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class ParserUtils {
+
     public static Optional<String> get(Options options, ProtoMember member) {
         return Optional.ofNullable((String) options.get(member));
     }

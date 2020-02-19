@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import java.nio.file.Path;
 
 public class WireLoggerImpl implements WireLogger {
+
     @Override
     public void artifact(@NotNull Path path, @NotNull JavaFile javaFile) {
     }

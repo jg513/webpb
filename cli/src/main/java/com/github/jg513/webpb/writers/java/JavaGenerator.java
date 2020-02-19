@@ -55,6 +55,7 @@ import java.util.Map;
 import java.util.Objects;
 
 public final class JavaGenerator {
+
     private static final String ENUM_VALUE = "code";
 
     private static final Map<ProtoType, Type> TYPES_MAP = new HashMap<ProtoType, Type>() {{

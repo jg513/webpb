@@ -29,6 +29,7 @@ import java.util.Set;
 
 @RequiredArgsConstructor(staticName = "of")
 final class TypescriptGenerator {
+
     private static final String INDENT = "    ";
 
     private final SchemaContext schemaContext;

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ToObject extends AbstractGenerator {
+
     public ToObject(TypescriptGenerator generator, StringBuilder builder) {
         super(generator, builder);
     }

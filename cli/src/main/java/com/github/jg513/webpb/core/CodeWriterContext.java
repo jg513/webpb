@@ -13,6 +13,7 @@ import java.util.List;
 @Getter
 @Builder
 public class CodeWriterContext {
+
     private Logger log;
 
     private String out;

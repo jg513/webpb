@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class TypescriptWriter extends CodeWriter {
+
     public TypescriptWriter(CodeWriterContext options) {
         super(options);
     }

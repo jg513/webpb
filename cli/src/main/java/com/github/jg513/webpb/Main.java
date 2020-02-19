@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 
 @Command(name = "webpb", mixinStandardHelpOptions = true, version = "Picocli example 4.0")
 public class Main implements Runnable {
+
     @Option(names = "--proto_path", arity = "1..*", description = "Paths to resolving proto files.", required = true)
     private String[] protoPaths;
 

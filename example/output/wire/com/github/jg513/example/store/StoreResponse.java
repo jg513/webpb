@@ -120,6 +120,9 @@ public final class StoreResponse extends Message<StoreResponse, StoreResponse.Bu
         }
     }
 
+    @Getter
+    @Setter
+    @Accessors(chain = true)
     public static final class StoreNestedPb extends Message<StoreNestedPb, StoreNestedPb.Builder> {
 
         public static final ProtoAdapter<StoreNestedPb> ADAPTER = new ProtoAdapter_StoreNestedPb();
@@ -132,7 +135,11 @@ public final class StoreResponse extends Message<StoreResponse, StoreResponse.Bu
                 tag = 1,
                 adapter = "com.squareup.wire.ProtoAdapter#STRING",
                 label = WireField.Label.REQUIRED)
-        public final String employee;
+        private String employee;
+
+        public StoreNestedPb() {
+            super(ADAPTER, ByteString.EMPTY);
+        }
 
         public StoreNestedPb(String employee) {
             this(employee, ByteString.EMPTY);

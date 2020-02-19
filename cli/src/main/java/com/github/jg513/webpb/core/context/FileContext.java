@@ -19,6 +19,7 @@ import java.util.Optional;
 
 @Getter
 public class FileContext {
+
     private Map<Type, TypeContext> typeContexts = new HashMap<>();
 
     private SchemaContext context;

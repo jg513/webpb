@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 
 @RequiredArgsConstructor(staticName = "of")
 public class LoggerImpl implements Logger {
+
     private final PrintWriter out;
 
     private final PrintWriter err;

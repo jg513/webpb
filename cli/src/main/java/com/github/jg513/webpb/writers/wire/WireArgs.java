@@ -13,6 +13,7 @@ import java.util.List;
 @Setter
 @Accessors(chain = true)
 public class WireArgs {
+
     private FileSystem fs;
 
     private WireLogger log;

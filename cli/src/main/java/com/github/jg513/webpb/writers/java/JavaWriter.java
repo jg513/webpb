@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class JavaWriter extends CodeWriter {
+
     public JavaWriter(CodeWriterContext options) {
         super(options);
     }

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Types {
+
     static final Map<ProtoType, String> types = new HashMap<ProtoType, String>() {{
         put(ProtoType.BOOL, "boolean");
         put(ProtoType.BYTES, "Uint8Array");

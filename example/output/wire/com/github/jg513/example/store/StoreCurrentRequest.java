@@ -40,6 +40,10 @@ public final class StoreCurrentRequest
         super(ADAPTER, unknownFields);
     }
 
+    public MessageOptions MESSAGE_OPTIONS() {
+        return MESSAGE_OPTIONS;
+    }
+
     @Override
     public Builder newBuilder() {
         Builder builder = new Builder();

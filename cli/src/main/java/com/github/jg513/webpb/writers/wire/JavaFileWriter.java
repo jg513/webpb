@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 @RequiredArgsConstructor
 public class JavaFileWriter implements Callable<Unit> {
+
     private final SchemaContext context;
 
     private final String destination;

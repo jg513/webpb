@@ -22,6 +22,7 @@ import java.util.Optional;
 @Getter
 @Setter
 public class JavaOptions {
+
     private Map<String, Name> nameMap = new HashMap<>();
 
     private Map<AnnotationExpr, Name> annotationMap = new LinkedHashMap<>();

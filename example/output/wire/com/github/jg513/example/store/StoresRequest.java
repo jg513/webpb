@@ -18,13 +18,13 @@ import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.StringBuilder;
+import java.util.Arrays;
 import okio.ByteString;
 import javax.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Range;
-import java.util.Arrays;
 
 @Getter
 @Setter
@@ -92,6 +92,10 @@ public final class StoresRequest extends Message<StoresRequest, StoresRequest.Bu
         this.pageable = pageable;
         this.type = type;
         this.city = city;
+    }
+
+    public MessageOptions MESSAGE_OPTIONS() {
+        return MESSAGE_OPTIONS;
     }
 
     @Override

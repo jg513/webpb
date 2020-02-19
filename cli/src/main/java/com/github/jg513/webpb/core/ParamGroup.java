@@ -16,9 +16,11 @@ import java.util.regex.Pattern;
 
 @Getter
 public class ParamGroup {
+
     @Getter
     @AllArgsConstructor
     public static class Param {
+
         private String prefix;
 
         private String key;

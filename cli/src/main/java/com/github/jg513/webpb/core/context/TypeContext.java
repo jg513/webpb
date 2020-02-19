@@ -14,6 +14,7 @@ import java.util.Optional;
 
 @Getter
 public class TypeContext {
+
     private Type type;
 
     private Map<String, FieldContext> fieldContexts = new HashMap<>();

@@ -7,5 +7,6 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public class PendingFileSpec implements PendingSpec {
+
     private final ProtoFile file;
 }

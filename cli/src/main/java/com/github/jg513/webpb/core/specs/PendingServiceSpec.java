@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class PendingServiceSpec implements PendingSpec {
+
     private final ProtoFile file;
 
     private final Service service;

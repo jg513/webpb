@@ -70,6 +70,9 @@ public final class EmptyPb extends Message<EmptyPb, EmptyPb.Builder> {
         }
     }
 
+    @Getter
+    @Setter
+    @Accessors(chain = true)
     public static final class EnclosingPb extends Message<EnclosingPb, EnclosingPb.Builder> {
 
         public static final ProtoAdapter<EnclosingPb> ADAPTER = new ProtoAdapter_EnclosingPb();

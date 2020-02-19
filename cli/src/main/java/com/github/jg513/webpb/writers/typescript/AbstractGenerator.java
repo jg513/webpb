@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public abstract class AbstractGenerator {
+
     protected final TypescriptGenerator generator;
 
     protected final StringBuilder builder;

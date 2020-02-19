@@ -5,6 +5,7 @@ import com.squareup.wire.schema.MessageType;
 import com.squareup.wire.schema.ProtoType;
 
 public class Decoder extends AbstractGenerator {
+
     public Decoder(TypescriptGenerator generator, StringBuilder builder) {
         super(generator, builder);
     }

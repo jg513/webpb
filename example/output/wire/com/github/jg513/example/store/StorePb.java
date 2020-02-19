@@ -16,6 +16,7 @@ import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.StringBuilder;
+import java.util.Arrays;
 import okio.ByteString;
 import lombok.Getter;
 import lombok.Setter;
@@ -74,6 +75,10 @@ public final class StorePb extends Message<StorePb, StorePb.Builder> {
         this.id = id;
         this.name = name;
         this.city = city;
+    }
+
+    public MessageOptions MESSAGE_OPTIONS() {
+        return MESSAGE_OPTIONS;
     }
 
     @Override

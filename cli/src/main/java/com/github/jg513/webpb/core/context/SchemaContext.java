@@ -22,6 +22,7 @@ import java.util.Optional;
 @Getter
 @Setter
 public class SchemaContext {
+
     private static final String OPTIONS_FILE = "WebpbOptions";
 
     private Map<ProtoFile, FileContext> fileContexts = new HashMap<>();

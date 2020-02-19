@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class WebpbCompiler {
+
     private static final int MAX_WRITE_CONCURRENCY = 8;
 
     private static final String DESCRIPTOR_PROTO = "google/protobuf/descriptor.proto";

@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class QualifiedNames {
+
     private Map<String, Name> qualifiedNames = new ConcurrentHashMap<>();
 
     public void putAll(Map<String, Name> names) {
