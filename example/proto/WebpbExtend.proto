@@ -16,6 +16,8 @@ extend google.protobuf.FileOptions {
     optional bool ts_json = 2101;
 
     optional bool ts_stream = 2102;
+
+    optional bool ts_long_as_string = 2103;
 }
 
 extend google.protobuf.MessageOptions {
@@ -34,4 +36,6 @@ extend google.protobuf.FieldOptions {
     optional bool omitted = 1000;
 
     repeated string java_anno = 2000;
+
+    optional bool ts_string = 3000;
 }

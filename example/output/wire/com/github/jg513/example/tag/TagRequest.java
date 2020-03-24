@@ -43,7 +43,7 @@ public final class TagRequest extends Message<TagRequest, TagRequest.Builder> {
         super(ADAPTER, unknownFields);
     }
 
-    public MessageOptions MESSAGE_OPTIONS() {
+    public MessageOptions messageOptions() {
         return MESSAGE_OPTIONS;
     }
 

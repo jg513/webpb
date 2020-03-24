@@ -38,6 +38,8 @@ public class FileContext {
 
     private boolean tsStream = true;
 
+    private boolean tsLongAsString = true;
+
     public FileContext(SchemaContext context, ProtoFile protoFile) {
         this.context = context;
         this.protoFile = protoFile;
@@ -53,6 +55,7 @@ public class FileContext {
                 this.tsLong = extend.tsLong;
                 this.tsJson = extend.tsJson;
                 this.tsStream = extend.tsStream;
+                this.tsLongAsString = extend.tsLongAsString;
             });
         ParserUtils
             .getList(protoFile.getOptions(), FileOptions.JAVA_COMMON_ANNO)
@@ -72,6 +75,9 @@ public class FileContext {
         ParserUtils
             .get(protoFile.getOptions(), FileOptions.TS_STREAM)
             .ifPresent(v -> this.tsStream = "true".equals(v));
+        ParserUtils
+            .get(protoFile.getOptions(), FileOptions.TS_LONG_AS_STRING)
+            .ifPresent(v -> this.tsLongAsString = "true".equals(v));
         protoFile.getTypes().forEach(type ->
             typeContexts.put(type, new TypeContext(FileContext.this, type))
         );

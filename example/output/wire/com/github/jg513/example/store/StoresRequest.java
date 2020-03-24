@@ -94,7 +94,7 @@ public final class StoresRequest extends Message<StoresRequest, StoresRequest.Bu
         this.city = city;
     }
 
-    public MessageOptions MESSAGE_OPTIONS() {
+    public MessageOptions messageOptions() {
         return MESSAGE_OPTIONS;
     }
 

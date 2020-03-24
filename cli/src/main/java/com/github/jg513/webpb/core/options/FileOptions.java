@@ -19,4 +19,6 @@ public class FileOptions {
     public static final ProtoMember TS_JSON = ProtoMember.get(FILE_OPTIONS, "ts_json");
 
     public static final ProtoMember TS_STREAM = ProtoMember.get(FILE_OPTIONS, "ts_stream");
+
+    public static final ProtoMember TS_LONG_AS_STRING = ProtoMember.get(FILE_OPTIONS, "ts_long_as_string");
 }

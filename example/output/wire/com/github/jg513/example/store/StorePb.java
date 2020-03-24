@@ -77,7 +77,7 @@ public final class StorePb extends Message<StorePb, StorePb.Builder> {
         this.city = city;
     }
 
-    public MessageOptions MESSAGE_OPTIONS() {
+    public MessageOptions messageOptions() {
         return MESSAGE_OPTIONS;
     }
 

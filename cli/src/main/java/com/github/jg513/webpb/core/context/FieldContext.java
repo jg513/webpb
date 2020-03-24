@@ -20,6 +20,8 @@ public class FieldContext {
 
     private boolean omitted = false;
 
+    private boolean tsString = false;
+
     public FieldContext(TypeContext typeContext, Field field) {
         this.context = typeContext.getContext();
         this.typeContext = typeContext;
@@ -29,5 +31,8 @@ public class FieldContext {
         ParserUtils
             .get(field.getOptions(), FieldOptions.OMITTED)
             .ifPresent(v -> this.omitted = "true".equals(v));
+        ParserUtils
+            .get(field.getOptions(), FieldOptions.TS_STRING)
+            .ifPresent(v -> this.tsString = "true".equals(v));
     }
 }

@@ -200,7 +200,7 @@ public final class StoreRequest extends Message<StoreRequest, StoreRequest.Build
         this.anyStore = builder.anyStore;
     }
 
-    public MessageOptions MESSAGE_OPTIONS() {
+    public MessageOptions messageOptions() {
         return MESSAGE_OPTIONS;
     }
 

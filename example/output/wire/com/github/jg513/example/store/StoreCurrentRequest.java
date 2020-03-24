@@ -40,7 +40,7 @@ public final class StoreCurrentRequest
         super(ADAPTER, unknownFields);
     }
 
-    public MessageOptions MESSAGE_OPTIONS() {
+    public MessageOptions messageOptions() {
         return MESSAGE_OPTIONS;
     }
 

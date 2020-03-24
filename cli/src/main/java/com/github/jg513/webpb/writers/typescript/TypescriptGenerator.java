@@ -4,8 +4,10 @@ import com.github.jg513.webpb.core.Const;
 import com.github.jg513.webpb.core.Handler;
 import com.github.jg513.webpb.core.ParamGroup;
 import com.github.jg513.webpb.core.Utils;
+import com.github.jg513.webpb.core.context.FieldContext;
 import com.github.jg513.webpb.core.context.FileContext;
 import com.github.jg513.webpb.core.context.SchemaContext;
+import com.github.jg513.webpb.core.context.TypeContext;
 import com.github.jg513.webpb.core.options.FieldOptions;
 import com.github.jg513.webpb.core.options.MessageOptions;
 import com.squareup.wire.schema.EnclosingType;
@@ -174,6 +176,7 @@ final class TypescriptGenerator {
     }
 
     private void generateMessageFields(MessageType type, boolean isInterface) {
+        TypeContext typeContext = fileContext.typeContext(type).orElse(null);
         for (Field field : type.getFieldsAndOneOfFields()) {
             ProtoType protoType = field.getType();
             assert protoType != null;
@@ -186,14 +189,16 @@ final class TypescriptGenerator {
             } else if (!isInterface & field.getDefault() == null) {
                 builder.append('!');
             }
+            FieldContext fieldContext = typeContext == null
+                ? null : typeContext.fieldContext(field.getName()).orElse(null);
             if (protoType.isMap()) {
                 ProtoType keyType = protoType.getKeyType();
                 ProtoType valueType = protoType.getValueType();
                 assert keyType != null && valueType != null;
                 builder.append(": ").append("{ [k: string]: ")
-                    .append(toTypeName(valueType)).append(" }");
+                    .append(toTypeName(valueType, fieldContext)).append(" }");
             } else {
-                String typeName = toTypeName(protoType);
+                String typeName = toTypeName(protoType, fieldContext);
                 builder.append(": ").append(typeName);
                 if (field.isRepeated()) {
                     builder.append("[]");
@@ -321,9 +326,15 @@ final class TypescriptGenerator {
         indent().append(key).append(": ").append(value == null ? "" : value).append(",\n");
     }
 
-    private String toTypeName(ProtoType protoType) {
-        if (fileContext.isTsLong() && Types.longTypes.containsKey(protoType)) {
-            return "(number | $protobuf.Long)";
+    private String toTypeName(ProtoType protoType, FieldContext fieldContext) {
+        if (Types.longTypes.containsKey(protoType)) {
+            if (fileContext.isTsLong()) {
+                return "(number | $protobuf.Long)";
+            } else if (fileContext.isTsLongAsString()) {
+                return "string";
+            } else if (fieldContext != null && fieldContext.isTsString()) {
+                return "string";
+            }
         } else if (Types.types.containsKey(protoType)) {
             return Types.types.get(protoType);
         }

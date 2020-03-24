@@ -55,6 +55,7 @@ public class JavaParserFilter {
         put("path", "path");
         put("tag", "tags");
         put("java_anno", "javaAnnotations");
+        put("ts_string", "tsString");
     }};
 
     private JavaParser javaParser = new JavaParser();
