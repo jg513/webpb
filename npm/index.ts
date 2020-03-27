@@ -51,7 +51,7 @@ export namespace Webpb {
         // tslint:disable-next-line:forin
         for (const key in params) {
             const v = params[key];
-            if (v === null || v === undefined) {
+            if (v === null || v === undefined || v === '') {
                 continue;
             }
             str += str.length === 0 ? '?' : '&';

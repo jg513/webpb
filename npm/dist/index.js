@@ -43,7 +43,7 @@ var Webpb;
         // tslint:disable-next-line:forin
         for (var key in params) {
             var v = params[key];
-            if (v === null || v === undefined) {
+            if (v === null || v === undefined || v === '') {
                 continue;
             }
             str += str.length === 0 ? '?' : '&';
