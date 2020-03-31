@@ -335,7 +335,8 @@ final class TypescriptGenerator {
             } else if (fieldContext != null && fieldContext.isTsString()) {
                 return "string";
             }
-        } else if (Types.types.containsKey(protoType)) {
+        }
+        if (Types.types.containsKey(protoType)) {
             return Types.types.get(protoType);
         }
 

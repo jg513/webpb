@@ -78,9 +78,12 @@ public class FileContext {
         ParserUtils
             .get(protoFile.getOptions(), FileOptions.TS_LONG_AS_STRING)
             .ifPresent(v -> this.tsLongAsString = "true".equals(v));
-        protoFile.getTypes().forEach(type ->
-            typeContexts.put(type, new TypeContext(FileContext.this, type))
-        );
+        protoFile.getTypes().forEach(this::genTypeContexts);
+    }
+
+    private void genTypeContexts(Type type) {
+        typeContexts.put(type, new TypeContext(FileContext.this, type));
+        type.getNestedTypes().forEach(this::genTypeContexts);
     }
 
     private Map<String, Name> parseImports(JavaParser javaParser, ProtoFile protoFile) {

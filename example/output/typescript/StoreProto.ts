@@ -72,6 +72,7 @@ export namespace StoreProto {
         binary: Uint8Array;
         type: StoreProto.StoreType;
         floatData: number;
+        stringField: string;
         anyName: string;
         anyProject: StoreProto.IProject;
         anyStore: StoreProto.StoreType;
@@ -94,6 +95,7 @@ export namespace StoreProto {
         binary!: Uint8Array;
         type!: StoreProto.StoreType;
         floatData!: number;
+        stringField!: string;
         anyName!: string;
         anyProject!: StoreProto.IProject;
         anyStore!: StoreProto.StoreType;
@@ -201,21 +203,24 @@ export namespace StoreProto {
 
     export namespace EmptyPb {
         export interface IEnclosingPb {
+            innerString: string;
         }
 
         export class EnclosingPb implements IEnclosingPb {
+            innerString!: string;
             META: () => Webpb.WebpbMeta;
 
-            private constructor() {
-                this.META = () => ({
+            private constructor(p?: IEnclosingPb) {
+                Webpb.assign(p, this, []);
+                this.META = () => (p && {
                     class: 'EnclosingPb',
                     method: '',
                     path: ''
                 });
             }
 
-            static create(): EnclosingPb {
-                return new EnclosingPb();
+            static create(properties: IEnclosingPb): EnclosingPb {
+                return new EnclosingPb(properties);
             }
         }
     }

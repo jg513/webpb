@@ -22,4 +22,4 @@ option (java_setter) = false;
 option (ts_long) = false;
 option (ts_json) = false;
 option (ts_stream) = false;
-option (ts_long_as_string) = true;
+option (ts_long_as_string) = false;

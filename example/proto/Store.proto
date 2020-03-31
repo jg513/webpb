@@ -48,6 +48,7 @@ message StoreRequest {
         Project anyProject = 21;
         StoreType anyStore = 22;
     }
+    required int64 stringField = 24 [(ts_string) = true];
 }
 
 message StoreResponse {
@@ -67,6 +68,7 @@ message StoreCurrentRequest {
 
 message EmptyPb {
     message EnclosingPb {
+        required int64 innerString = 24 [(ts_string) = true];
     }
 }
 
