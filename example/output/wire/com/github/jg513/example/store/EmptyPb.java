@@ -2,12 +2,16 @@
 // Source file: Store.proto
 package com.github.jg513.example.store;
 
+import com.github.jg513.webpb.options.FieldOptions;
 import com.squareup.wire.FieldEncoding;
 import com.squareup.wire.Message;
 import com.squareup.wire.ProtoAdapter;
 import com.squareup.wire.ProtoReader;
 import com.squareup.wire.ProtoWriter;
+import com.squareup.wire.WireField;
+import com.squareup.wire.internal.Internal;
 import java.io.IOException;
+import java.lang.Long;
 import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
@@ -79,17 +83,34 @@ public final class EmptyPb extends Message<EmptyPb, EmptyPb.Builder> {
 
         private static final long serialVersionUID = 0L;
 
+        public static final FieldOptions FIELD_OPTIONS_INNERSTRING =
+                new FieldOptions.Builder().tsString(true).build();
+
+        public static final Long DEFAULT_INNERSTRING = 0L;
+
+        @WireField(
+                tag = 24,
+                adapter = "com.squareup.wire.ProtoAdapter#INT64",
+                label = WireField.Label.REQUIRED)
+        private Long innerString;
+
         public EnclosingPb() {
-            this(ByteString.EMPTY);
+            super(ADAPTER, ByteString.EMPTY);
         }
 
-        public EnclosingPb(ByteString unknownFields) {
+        public EnclosingPb(Long innerString) {
+            this(innerString, ByteString.EMPTY);
+        }
+
+        public EnclosingPb(Long innerString, ByteString unknownFields) {
             super(ADAPTER, unknownFields);
+            this.innerString = innerString;
         }
 
         @Override
         public Builder newBuilder() {
             Builder builder = new Builder();
+            builder.innerString = innerString;
             builder.addUnknownFields(unknownFields());
             return builder;
         }
@@ -99,27 +120,44 @@ public final class EmptyPb extends Message<EmptyPb, EmptyPb.Builder> {
             if (other == this) return true;
             if (!(other instanceof EnclosingPb)) return false;
             EnclosingPb o = (EnclosingPb) other;
-            return unknownFields().equals(o.unknownFields());
+            return unknownFields().equals(o.unknownFields()) && innerString.equals(o.innerString);
         }
 
         @Override
         public int hashCode() {
-            return unknownFields().hashCode();
+            int result = super.hashCode;
+            if (result == 0) {
+                result = unknownFields().hashCode();
+                result = result * 37 + innerString.hashCode();
+                super.hashCode = result;
+            }
+            return result;
         }
 
         @Override
         public String toString() {
             StringBuilder builder = new StringBuilder();
+            builder.append(", innerString=").append(innerString);
             return builder.replace(0, 2, "EnclosingPb{").append('}').toString();
         }
 
         public static final class Builder extends Message.Builder<EnclosingPb, Builder> {
 
+            public Long innerString;
+
             public Builder() {}
+
+            public Builder innerString(Long innerString) {
+                this.innerString = innerString;
+                return this;
+            }
 
             @Override
             public EnclosingPb build() {
-                return new EnclosingPb(super.buildUnknownFields());
+                if (innerString == null) {
+                    throw Internal.missingRequiredFields(innerString, "innerString");
+                }
+                return new EnclosingPb(innerString, super.buildUnknownFields());
             }
         }
 
@@ -131,11 +169,13 @@ public final class EmptyPb extends Message<EmptyPb, EmptyPb.Builder> {
 
             @Override
             public int encodedSize(EnclosingPb value) {
-                return value.unknownFields().size();
+                return ProtoAdapter.INT64.encodedSizeWithTag(24, value.innerString)
+                        + value.unknownFields().size();
             }
 
             @Override
             public void encode(ProtoWriter writer, EnclosingPb value) throws IOException {
+                ProtoAdapter.INT64.encodeWithTag(writer, 24, value.innerString);
                 writer.writeBytes(value.unknownFields());
             }
 
@@ -145,6 +185,9 @@ public final class EmptyPb extends Message<EmptyPb, EmptyPb.Builder> {
                 long token = reader.beginMessage();
                 for (int tag; (tag = reader.nextTag()) != -1; ) {
                     switch (tag) {
+                        case 24:
+                            builder.innerString(ProtoAdapter.INT64.decode(reader));
+                            break;
                         default:
                             {
                                 reader.readUnknownField(tag);

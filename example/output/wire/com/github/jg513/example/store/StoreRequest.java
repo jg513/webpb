@@ -52,6 +52,9 @@ public final class StoreRequest extends Message<StoreRequest, StoreRequest.Build
                             Collections.singletonList("@Pattern(regexp = Const.EMAIL_REGEX)"))
                     .build();
 
+    public static final FieldOptions FIELD_OPTIONS_STRINGFIELD =
+            new FieldOptions.Builder().tsString(true).build();
+
     public static final Integer DEFAULT_ID = 0;
 
     public static final String DEFAULT_EMAIL = "";
@@ -65,6 +68,8 @@ public final class StoreRequest extends Message<StoreRequest, StoreRequest.Build
     public static final StoreType DEFAULT_TYPE = StoreType.NORMAL;
 
     public static final Float DEFAULT_FLOATDATA = 0.0f;
+
+    public static final Long DEFAULT_STRINGFIELD = 0L;
 
     public static final String DEFAULT_ANYNAME = "";
 
@@ -164,6 +169,12 @@ public final class StoreRequest extends Message<StoreRequest, StoreRequest.Build
             label = WireField.Label.REQUIRED)
     private Float floatData;
 
+    @WireField(
+            tag = 24,
+            adapter = "com.squareup.wire.ProtoAdapter#INT64",
+            label = WireField.Label.REQUIRED)
+    private Long stringField;
+
     @WireField(tag = 20, adapter = "com.squareup.wire.ProtoAdapter#STRING")
     private String anyName;
 
@@ -172,6 +183,10 @@ public final class StoreRequest extends Message<StoreRequest, StoreRequest.Build
 
     @WireField(tag = 22, adapter = "com.github.jg513.example.store.StoreType#ADAPTER")
     private StoreType anyStore;
+
+    public StoreRequest() {
+        super(ADAPTER, ByteString.EMPTY);
+    }
 
     public StoreRequest(Builder builder, ByteString unknownFields) {
         super(ADAPTER, unknownFields);
@@ -195,6 +210,7 @@ public final class StoreRequest extends Message<StoreRequest, StoreRequest.Build
         this.binary = builder.binary;
         this.type = builder.type;
         this.floatData = builder.floatData;
+        this.stringField = builder.stringField;
         this.anyName = builder.anyName;
         this.anyProject = builder.anyProject;
         this.anyStore = builder.anyStore;
@@ -223,6 +239,7 @@ public final class StoreRequest extends Message<StoreRequest, StoreRequest.Build
         builder.binary = binary;
         builder.type = type;
         builder.floatData = floatData;
+        builder.stringField = stringField;
         builder.anyName = anyName;
         builder.anyProject = anyProject;
         builder.anyStore = anyStore;
@@ -252,6 +269,7 @@ public final class StoreRequest extends Message<StoreRequest, StoreRequest.Build
                 && binary.equals(o.binary)
                 && type.equals(o.type)
                 && floatData.equals(o.floatData)
+                && stringField.equals(o.stringField)
                 && Internal.equals(anyName, o.anyName)
                 && Internal.equals(anyProject, o.anyProject)
                 && Internal.equals(anyStore, o.anyStore);
@@ -278,6 +296,7 @@ public final class StoreRequest extends Message<StoreRequest, StoreRequest.Build
             result = result * 37 + binary.hashCode();
             result = result * 37 + type.hashCode();
             result = result * 37 + floatData.hashCode();
+            result = result * 37 + stringField.hashCode();
             result = result * 37 + (anyName != null ? anyName.hashCode() : 0);
             result = result * 37 + (anyProject != null ? anyProject.hashCode() : 0);
             result = result * 37 + (anyStore != null ? anyStore.hashCode() : 0);
@@ -305,6 +324,7 @@ public final class StoreRequest extends Message<StoreRequest, StoreRequest.Build
         builder.append(", binary=").append(binary);
         builder.append(", type=").append(type);
         builder.append(", floatData=").append(floatData);
+        builder.append(", stringField=").append(stringField);
         if (anyName != null) builder.append(", anyName=").append(anyName);
         if (anyProject != null) builder.append(", anyProject=").append(anyProject);
         if (anyStore != null) builder.append(", anyStore=").append(anyStore);
@@ -344,6 +364,8 @@ public final class StoreRequest extends Message<StoreRequest, StoreRequest.Build
         public StoreType type;
 
         public Float floatData;
+
+        public Long stringField;
 
         public String anyName;
 
@@ -450,6 +472,11 @@ public final class StoreRequest extends Message<StoreRequest, StoreRequest.Build
             return this;
         }
 
+        public Builder stringField(Long stringField) {
+            this.stringField = stringField;
+            return this;
+        }
+
         public Builder anyName(String anyName) {
             this.anyName = anyName;
             this.anyProject = null;
@@ -479,7 +506,8 @@ public final class StoreRequest extends Message<StoreRequest, StoreRequest.Build
                     || max == null
                     || binary == null
                     || type == null
-                    || floatData == null) {
+                    || floatData == null
+                    || stringField == null) {
                 throw Internal.missingRequiredFields(
                         id,
                         "id",
@@ -494,7 +522,9 @@ public final class StoreRequest extends Message<StoreRequest, StoreRequest.Build
                         type,
                         "type",
                         floatData,
-                        "floatData");
+                        "floatData",
+                        stringField,
+                        "stringField");
             }
             return new StoreRequest(this, super.buildUnknownFields());
         }
@@ -539,6 +569,7 @@ public final class StoreRequest extends Message<StoreRequest, StoreRequest.Build
                     + ProtoAdapter.BYTES.encodedSizeWithTag(14, value.binary)
                     + StoreType.ADAPTER.encodedSizeWithTag(15, value.type)
                     + ProtoAdapter.FLOAT.encodedSizeWithTag(16, value.floatData)
+                    + ProtoAdapter.INT64.encodedSizeWithTag(24, value.stringField)
                     + ProtoAdapter.STRING.encodedSizeWithTag(20, value.anyName)
                     + Project.ADAPTER.encodedSizeWithTag(21, value.anyProject)
                     + StoreType.ADAPTER.encodedSizeWithTag(22, value.anyStore)
@@ -563,6 +594,7 @@ public final class StoreRequest extends Message<StoreRequest, StoreRequest.Build
             ProtoAdapter.BYTES.encodeWithTag(writer, 14, value.binary);
             StoreType.ADAPTER.encodeWithTag(writer, 15, value.type);
             ProtoAdapter.FLOAT.encodeWithTag(writer, 16, value.floatData);
+            ProtoAdapter.INT64.encodeWithTag(writer, 24, value.stringField);
             ProtoAdapter.STRING.encodeWithTag(writer, 20, value.anyName);
             Project.ADAPTER.encodeWithTag(writer, 21, value.anyProject);
             StoreType.ADAPTER.encodeWithTag(writer, 22, value.anyStore);
@@ -644,6 +676,9 @@ public final class StoreRequest extends Message<StoreRequest, StoreRequest.Build
                             }
                             break;
                         }
+                    case 24:
+                        builder.stringField(ProtoAdapter.INT64.decode(reader));
+                        break;
                     default:
                         {
                             reader.readUnknownField(tag);

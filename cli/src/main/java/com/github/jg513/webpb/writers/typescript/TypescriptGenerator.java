@@ -42,7 +42,7 @@ final class TypescriptGenerator {
 
     private final StringBuilder builder;
 
-    private Set<String> imports = new HashSet<>();
+    private final Set<String> imports = new HashSet<>();
 
     private int level = 0;
 
@@ -69,8 +69,8 @@ final class TypescriptGenerator {
             }
             for (String type : imports) {
                 if (!StringUtils.startsWith(type, packageName)) {
-                    builder.append("import { ").append(type)
-                        .append(" } from './").append(type).append("';\n\n");
+                    builder.append("import * as ").append(type)
+                        .append(" from './").append(type).append("';\n\n");
                 }
             }
             this.builder.insert(0, builder);
@@ -81,7 +81,6 @@ final class TypescriptGenerator {
 
     @SuppressWarnings("unchecked")
     private boolean generateTypes(String namespace, List<Type> types) {
-        indent().append("export namespace ").append(namespace).append(" {\n");
         boolean hasContent = false;
         for (Type type : types) {
             if (type instanceof MessageType && !tags.isEmpty()) {
@@ -99,7 +98,6 @@ final class TypescriptGenerator {
                 ));
             }
         }
-        closeBracket();
         if (level == 0) {
             trimDuplicatedNewline();
         }
@@ -119,60 +117,54 @@ final class TypescriptGenerator {
     }
 
     private void generateEnum(EnumType type) {
-        level(() -> {
-            indent().append("export enum ").append(type.getType().getSimpleName()).append(" {\n");
+        indent().append("export enum ").append(type.getType().getSimpleName()).append(" {\n");
 
-            for (EnumConstant constant : type.getConstants()) {
-                level(() -> indent().append(constant.getName())
-                    .append(" = ").append(constant.getTag()).append(",\n")
-                );
-            }
-            closeBracket();
-        });
+        for (EnumConstant constant : type.getConstants()) {
+            level(() -> indent().append(constant.getName())
+                .append(" = ").append(constant.getTag()).append(",\n")
+            );
+        }
+        closeBracket();
     }
 
     private void generateMessage(MessageType type) {
         String className = type.getType().getSimpleName();
 
-        level(() -> {
-            indent().append("export interface ").append(interfaceName(className)).append(" {\n");
-            level(() -> generateMessageFields(type, true));
-            closeBracket();
-        });
+        indent().append("export interface ").append(interfaceName(className)).append(" {\n");
+        level(() -> generateMessageFields(type, true));
+        closeBracket();
+
+        indent()
+            .append("export class ").append(className)
+            .append(" implements ").append(interfaceName(className));
+        if (type.getOptions().get(MessageOptions.PATH) != null) {
+            builder.append(", Webpb.WebpbMessage {\n");
+        } else {
+            builder.append(" {\n");
+        }
 
         level(() -> {
-            indent()
-                .append("export class ").append(className)
-                .append(" implements ").append(interfaceName(className));
-            if (type.getOptions().get(MessageOptions.PATH) != null) {
-                builder.append(", Webpb.WebpbMessage {\n");
-            } else {
-                builder.append(" {\n");
+            generateMessageFields(type, false);
+            indent().append("META: () => Webpb.WebpbMeta;\n\n");
+            generateConstructor(type, className);
+
+            if (fileContext.isTsStream()) {
+                Encoder encoder = new Encoder(this, builder);
+                encoder.generateEncode(type, className);
+                encoder.generateEncodeDelimited(type, className);
+
+                Decoder decoder = new Decoder(this, builder);
+                decoder.generateDecode(type);
+                decoder.generateDecodeDelimited(type);
             }
 
-            level(() -> {
-                generateMessageFields(type, false);
-                indent().append("META: () => Webpb.WebpbMeta;\n\n");
-                generateConstructor(type, className);
-
-                if (fileContext.isTsStream()) {
-                    Encoder encoder = new Encoder(this, builder);
-                    encoder.generateEncode(type, className);
-                    encoder.generateEncodeDelimited(type, className);
-
-                    Decoder decoder = new Decoder(this, builder);
-                    decoder.generateDecode(type);
-                    decoder.generateDecodeDelimited(type);
-                }
-
-                if (fileContext.isTsJson()) {
-                    ToObject toObject = new ToObject(this, builder);
-                    toObject.generateToObject(type, className);
-                    toObject.generateToJSON(type, className);
-                }
-            });
-            closeBracket();
+            if (fileContext.isTsJson()) {
+                ToObject toObject = new ToObject(this, builder);
+                toObject.generateToObject(type, className);
+                toObject.generateToJSON(type, className);
+            }
         });
+        closeBracket();
     }
 
     private void generateMessageFields(MessageType type, boolean isInterface) {
@@ -196,9 +188,9 @@ final class TypescriptGenerator {
                 ProtoType valueType = protoType.getValueType();
                 assert keyType != null && valueType != null;
                 builder.append(": ").append("{ [k: string]: ")
-                    .append(toTypeName(valueType, fieldContext)).append(" }");
+                    .append(toTypeName(type, valueType, fieldContext)).append(" }");
             } else {
-                String typeName = toTypeName(protoType, fieldContext);
+                String typeName = toTypeName(type, protoType, fieldContext);
                 builder.append(": ").append(typeName);
                 if (field.isRepeated()) {
                     builder.append("[]");
@@ -319,14 +311,14 @@ final class TypescriptGenerator {
     }
 
     private void generateEnclosingType(EnclosingType type) {
-        level(() -> generateTypes(type.getType().getSimpleName(), type.getNestedTypes()));
+        generateTypes(type.getType().getSimpleName(), type.getNestedTypes());
     }
 
     private void generateMetaField(String key, String value) {
         indent().append(key).append(": ").append(value == null ? "" : value).append(",\n");
     }
 
-    private String toTypeName(ProtoType protoType, FieldContext fieldContext) {
+    private String toTypeName(MessageType messageType, ProtoType protoType, FieldContext fieldContext) {
         if (Types.longTypes.containsKey(protoType)) {
             if (fileContext.isTsLong()) {
                 return "(number | $protobuf.Long)";
@@ -340,7 +332,14 @@ final class TypescriptGenerator {
             return Types.types.get(protoType);
         }
 
+        String packageName = fileContext.getProtoFile().getPackageName();
         Type type = this.schema.getType(protoType);
+        if (StringUtils.startsWith(protoType.getEnclosingTypeOrPackage(), packageName)) {
+            if (type instanceof MessageType) {
+                return "I" + protoType.getSimpleName();
+            }
+            return protoType.getSimpleName();
+        }
         if (type instanceof MessageType) {
             return protoType.getEnclosingTypeOrPackage() + ".I" + protoType.getSimpleName();
         } else {

@@ -83,9 +83,6 @@ public class JavaParserFilter {
                         return super.visit(n, arg);
                     }
                     n.getConstructors().stream()
-                        .filter(ctor -> ctor.getParameters().stream().noneMatch(
-                            parameter -> "unknownFields".equals(parameter.getNameAsString())
-                        ))
                         .findFirst()
                         .ifPresent(ctor -> ctor.getBody().getStatements().stream()
                             .filter(Statement::isExplicitConstructorInvocationStmt)
@@ -99,7 +96,8 @@ public class JavaParserFilter {
                                         .setName(ctor.getName())
                                         .setBody(new BlockStmt(new NodeList<>(
                                             new ExplicitConstructorInvocationStmt(false, null, new NodeList<>(
-                                                new NameExpr("ADAPTER"), expression
+                                                new NameExpr("ADAPTER"),
+                                                new FieldAccessExpr(new NameExpr("ByteString"), "EMPTY")
                                             ))
                                         ))),
                                     ctor);
