@@ -177,6 +177,12 @@ public class JavaParserFilter {
             .filter(field -> field.isAnnotationPresent("WireField"))
             .forEach(field -> {
                 field.setModifiers(Keyword.PRIVATE);
+                typeContext.fieldContext(field.getVariable(0).getNameAsString())
+                    .ifPresent(fieldContext -> {
+                        if (fieldContext.isOmitted()) {
+                            field.addModifier(Keyword.TRANSIENT);
+                        }
+                    });
                 addGetters(typeContext, typeDeclaration, field);
                 addFieldAnnotations(typeContext, field, imports);
             });

@@ -62,13 +62,13 @@ public final class StoresRequest extends Message<StoresRequest, StoresRequest.Bu
             tag = 1,
             adapter = "com.github.jg513.example.resource.PageablePb#ADAPTER",
             label = WireField.Label.REQUIRED)
-    private PageablePb pageable;
+    private transient PageablePb pageable;
 
     @WireField(
             tag = 2,
             adapter = "com.squareup.wire.ProtoAdapter#INT32",
             label = WireField.Label.REQUIRED)
-    private Integer type;
+    private transient Integer type;
 
     @WireField(
             tag = 3,

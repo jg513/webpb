@@ -59,7 +59,7 @@ final class TypescriptGenerator {
             StringBuilder builder = new StringBuilder();
             builder.append("// " + Const.HEADER + "\n");
             builder.append("// " + Const.GIT_URL + "\n\n");
-            builder.append("import { Webpb } from 'webpb';\n\n");
+            builder.append("import * as Webpb from 'webpb';\n\n");
             if (fileContext.isTsJson() || fileContext.isTsStream()) {
                 builder.append("import * as $protobuf from \"protobufjs\";\n");
                 if (fileContext.isTsLong() && withLong) {

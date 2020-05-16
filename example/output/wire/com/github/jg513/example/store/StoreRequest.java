@@ -79,7 +79,7 @@ public final class StoreRequest extends Message<StoreRequest, StoreRequest.Build
             tag = 1,
             adapter = "com.squareup.wire.ProtoAdapter#INT32",
             label = WireField.Label.REQUIRED)
-    private Integer id;
+    private transient Integer id;
 
     @WireField(
             tag = 2,
