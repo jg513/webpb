@@ -2,7 +2,7 @@ package com.github.jg513.webpb.writers.typescript;
 
 import com.github.jg513.webpb.core.CodeWriter;
 import com.github.jg513.webpb.core.CodeWriterContext;
-import com.github.jg513.webpb.core.PendingSpec;
+import com.github.jg513.webpb.core.specs.PendingSpec;
 import com.github.jg513.webpb.core.specs.PendingFileSpec;
 import com.squareup.wire.schema.ProtoFile;
 
@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class TypescriptWriter extends CodeWriter {
+
     public TypescriptWriter(CodeWriterContext options) {
         super(options);
     }
@@ -28,13 +29,13 @@ public class TypescriptWriter extends CodeWriter {
             }
             try {
                 ProtoFile protoFile = ((PendingFileSpec) spec).getFile();
-                if (protoFile.types().isEmpty()) {
+                if (protoFile.getTypes().isEmpty()) {
                     continue;
                 }
-                String packageName = protoFile.packageName();
+                String packageName = protoFile.getPackageName();
                 StringBuilder builder = new StringBuilder();
                 boolean hasContent = TypescriptGenerator
-                    .of(context.getSchema(), context.getTags(), builder)
+                    .of(context.getSchemaContext(), context.getSchema(), context.getTags(), builder)
                     .generate(protoFile);
                 if (!hasContent) {
                     continue;

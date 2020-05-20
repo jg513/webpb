@@ -1,16 +1,19 @@
 package com.github.jg513.webpb.core;
 
+import com.github.jg513.webpb.core.context.SchemaContext;
 import com.github.jg513.webpb.core.specs.PendingFileSpec;
 import com.github.jg513.webpb.core.specs.PendingServiceSpec;
+import com.github.jg513.webpb.core.specs.PendingSpec;
 import com.github.jg513.webpb.core.specs.PendingTypeSpec;
 import com.github.jg513.webpb.log.Logger;
 import com.github.jg513.webpb.writers.java.JavaWriter;
 import com.github.jg513.webpb.writers.typescript.TypescriptWriter;
-import com.squareup.wire.schema.IdentifierSet;
 import com.squareup.wire.schema.ProtoFile;
+import com.squareup.wire.schema.PruningRules;
 import com.squareup.wire.schema.Schema;
 import com.squareup.wire.schema.SchemaLoader;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,6 +40,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class WebpbCompiler {
+
     private static final int MAX_WRITE_CONCURRENCY = 8;
 
     private static final String DESCRIPTOR_PROTO = "google/protobuf/descriptor.proto";
@@ -59,7 +63,8 @@ public class WebpbCompiler {
 
     private final String out;
 
-    private final IdentifierSet identifierSet;
+    @NotNull
+    private final PruningRules pruningRules;
 
     public void compile() throws IOException {
         String typeUppercase = type.toUpperCase();
@@ -83,6 +88,7 @@ public class WebpbCompiler {
             .log(log)
             .out(out)
             .schema(schema)
+            .schemaContext(new SchemaContext(schema))
             .specs(createSpecs(schema))
             .tags(this.tags == null ? Collections.emptyList() : Arrays.asList(this.tags))
             .build();
@@ -98,7 +104,7 @@ public class WebpbCompiler {
         executor.shutdown();
 
         try {
-            for (Future future : futures) {
+            for (Future<?> future : futures) {
                 future.get();
             }
         } catch (ExecutionException e) {
@@ -127,20 +133,16 @@ public class WebpbCompiler {
             }
         }
         Schema schema = loader.load();
-        if (!identifierSet.isEmpty()) {
+        if (!pruningRules.isEmpty()) {
             log.info("Analyzing dependencies of root types.");
-            schema = schema.prune(identifierSet);
-            for (String rule : identifierSet.unusedIncludes()) {
-                log.info("Unused include: %s", rule);
-            }
-            for (String rule : identifierSet.unusedExcludes()) {
-                log.info("Unused exclude: %s", rule);
-            }
+            schema = schema.prune(pruningRules);
+            pruningRules.unusedIncludes().forEach(v -> log.info("Unused include: " + v));
+            pruningRules.unusedExcludes().forEach(v -> log.info("Unused exclude: " + v));
         }
         return schema;
     }
 
-    private List<String> resolveFiles(List<Path> directories) throws IOException {
+    public static List<String> resolveFiles(List<Path> directories) throws IOException {
         List<String> files = new ArrayList<>();
         for (Path directory : directories) {
             Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
@@ -161,16 +163,16 @@ public class WebpbCompiler {
 
     private AbstractQueue<PendingSpec> createSpecs(Schema schema) {
         AbstractQueue<PendingSpec> specs = new ConcurrentLinkedQueue<>();
-        for (ProtoFile file : schema.protoFiles()) {
-            if (file.location().getPath().equals(DESCRIPTOR_PROTO)) {
+        for (ProtoFile file : schema.getProtoFiles()) {
+            if (file.getLocation().getPath().equals(DESCRIPTOR_PROTO)) {
                 continue;
             }
             specs.add(new PendingFileSpec(file));
-            specs.addAll(file.types().stream()
+            specs.addAll(file.getTypes().stream()
                 .map(t -> new PendingTypeSpec(file, t))
                 .collect(Collectors.toList())
             );
-            specs.addAll(file.services().stream()
+            specs.addAll(file.getServices().stream()
                 .map(s -> new PendingServiceSpec(file, s))
                 .collect(Collectors.toList())
             );

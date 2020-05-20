@@ -10,14 +10,17 @@ import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Getter
 public class ParamGroup {
+
     @Getter
     @AllArgsConstructor
     public static class Param {
+
         private String prefix;
 
         private String key;
@@ -72,7 +75,7 @@ public class ParamGroup {
             if (field == null) {
                 return false;
             }
-            type = schema.getType(field.type());
+            type = schema.getType(Objects.requireNonNull(field.getType()));
         }
         return true;
     }

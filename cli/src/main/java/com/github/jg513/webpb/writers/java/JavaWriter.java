@@ -4,7 +4,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.PackageDeclaration;
 import com.github.jg513.webpb.core.CodeWriter;
 import com.github.jg513.webpb.core.CodeWriterContext;
-import com.github.jg513.webpb.core.PendingSpec;
+import com.github.jg513.webpb.core.specs.PendingSpec;
 import com.github.jg513.webpb.core.Utils;
 import com.github.jg513.webpb.core.options.MessageOptions;
 import com.github.jg513.webpb.core.specs.PendingTypeSpec;
@@ -18,8 +18,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 
 public class JavaWriter extends CodeWriter {
+
     public JavaWriter(CodeWriterContext options) {
         super(options);
     }
@@ -37,10 +39,10 @@ public class JavaWriter extends CodeWriter {
             if (!(spec instanceof PendingTypeSpec)) {
                 continue;
             }
-            ProtoFile file = ((PendingTypeSpec) spec).getFile();
+            ProtoFile file = ((PendingTypeSpec) spec).getProtoFile();
             Type type = ((PendingTypeSpec) spec).getType();
             if (type instanceof MessageType && !context.getTags().isEmpty()) {
-                List<String> tags = (List<String>) type.options().get(MessageOptions.TAG);
+                List<String> tags = (List<String>) type.getOptions().get(MessageOptions.TAG);
                 if (tags != null && !Utils.containsAny(context.getTags(), tags)) {
                     continue;
                 }
@@ -63,7 +65,7 @@ public class JavaWriter extends CodeWriter {
                         }
                     }
                 }
-                path = path.resolve(type.type().simpleName() + ".java");
+                path = path.resolve(Objects.requireNonNull(type.getType()).getSimpleName() + ".java");
                 String content = unit.toString()
                     .replace("// https://github.com/jg513/webpb", "// https://github.com/jg513/webpb\n")
                     .replace("switch(", "switch (");

@@ -16,11 +16,13 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @Getter
 @Setter
 public class JavaOptions {
+
     private Map<String, Name> nameMap = new HashMap<>();
 
     private Map<AnnotationExpr, Name> annotationMap = new LinkedHashMap<>();
@@ -30,7 +32,7 @@ public class JavaOptions {
     private boolean setter = true;
 
     public JavaOptions(Schema schema) {
-        for (ProtoFile file : schema.protoFiles()) {
+        for (ProtoFile file : schema.getProtoFiles()) {
             this.parseOptions(file);
         }
     }
@@ -42,14 +44,14 @@ public class JavaOptions {
             .ifSuccessful(name -> nameMap.put(name.getIdentifier(), name));
         parser.parseName(Map.class.getName())
             .ifSuccessful(name -> nameMap.put(name.getIdentifier(), name));
-        for (Type type : file.types()) {
-            String identifier = type.type().simpleName();
+        for (Type type : file.getTypes()) {
+            String identifier = Objects.requireNonNull(type.getType()).getSimpleName();
             if (StringUtils.isEmpty(file.javaPackage())) {
                 throw new IllegalArgumentException("java_package option is required in " + file.name());
             }
             nameMap.put(identifier, new Name(new Name(null, file.javaPackage()), identifier));
         }
-        List<String> importList = (List<String>) file.options().get(FileOptions.JAVA_IMPORT);
+        List<String> importList = (List<String>) file.getOptions().get(FileOptions.JAVA_IMPORT);
         if (importList != null && !importList.isEmpty()) {
             for (String str : importList) {
                 parser.parseName(str).ifSuccessful(name ->
@@ -57,7 +59,7 @@ public class JavaOptions {
                 );
             }
         }
-        List<String> annotationList = (List<String>) file.options().get(FileOptions.JAVA_MESSAGE_ANNO);
+        List<String> annotationList = (List<String>) file.getOptions().get(FileOptions.JAVA_COMMON_ANNO);
         if (annotationList != null && !annotationList.isEmpty()) {
             for (String annotation : annotationList) {
                 parser.parseAnnotation(annotation).ifSuccessful(expr -> {
@@ -67,8 +69,8 @@ public class JavaOptions {
                 });
             }
         }
-        this.getter = "true".equals(file.options().get(FileOptions.JAVA_GETTER));
-        this.setter = "true".equals(file.options().get(FileOptions.JAVA_SETTER));
+        this.getter = "true".equals(file.getOptions().get(FileOptions.JAVA_GETTER));
+        this.setter = "true".equals(file.getOptions().get(FileOptions.JAVA_SETTER));
     }
 
     public Name getFullName(Name name) {
@@ -83,10 +85,6 @@ public class JavaOptions {
     }
 
     public Optional<Name> getName(String identifier) {
-        Name name = nameMap.get(identifier);
-        if (name == null) {
-            return Optional.empty();
-        }
-        return Optional.of(name.clone());
+        return Optional.ofNullable(nameMap.get(identifier));
     }
 }

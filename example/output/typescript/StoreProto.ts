@@ -3,216 +3,296 @@
 
 import { Webpb } from 'webpb';
 
-import { ResourceProto } from './ResourceProto';
+import * as ResourceProto from './ResourceProto';
 
-export namespace StoreProto {
-    export interface IStorePb {
-        id: number;
-        name: string;
-        city: number;
+export interface IStorePb {
+    id: number;
+    name: string;
+    city: number;
+}
+
+export class StorePb implements IStorePb {
+    id!: number;
+    name: string = "store";
+    city: number = 100;
+    META: () => Webpb.WebpbMeta;
+
+    private constructor(p?: IStorePb) {
+        Webpb.assign(p, this, []);
+        this.META = () => (p && {
+            class: 'StorePb',
+            method: '',
+            path: ''
+        });
     }
 
-    export class StorePb implements IStorePb {
-        id!: number;
-        name: string = "store";
-        city: number = 100;
+    static create(properties: IStorePb): StorePb {
+        return new StorePb(properties);
+    }
+}
+
+export interface IProject {
+}
+
+export class Project implements IProject {
+    META: () => Webpb.WebpbMeta;
+
+    private constructor() {
+        this.META = () => ({
+            class: 'Project',
+            method: '',
+            path: ''
+        });
+    }
+
+    static create(): Project {
+        return new Project();
+    }
+}
+
+export enum StoreType {
+    NORMAL = 0,
+}
+
+export interface IStoreRequest {
+    id: number;
+    email: string;
+    valid?: boolean;
+    data: { [k: string]: number };
+    projects: { [k: string]: Project };
+    unpacked: number[];
+    packed: number[];
+    projectList: Project[];
+    project: Project;
+    max: number;
+    longMap: { [k: string]: number };
+    projectMap: { [k: string]: Project };
+    typeMap: { [k: string]: StoreType };
+    binary: Uint8Array;
+    type: StoreType;
+    floatData: number;
+    stringField: string;
+    anyName: string;
+    anyProject: Project;
+    anyStore: StoreType;
+}
+
+export class StoreRequest implements IStoreRequest, Webpb.WebpbMessage {
+    id!: number;
+    email!: string;
+    valid?: boolean;
+    data!: { [k: string]: number };
+    projects!: { [k: string]: Project };
+    unpacked!: number[];
+    packed!: number[];
+    projectList!: Project[];
+    project!: Project;
+    max: number = 0xfffffFFFFFFFF;
+    longMap!: { [k: string]: number };
+    projectMap!: { [k: string]: Project };
+    typeMap!: { [k: string]: StoreType };
+    binary!: Uint8Array;
+    type!: StoreType;
+    floatData!: number;
+    stringField!: string;
+    anyName!: string;
+    anyProject!: Project;
+    anyStore!: StoreType;
+    META: () => Webpb.WebpbMeta;
+
+    private constructor(p?: IStoreRequest) {
+        Webpb.assign(p, this, ["id"]);
+        this.META = () => (p && {
+            class: 'StoreRequest',
+            method: 'GET',
+            path: `/stores/${p.id}`
+        });
+    }
+
+    static create(properties: IStoreRequest): StoreRequest {
+        return new StoreRequest(properties);
+    }
+}
+
+export interface IStoreResponse {
+    store: StorePb;
+    nested: StoreNestedPb;
+}
+
+export class StoreResponse implements IStoreResponse {
+    store!: StorePb;
+    nested!: StoreNestedPb;
+    META: () => Webpb.WebpbMeta;
+
+    private constructor(p?: IStoreResponse) {
+        Webpb.assign(p, this, []);
+        this.META = () => (p && {
+            class: 'StoreResponse',
+            method: '',
+            path: ''
+        });
+    }
+
+    static create(properties: IStoreResponse): StoreResponse {
+        return new StoreResponse(properties);
+    }
+}
+
+    export interface IStoreNestedPb {
+        employee: string;
+    }
+
+    export class StoreNestedPb implements IStoreNestedPb {
+        employee!: string;
         META: () => Webpb.WebpbMeta;
 
-        private constructor(p: IStorePb) {
+        private constructor(p?: IStoreNestedPb) {
             Webpb.assign(p, this, []);
-            this.META = () => ({
-                class: 'StorePb',
+            this.META = () => (p && {
+                class: 'StoreNestedPb',
                 method: '',
                 path: ''
             });
         }
 
-        static create(properties: IStorePb): StorePb {
-            return new StorePb(properties);
+        static create(properties: IStoreNestedPb): StoreNestedPb {
+            return new StoreNestedPb(properties);
         }
     }
 
-    export interface IStoreRequest {
-        id: number;
-        email: string;
+export interface IStoreCurrentRequest {
+}
+
+export class StoreCurrentRequest implements IStoreCurrentRequest, Webpb.WebpbMessage {
+    META: () => Webpb.WebpbMeta;
+
+    private constructor() {
+        this.META = () => ({
+            class: 'StoreCurrentRequest',
+            method: 'GET',
+            path: `/stores/current`
+        });
     }
 
-    export class StoreRequest implements IStoreRequest, Webpb.WebpbMessage {
-        id!: number;
-        email!: string;
+    static create(): StoreCurrentRequest {
+        return new StoreCurrentRequest();
+    }
+}
+
+export interface IEmptyPb {
+}
+
+export class EmptyPb implements IEmptyPb {
+    META: () => Webpb.WebpbMeta;
+
+    private constructor() {
+        this.META = () => ({
+            class: 'EmptyPb',
+            method: '',
+            path: ''
+        });
+    }
+
+    static create(): EmptyPb {
+        return new EmptyPb();
+    }
+}
+
+    export interface IEnclosingPb {
+        innerString: string;
+    }
+
+    export class EnclosingPb implements IEnclosingPb {
+        innerString!: string;
         META: () => Webpb.WebpbMeta;
 
-        private constructor(p: IStoreRequest) {
-            Webpb.assign(p, this, ["id"]);
-            this.META = () => ({
-                class: 'StoreRequest',
-                method: 'GET',
-                path: `/stores/${p.id}`
-            });
-        }
-
-        static create(properties: IStoreRequest): StoreRequest {
-            return new StoreRequest(properties);
-        }
-    }
-
-    export interface IStoreResponse {
-        store: StoreProto.IStorePb;
-        nested: StoreProto.StoreResponse.IStoreNestedPb;
-    }
-
-    export class StoreResponse implements IStoreResponse {
-        store!: StoreProto.IStorePb;
-        nested!: StoreProto.StoreResponse.IStoreNestedPb;
-        META: () => Webpb.WebpbMeta;
-
-        private constructor(p: IStoreResponse) {
+        private constructor(p?: IEnclosingPb) {
             Webpb.assign(p, this, []);
-            this.META = () => ({
-                class: 'StoreResponse',
+            this.META = () => (p && {
+                class: 'EnclosingPb',
                 method: '',
                 path: ''
             });
         }
 
-        static create(properties: IStoreResponse): StoreResponse {
-            return new StoreResponse(properties);
+        static create(properties: IEnclosingPb): EnclosingPb {
+            return new EnclosingPb(properties);
         }
     }
 
-    export namespace StoreResponse {
-        export interface IStoreNestedPb {
-            employee: string;
-        }
+export interface IStoresRequest {
+    pageable: ResourceProto.IPageablePb;
+    type: number;
+    city: number;
+}
 
-        export class StoreNestedPb implements IStoreNestedPb {
-            employee!: string;
-            META: () => Webpb.WebpbMeta;
+export class StoresRequest implements IStoresRequest, Webpb.WebpbMessage {
+    pageable!: ResourceProto.IPageablePb;
+    type!: number;
+    city!: number;
+    META: () => Webpb.WebpbMeta;
 
-            private constructor(p: IStoreNestedPb) {
-                Webpb.assign(p, this, []);
-                this.META = () => ({
-                    class: 'StoreNestedPb',
-                    method: '',
-                    path: ''
-                });
-            }
-
-            static create(properties: IStoreNestedPb): StoreNestedPb {
-                return new StoreNestedPb(properties);
-            }
-        }
+    private constructor(p?: IStoresRequest) {
+        Webpb.assign(p, this, ["pageable", "type"]);
+        this.META = () => (p && {
+            class: 'StoresRequest',
+            method: 'POST',
+            path: `/stores/${p.type}${Webpb.query({
+                page: Webpb.getter(p, 'pageable.page'),
+                size: Webpb.getter(p, 'pageable.size'),
+            })}`
+        });
     }
 
-    export interface IStoreCurrentRequest {
+    static create(properties: IStoresRequest): StoresRequest {
+        return new StoresRequest(properties);
+    }
+}
+
+export interface IStoresResponse {
+    stores: StorePb;
+    paging: ResourceProto.IPagingPb;
+}
+
+export class StoresResponse implements IStoresResponse {
+    stores!: StorePb;
+    paging!: ResourceProto.IPagingPb;
+    META: () => Webpb.WebpbMeta;
+
+    private constructor(p?: IStoresResponse) {
+        Webpb.assign(p, this, []);
+        this.META = () => (p && {
+            class: 'StoresResponse',
+            method: '',
+            path: ''
+        });
     }
 
-    export class StoreCurrentRequest implements IStoreCurrentRequest, Webpb.WebpbMessage {
-        META: () => Webpb.WebpbMeta;
+    static create(properties: IStoresResponse): StoresResponse {
+        return new StoresResponse(properties);
+    }
+}
 
-        private constructor() {
-            this.META = () => ({
-                class: 'StoreCurrentRequest',
-                method: 'GET',
-                path: `/stores/current`
-            });
-        }
+export interface IUserMpLoginRequest {
+    appId: string;
+    code: string;
+}
 
-        static create(): StoreCurrentRequest {
-            return new StoreCurrentRequest();
-        }
+export class UserMpLoginRequest implements IUserMpLoginRequest {
+    appId!: string;
+    code!: string;
+    META: () => Webpb.WebpbMeta;
+
+    private constructor(p?: IUserMpLoginRequest) {
+        Webpb.assign(p, this, []);
+        this.META = () => (p && {
+            class: 'UserMpLoginRequest',
+            method: '',
+            path: ''
+        });
     }
 
-    export interface IEmptyPb {
-    }
-
-    export class EmptyPb implements IEmptyPb {
-        META: () => Webpb.WebpbMeta;
-
-        private constructor() {
-            this.META = () => ({
-                class: 'EmptyPb',
-                method: '',
-                path: ''
-            });
-        }
-
-        static create(): EmptyPb {
-            return new EmptyPb();
-        }
-    }
-
-    export namespace EmptyPb {
-        export interface IEnclosingPb {
-        }
-
-        export class EnclosingPb implements IEnclosingPb {
-            META: () => Webpb.WebpbMeta;
-
-            private constructor() {
-                this.META = () => ({
-                    class: 'EnclosingPb',
-                    method: '',
-                    path: ''
-                });
-            }
-
-            static create(): EnclosingPb {
-                return new EnclosingPb();
-            }
-        }
-    }
-
-    export interface IStoresRequest {
-        pageable: ResourceProto.IPageablePb;
-        type: number;
-        city: number;
-    }
-
-    export class StoresRequest implements IStoresRequest, Webpb.WebpbMessage {
-        pageable!: ResourceProto.IPageablePb;
-        type!: number;
-        city!: number;
-        META: () => Webpb.WebpbMeta;
-
-        private constructor(p: IStoresRequest) {
-            Webpb.assign(p, this, ["pageable", "type"]);
-            this.META = () => ({
-                class: 'StoresRequest',
-                method: 'POST',
-                path: `/stores/${p.type}${Webpb.query({
-                    page: Webpb.getter(p, 'pageable.page'),
-                    size: Webpb.getter(p, 'pageable.size'),
-                })}`
-            });
-        }
-
-        static create(properties: IStoresRequest): StoresRequest {
-            return new StoresRequest(properties);
-        }
-    }
-
-    export interface IStoresResponse {
-        stores: StoreProto.IStorePb;
-        paging: ResourceProto.IPagingPb;
-    }
-
-    export class StoresResponse implements IStoresResponse {
-        stores!: StoreProto.IStorePb;
-        paging!: ResourceProto.IPagingPb;
-        META: () => Webpb.WebpbMeta;
-
-        private constructor(p: IStoresResponse) {
-            Webpb.assign(p, this, []);
-            this.META = () => ({
-                class: 'StoresResponse',
-                method: '',
-                path: ''
-            });
-        }
-
-        static create(properties: IStoresResponse): StoresResponse {
-            return new StoresResponse(properties);
-        }
+    static create(properties: IUserMpLoginRequest): UserMpLoginRequest {
+        return new UserMpLoginRequest(properties);
     }
 }

@@ -3,33 +3,31 @@
 
 import { Webpb } from 'webpb';
 
-export namespace ErrorProto {
-    export enum ErrorCode {
-        OK = 0,
-        ERROR = 1,
+export enum ErrorCode {
+    OK = 0,
+    ERROR = 1,
+}
+
+export interface IErrorMessage {
+    code: ErrorCode;
+    message?: string;
+}
+
+export class ErrorMessage implements IErrorMessage {
+    code!: ErrorCode;
+    message?: string;
+    META: () => Webpb.WebpbMeta;
+
+    private constructor(p?: IErrorMessage) {
+        Webpb.assign(p, this, []);
+        this.META = () => (p && {
+            class: 'ErrorMessage',
+            method: '',
+            path: ''
+        });
     }
 
-    export interface IErrorMessage {
-        code: ErrorProto.ErrorCode;
-        message?: string;
-    }
-
-    export class ErrorMessage implements IErrorMessage {
-        code!: ErrorProto.ErrorCode;
-        message?: string;
-        META: () => Webpb.WebpbMeta;
-
-        private constructor(p: IErrorMessage) {
-            Webpb.assign(p, this, []);
-            this.META = () => ({
-                class: 'ErrorMessage',
-                method: '',
-                path: ''
-            });
-        }
-
-        static create(properties: IErrorMessage): ErrorMessage {
-            return new ErrorMessage(properties);
-        }
+    static create(properties: IErrorMessage): ErrorMessage {
+        return new ErrorMessage(properties);
     }
 }

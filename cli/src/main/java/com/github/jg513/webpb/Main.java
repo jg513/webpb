@@ -3,20 +3,26 @@ package com.github.jg513.webpb;
 import com.github.jg513.webpb.core.WebpbCompiler;
 import com.github.jg513.webpb.log.Logger;
 import com.github.jg513.webpb.log.LoggerImpl;
-import com.squareup.wire.schema.IdentifierSet;
+import com.github.jg513.webpb.writers.wire.WireArgs;
+import com.github.jg513.webpb.writers.wire.WireCompiler;
+import com.github.jg513.webpb.writers.wire.WireLoggerImpl;
+import com.squareup.wire.schema.PruningRules;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.stream.Collectors;
 
 @Command(name = "webpb", mixinStandardHelpOptions = true, version = "Picocli example 4.0")
 public class Main implements Runnable {
+
     @Option(names = "--proto_path", arity = "1..*", description = "Paths to resolving proto files.", required = true)
     private String[] protoPaths;
 
-    @Option(names = "--type", arity = "1", description = "TS, JAVA", required = true)
+    @Option(names = "--type", arity = "1", description = "TS, JAVA, WIRE", required = true)
     private String type;
 
     @Option(names = "--out", arity = "1", description = "Generated code output directory.", required = true)
@@ -40,17 +46,56 @@ public class Main implements Runnable {
     private static CommandLine commandLine;
 
     public void run() {
+        try {
+            if ("WIRE".equals(type)) {
+                useWireCompiler();
+            } else {
+                useWebpbCompiler();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            commandLine.getErr().printf(e.getMessage());
+        }
+    }
+
+    private void useWebpbCompiler() throws Exception {
         Logger log = LoggerImpl.of(commandLine.getOut(), commandLine.getErr(), quiet);
-        IdentifierSet identifierSet = new IdentifierSet.Builder()
+        PruningRules pruningRules = new PruningRules.Builder()
             .include(includes == null ? Collections.emptyList() : Arrays.asList(includes))
             .exclude(excludes == null ? Collections.emptyList() : Arrays.asList(excludes))
             .build();
-        try {
-            new WebpbCompiler(log, protoPaths, files, tags, type, out, identifierSet).compile();
-        } catch (Exception e) {
-            e.printStackTrace();
-            log.error(e.getMessage());
-        }
+        new WebpbCompiler(log, protoPaths, files, tags, type, out, pruningRules).compile();
+    }
+
+    private void useWireCompiler() throws Exception {
+        WireArgs wireArgs = new WireArgs();
+        wireArgs
+            .setFs(Paths.get("").getFileSystem())
+            .setLog(new WireLoggerImpl())
+            .setProtoPaths(Arrays.asList(protoPaths))
+            .setJavaOut(out)
+            .setSourceFileNames(WebpbCompiler.resolveFiles(
+                Arrays.stream(protoPaths).map(v -> Paths.get(v)).collect(Collectors.toList())
+            ))
+            .setPruningRules(new PruningRules.Builder()
+                .build()
+            );
+        WireCompiler compiler = new WireCompiler(
+            wireArgs.getFs(),
+            wireArgs.getLog(),
+            wireArgs.getProtoPaths(),
+            wireArgs.getJavaOut(),
+            wireArgs.getKotlinOut(),
+            wireArgs.getSourceFileNames(),
+            wireArgs.getPruningRules(),
+            wireArgs.isDryRun(),
+            wireArgs.isNamedFilesOnly(),
+            wireArgs.isEmitAndroid(),
+            wireArgs.isEmitAndroidAnnotations(),
+            wireArgs.isEmitCompact(),
+            wireArgs.isJavaInterop()
+        );
+        compiler.compile();
     }
 
     public static void main(String[] args) {
