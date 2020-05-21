@@ -3,7 +3,7 @@
 package com.github.jg513.example.store;
 
 import com.github.jg513.example.resource.PageablePb;
-import com.github.jg513.webpb.options.FieldOptions;
+import com.github.jg513.webpb.core.WebpbMessage;
 import com.github.jg513.webpb.options.MessageOptions;
 import com.squareup.wire.FieldEncoding;
 import com.squareup.wire.Message;
@@ -18,22 +18,18 @@ import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.StringBuilder;
-import java.util.Arrays;
-import okio.ByteString;
 import javax.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import okio.ByteString;
 import org.hibernate.validator.constraints.Range;
 
 @Getter
 @Setter
 @Accessors(chain = true)
-public final class StoresRequest extends Message<StoresRequest, StoresRequest.Builder> {
-
-    public static final ProtoAdapter<StoresRequest> ADAPTER = new ProtoAdapter_StoresRequest();
-
-    private static final long serialVersionUID = 0L;
+public final class StoresRequest extends Message<StoresRequest, StoresRequest.Builder>
+        implements WebpbMessage {
 
     public static final MessageOptions MESSAGE_OPTIONS =
             new MessageOptions.Builder()
@@ -41,18 +37,9 @@ public final class StoresRequest extends Message<StoresRequest, StoresRequest.Bu
                     .path("/stores/{type}?page={pageable.page}&size={pageable.size}")
                     .build();
 
-    public static final FieldOptions FIELD_OPTIONS_PAGEABLE =
-            new FieldOptions.Builder().omitted(true).build();
+    public static final ProtoAdapter<StoresRequest> ADAPTER = new ProtoAdapter_StoresRequest();
 
-    public static final FieldOptions FIELD_OPTIONS_TYPE =
-            new FieldOptions.Builder().omitted(true).build();
-
-    public static final FieldOptions FIELD_OPTIONS_CITY =
-            new FieldOptions.Builder()
-                    .javaAnnotations(
-                            Arrays.asList(
-                                    "@NotNull(message = \"City is required\")", "@Range(min = 0)"))
-                    .build();
+    private static final long serialVersionUID = 0L;
 
     public static final Integer DEFAULT_TYPE = 0;
 
@@ -94,6 +81,7 @@ public final class StoresRequest extends Message<StoresRequest, StoresRequest.Bu
         this.city = city;
     }
 
+    @Override
     public MessageOptions messageOptions() {
         return MESSAGE_OPTIONS;
     }
@@ -179,7 +167,10 @@ public final class StoresRequest extends Message<StoresRequest, StoresRequest.Bu
     private static final class ProtoAdapter_StoresRequest extends ProtoAdapter<StoresRequest> {
 
         public ProtoAdapter_StoresRequest() {
-            super(FieldEncoding.LENGTH_DELIMITED, StoresRequest.class);
+            super(
+                    FieldEncoding.LENGTH_DELIMITED,
+                    StoresRequest.class,
+                    "type.googleapis.com/StoreProto.StoresRequest");
         }
 
         @Override

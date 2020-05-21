@@ -61,8 +61,8 @@ public class Main implements Runnable {
     private void useWebpbCompiler() throws Exception {
         Logger log = LoggerImpl.of(commandLine.getOut(), commandLine.getErr(), quiet);
         PruningRules pruningRules = new PruningRules.Builder()
-            .include(includes == null ? Collections.emptyList() : Arrays.asList(includes))
-            .exclude(excludes == null ? Collections.emptyList() : Arrays.asList(excludes))
+            .addRoot(includes == null ? Collections.emptyList() : Arrays.asList(includes))
+            .prune(excludes == null ? Collections.emptyList() : Arrays.asList(excludes))
             .build();
         new WebpbCompiler(log, protoPaths, files, tags, type, out, pruningRules).compile();
     }

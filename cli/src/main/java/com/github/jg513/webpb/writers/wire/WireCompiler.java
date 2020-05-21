@@ -113,8 +113,8 @@ public class WireCompiler {
         if (!pruningRules.isEmpty()) {
             log.info("Analyzing dependencies of root types.");
             schema = schema.prune(pruningRules);
-            pruningRules.unusedIncludes().forEach(v -> log.info("Unused include: " + v));
-            pruningRules.unusedExcludes().forEach(v -> log.info("Unused exclude: " + v));
+            pruningRules.unusedRoots().forEach(v -> log.info("Unused root: " + v));
+            pruningRules.unusedPrunes().forEach(v -> log.info("Unused prune: " + v));
         }
 
         AbstractQueue<PendingSpec> queue = new ConcurrentLinkedQueue<>();

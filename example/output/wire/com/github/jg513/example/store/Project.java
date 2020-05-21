@@ -2,6 +2,8 @@
 // Source file: Store.proto
 package com.github.jg513.example.store;
 
+import com.github.jg513.webpb.core.WebpbMessage;
+import com.github.jg513.webpb.options.MessageOptions;
 import com.squareup.wire.FieldEncoding;
 import com.squareup.wire.Message;
 import com.squareup.wire.ProtoAdapter;
@@ -12,15 +14,17 @@ import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.StringBuilder;
-import okio.ByteString;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import okio.ByteString;
 
 @Getter
 @Setter
 @Accessors(chain = true)
-public final class Project extends Message<Project, Project.Builder> {
+public final class Project extends Message<Project, Project.Builder> implements WebpbMessage {
+
+    public static final MessageOptions MESSAGE_OPTIONS = new MessageOptions.Builder().build();
 
     public static final ProtoAdapter<Project> ADAPTER = new ProtoAdapter_Project();
 
@@ -32,6 +36,11 @@ public final class Project extends Message<Project, Project.Builder> {
 
     public Project(ByteString unknownFields) {
         super(ADAPTER, unknownFields);
+    }
+
+    @Override
+    public MessageOptions messageOptions() {
+        return MESSAGE_OPTIONS;
     }
 
     @Override
@@ -73,7 +82,10 @@ public final class Project extends Message<Project, Project.Builder> {
     private static final class ProtoAdapter_Project extends ProtoAdapter<Project> {
 
         public ProtoAdapter_Project() {
-            super(FieldEncoding.LENGTH_DELIMITED, Project.class);
+            super(
+                    FieldEncoding.LENGTH_DELIMITED,
+                    Project.class,
+                    "type.googleapis.com/StoreProto.Project");
         }
 
         @Override

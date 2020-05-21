@@ -6,7 +6,7 @@
 
     <groupId>com.github.jg513</groupId>
     <artifactId>webpb-spring</artifactId>
-    <version>0.0.3</version>
+    <version>0.0.4</version>
 
     <name>webpb-spring</name>
     <url>https://github.com/jg513/webpb</url>
@@ -39,32 +39,32 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
-            <version>5.2.2.RELEASE</version>
+            <version>5.2.6.RELEASE</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webflux</artifactId>
-            <version>5.2.2.RELEASE</version>
+            <version>5.2.6.RELEASE</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-messaging</artifactId>
-            <version>5.2.2.RELEASE</version>
+            <version>5.2.6.RELEASE</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.squareup.wire</groupId>
             <artifactId>wire-runtime</artifactId>
-            <version>3.0.3</version>
+            <version>3.2.2</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-core</artifactId>
-            <version>3.3.1.RELEASE</version>
+            <version>3.3.5.RELEASE</version>
             <scope>provided</scope>
         </dependency>
 
@@ -78,7 +78,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.10</version>
+            <version>1.18.12</version>
         </dependency>
 
         <dependency>

@@ -2,6 +2,8 @@
 // Source file: Error.proto
 package com.github.jg513.example.error;
 
+import com.github.jg513.webpb.core.WebpbMessage;
+import com.github.jg513.webpb.options.MessageOptions;
 import com.squareup.wire.FieldEncoding;
 import com.squareup.wire.Message;
 import com.squareup.wire.ProtoAdapter;
@@ -14,15 +16,18 @@ import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.StringBuilder;
-import okio.ByteString;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import okio.ByteString;
 
 @Getter
 @Setter
 @Accessors(chain = true)
-public final class ErrorMessage extends Message<ErrorMessage, ErrorMessage.Builder> {
+public final class ErrorMessage extends Message<ErrorMessage, ErrorMessage.Builder>
+        implements WebpbMessage {
+
+    public static final MessageOptions MESSAGE_OPTIONS = new MessageOptions.Builder().build();
 
     public static final ProtoAdapter<ErrorMessage> ADAPTER = new ProtoAdapter_ErrorMessage();
 
@@ -53,6 +58,11 @@ public final class ErrorMessage extends Message<ErrorMessage, ErrorMessage.Build
         super(ADAPTER, unknownFields);
         this.code = code;
         this.message = message;
+    }
+
+    @Override
+    public MessageOptions messageOptions() {
+        return MESSAGE_OPTIONS;
     }
 
     @Override
@@ -90,7 +100,7 @@ public final class ErrorMessage extends Message<ErrorMessage, ErrorMessage.Build
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(", code=").append(code);
-        if (message != null) builder.append(", message=").append(message);
+        if (message != null) builder.append(", message=").append(Internal.sanitize(message));
         return builder.replace(0, 2, "ErrorMessage{").append('}').toString();
     }
 
@@ -124,7 +134,10 @@ public final class ErrorMessage extends Message<ErrorMessage, ErrorMessage.Build
     private static final class ProtoAdapter_ErrorMessage extends ProtoAdapter<ErrorMessage> {
 
         public ProtoAdapter_ErrorMessage() {
-            super(FieldEncoding.LENGTH_DELIMITED, ErrorMessage.class);
+            super(
+                    FieldEncoding.LENGTH_DELIMITED,
+                    ErrorMessage.class,
+                    "type.googleapis.com/ErrorProto.ErrorMessage");
         }
 
         @Override

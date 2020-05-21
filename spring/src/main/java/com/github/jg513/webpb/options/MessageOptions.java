@@ -2,10 +2,12 @@ package com.github.jg513.webpb.options;
 
 import lombok.Getter;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Getter
 public class MessageOptions {
+
     private String method;
 
     private String path;
@@ -15,6 +17,7 @@ public class MessageOptions {
     private List<String> javaAnnotations;
 
     public static class Builder {
+
         private String method;
 
         private String path;
@@ -33,13 +36,13 @@ public class MessageOptions {
             return this;
         }
 
-        public Builder tags(List<String> tags) {
-            this.tags = tags;
+        public Builder tags(String... tags) {
+            this.tags = Arrays.asList(tags);
             return this;
         }
 
-        public Builder javaAnnotations(List<String> javaAnnotations) {
-            this.javaAnnotations = javaAnnotations;
+        public Builder javaAnnotations(String... javaAnnotations) {
+            this.javaAnnotations = Arrays.asList(javaAnnotations);
             return this;
         }
 

@@ -2,6 +2,8 @@
 // Source file: Store.proto
 package com.github.jg513.example.store;
 
+import com.github.jg513.webpb.core.WebpbMessage;
+import com.github.jg513.webpb.options.MessageOptions;
 import com.squareup.wire.FieldEncoding;
 import com.squareup.wire.Message;
 import com.squareup.wire.ProtoAdapter;
@@ -14,15 +16,18 @@ import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.StringBuilder;
-import okio.ByteString;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import okio.ByteString;
 
 @Getter
 @Setter
 @Accessors(chain = true)
-public final class StoreResponse extends Message<StoreResponse, StoreResponse.Builder> {
+public final class StoreResponse extends Message<StoreResponse, StoreResponse.Builder>
+        implements WebpbMessage {
+
+    public static final MessageOptions MESSAGE_OPTIONS = new MessageOptions.Builder().build();
 
     public static final ProtoAdapter<StoreResponse> ADAPTER = new ProtoAdapter_StoreResponse();
 
@@ -52,6 +57,11 @@ public final class StoreResponse extends Message<StoreResponse, StoreResponse.Bu
         super(ADAPTER, unknownFields);
         this.store = store;
         this.nested = nested;
+    }
+
+    @Override
+    public MessageOptions messageOptions() {
+        return MESSAGE_OPTIONS;
     }
 
     @Override
@@ -123,7 +133,10 @@ public final class StoreResponse extends Message<StoreResponse, StoreResponse.Bu
     @Getter
     @Setter
     @Accessors(chain = true)
-    public static final class StoreNestedPb extends Message<StoreNestedPb, StoreNestedPb.Builder> {
+    public static final class StoreNestedPb extends Message<StoreNestedPb, StoreNestedPb.Builder>
+            implements WebpbMessage {
+
+        public static final MessageOptions MESSAGE_OPTIONS = new MessageOptions.Builder().build();
 
         public static final ProtoAdapter<StoreNestedPb> ADAPTER = new ProtoAdapter_StoreNestedPb();
 
@@ -148,6 +161,11 @@ public final class StoreResponse extends Message<StoreResponse, StoreResponse.Bu
         public StoreNestedPb(String employee, ByteString unknownFields) {
             super(ADAPTER, unknownFields);
             this.employee = employee;
+        }
+
+        @Override
+        public MessageOptions messageOptions() {
+            return MESSAGE_OPTIONS;
         }
 
         @Override
@@ -180,7 +198,7 @@ public final class StoreResponse extends Message<StoreResponse, StoreResponse.Bu
         @Override
         public String toString() {
             StringBuilder builder = new StringBuilder();
-            builder.append(", employee=").append(employee);
+            builder.append(", employee=").append(Internal.sanitize(employee));
             return builder.replace(0, 2, "StoreNestedPb{").append('}').toString();
         }
 
@@ -207,7 +225,10 @@ public final class StoreResponse extends Message<StoreResponse, StoreResponse.Bu
         private static final class ProtoAdapter_StoreNestedPb extends ProtoAdapter<StoreNestedPb> {
 
             public ProtoAdapter_StoreNestedPb() {
-                super(FieldEncoding.LENGTH_DELIMITED, StoreNestedPb.class);
+                super(
+                        FieldEncoding.LENGTH_DELIMITED,
+                        StoreNestedPb.class,
+                        "type.googleapis.com/StoreProto.StoreResponse.StoreNestedPb");
             }
 
             @Override
@@ -253,7 +274,10 @@ public final class StoreResponse extends Message<StoreResponse, StoreResponse.Bu
     private static final class ProtoAdapter_StoreResponse extends ProtoAdapter<StoreResponse> {
 
         public ProtoAdapter_StoreResponse() {
-            super(FieldEncoding.LENGTH_DELIMITED, StoreResponse.class);
+            super(
+                    FieldEncoding.LENGTH_DELIMITED,
+                    StoreResponse.class,
+                    "type.googleapis.com/StoreProto.StoreResponse");
         }
 
         @Override

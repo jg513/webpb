@@ -6,6 +6,7 @@ import java.util.List;
 
 @Getter
 public class FileOptions {
+
     private List<String> javaImports;
 
     private List<String> javaMessageAnnotations;
@@ -15,6 +16,7 @@ public class FileOptions {
     private boolean javaGetter;
 
     public static class Builder {
+
         private List<String> javaImports;
 
         private List<String> javaMessageAnnotations;

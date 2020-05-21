@@ -3,6 +3,8 @@
 package com.github.jg513.example.store;
 
 import com.github.jg513.example.resource.PagingPb;
+import com.github.jg513.webpb.core.WebpbMessage;
+import com.github.jg513.webpb.options.MessageOptions;
 import com.squareup.wire.FieldEncoding;
 import com.squareup.wire.Message;
 import com.squareup.wire.ProtoAdapter;
@@ -15,15 +17,18 @@ import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.StringBuilder;
-import okio.ByteString;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import okio.ByteString;
 
 @Getter
 @Setter
 @Accessors(chain = true)
-public final class StoresResponse extends Message<StoresResponse, StoresResponse.Builder> {
+public final class StoresResponse extends Message<StoresResponse, StoresResponse.Builder>
+        implements WebpbMessage {
+
+    public static final MessageOptions MESSAGE_OPTIONS = new MessageOptions.Builder().build();
 
     public static final ProtoAdapter<StoresResponse> ADAPTER = new ProtoAdapter_StoresResponse();
 
@@ -53,6 +58,11 @@ public final class StoresResponse extends Message<StoresResponse, StoresResponse
         super(ADAPTER, unknownFields);
         this.stores = stores;
         this.paging = paging;
+    }
+
+    @Override
+    public MessageOptions messageOptions() {
+        return MESSAGE_OPTIONS;
     }
 
     @Override
@@ -124,7 +134,10 @@ public final class StoresResponse extends Message<StoresResponse, StoresResponse
     private static final class ProtoAdapter_StoresResponse extends ProtoAdapter<StoresResponse> {
 
         public ProtoAdapter_StoresResponse() {
-            super(FieldEncoding.LENGTH_DELIMITED, StoresResponse.class);
+            super(
+                    FieldEncoding.LENGTH_DELIMITED,
+                    StoresResponse.class,
+                    "type.googleapis.com/StoreProto.StoresResponse");
         }
 
         @Override

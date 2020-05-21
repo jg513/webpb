@@ -2,8 +2,9 @@
 // Source file: Store.proto
 package com.github.jg513.example.store;
 
-import com.github.jg513.webpb.options.FieldOptions;
+import com.github.jg513.webpb.core.WebpbMessage;
 import com.github.jg513.webpb.options.MessageOptions;
+import com.somewhere.Const;
 import com.squareup.wire.FieldEncoding;
 import com.squareup.wire.Message;
 import com.squareup.wire.ProtoAdapter;
@@ -20,40 +21,26 @@ import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.StringBuilder;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import okio.ByteString;
-import com.somewhere.Const;
 import javax.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import java.util.Collections;
+import okio.ByteString;
 
 @Getter
 @Setter
 @Accessors(chain = true)
-public final class StoreRequest extends Message<StoreRequest, StoreRequest.Builder> {
-
-    public static final ProtoAdapter<StoreRequest> ADAPTER = new ProtoAdapter_StoreRequest();
-
-    private static final long serialVersionUID = 0L;
+public final class StoreRequest extends Message<StoreRequest, StoreRequest.Builder>
+        implements WebpbMessage {
 
     public static final MessageOptions MESSAGE_OPTIONS =
             new MessageOptions.Builder().method("GET").path("/stores/{id}").build();
 
-    public static final FieldOptions FIELD_OPTIONS_ID =
-            new FieldOptions.Builder().omitted(true).build();
+    public static final ProtoAdapter<StoreRequest> ADAPTER = new ProtoAdapter_StoreRequest();
 
-    public static final FieldOptions FIELD_OPTIONS_EMAIL =
-            new FieldOptions.Builder()
-                    .javaAnnotations(
-                            Collections.singletonList("@Pattern(regexp = Const.EMAIL_REGEX)"))
-                    .build();
-
-    public static final FieldOptions FIELD_OPTIONS_STRINGFIELD =
-            new FieldOptions.Builder().tsString(true).build();
+    private static final long serialVersionUID = 0L;
 
     public static final Integer DEFAULT_ID = 0;
 
@@ -216,6 +203,7 @@ public final class StoreRequest extends Message<StoreRequest, StoreRequest.Build
         this.anyStore = builder.anyStore;
     }
 
+    @Override
     public MessageOptions messageOptions() {
         return MESSAGE_OPTIONS;
     }
@@ -309,7 +297,7 @@ public final class StoreRequest extends Message<StoreRequest, StoreRequest.Build
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(", id=").append(id);
-        builder.append(", email=").append(email);
+        builder.append(", email=").append(Internal.sanitize(email));
         if (valid != null) builder.append(", valid=").append(valid);
         if (!data.isEmpty()) builder.append(", data=").append(data);
         if (!projects.isEmpty()) builder.append(", projects=").append(projects);
@@ -325,7 +313,7 @@ public final class StoreRequest extends Message<StoreRequest, StoreRequest.Build
         builder.append(", type=").append(type);
         builder.append(", floatData=").append(floatData);
         builder.append(", stringField=").append(stringField);
-        if (anyName != null) builder.append(", anyName=").append(anyName);
+        if (anyName != null) builder.append(", anyName=").append(Internal.sanitize(anyName));
         if (anyProject != null) builder.append(", anyProject=").append(anyProject);
         if (anyStore != null) builder.append(", anyStore=").append(anyStore);
         return builder.replace(0, 2, "StoreRequest{").append('}').toString();
@@ -548,7 +536,10 @@ public final class StoreRequest extends Message<StoreRequest, StoreRequest.Build
                 ProtoAdapter.newMapAdapter(ProtoAdapter.INT64, StoreType.ADAPTER);
 
         public ProtoAdapter_StoreRequest() {
-            super(FieldEncoding.LENGTH_DELIMITED, StoreRequest.class);
+            super(
+                    FieldEncoding.LENGTH_DELIMITED,
+                    StoreRequest.class,
+                    "type.googleapis.com/StoreProto.StoreRequest");
         }
 
         @Override

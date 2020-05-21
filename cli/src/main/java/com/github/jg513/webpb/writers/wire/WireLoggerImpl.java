@@ -29,4 +29,8 @@ public class WireLoggerImpl implements WireLogger {
     @Override
     public void setQuiet(boolean b) {
     }
+
+    @Override
+    public void artifact(@NotNull Path path, @NotNull String s) {
+    }
 }

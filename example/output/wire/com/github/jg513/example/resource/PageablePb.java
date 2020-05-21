@@ -2,6 +2,8 @@
 // Source file: Resource.proto
 package com.github.jg513.example.resource;
 
+import com.github.jg513.webpb.core.WebpbMessage;
+import com.github.jg513.webpb.options.MessageOptions;
 import com.squareup.wire.FieldEncoding;
 import com.squareup.wire.Message;
 import com.squareup.wire.ProtoAdapter;
@@ -16,15 +18,18 @@ import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.StringBuilder;
-import okio.ByteString;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import okio.ByteString;
 
 @Getter
 @Setter
 @Accessors(chain = true)
-public final class PageablePb extends Message<PageablePb, PageablePb.Builder> {
+public final class PageablePb extends Message<PageablePb, PageablePb.Builder>
+        implements WebpbMessage {
+
+    public static final MessageOptions MESSAGE_OPTIONS = new MessageOptions.Builder().build();
 
     public static final ProtoAdapter<PageablePb> ADAPTER = new ProtoAdapter_PageablePb();
 
@@ -65,6 +70,11 @@ public final class PageablePb extends Message<PageablePb, PageablePb.Builder> {
         this.page = page;
         this.size = size;
         this.sort = sort;
+    }
+
+    @Override
+    public MessageOptions messageOptions() {
+        return MESSAGE_OPTIONS;
     }
 
     @Override
@@ -110,7 +120,7 @@ public final class PageablePb extends Message<PageablePb, PageablePb.Builder> {
         if (pagination != null) builder.append(", pagination=").append(pagination);
         if (page != null) builder.append(", page=").append(page);
         if (size != null) builder.append(", size=").append(size);
-        if (sort != null) builder.append(", sort=").append(sort);
+        if (sort != null) builder.append(", sort=").append(Internal.sanitize(sort));
         return builder.replace(0, 2, "PageablePb{").append('}').toString();
     }
 
@@ -155,7 +165,10 @@ public final class PageablePb extends Message<PageablePb, PageablePb.Builder> {
     private static final class ProtoAdapter_PageablePb extends ProtoAdapter<PageablePb> {
 
         public ProtoAdapter_PageablePb() {
-            super(FieldEncoding.LENGTH_DELIMITED, PageablePb.class);
+            super(
+                    FieldEncoding.LENGTH_DELIMITED,
+                    PageablePb.class,
+                    "type.googleapis.com/ResourceProto.PageablePb");
         }
 
         @Override

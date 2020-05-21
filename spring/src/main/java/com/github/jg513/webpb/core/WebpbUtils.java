@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Objects;
 
 public class WebpbUtils {
+
     @SuppressWarnings("unchecked")
     public static void updateAnnotation(Method method) {
         if (!method.isAnnotationPresent(WebpbRequestMapping.class)) {

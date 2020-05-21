@@ -8,6 +8,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import java.lang.reflect.Method;
 
 public class WebpbRequestControllerMapping extends RequestMappingHandlerMapping {
+
     @NotNull
     @Override
     protected RequestMappingInfo getMappingForMethod(@NotNull Method method,

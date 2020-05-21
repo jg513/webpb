@@ -2,6 +2,8 @@
 // Source file: Store.proto
 package com.github.jg513.example.store;
 
+import com.github.jg513.webpb.core.WebpbMessage;
+import com.github.jg513.webpb.options.MessageOptions;
 import com.squareup.wire.FieldEncoding;
 import com.squareup.wire.Message;
 import com.squareup.wire.ProtoAdapter;
@@ -14,16 +16,18 @@ import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.StringBuilder;
-import okio.ByteString;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import okio.ByteString;
 
 @Getter
 @Setter
 @Accessors(chain = true)
 public final class UserMpLoginRequest
-        extends Message<UserMpLoginRequest, UserMpLoginRequest.Builder> {
+        extends Message<UserMpLoginRequest, UserMpLoginRequest.Builder> implements WebpbMessage {
+
+    public static final MessageOptions MESSAGE_OPTIONS = new MessageOptions.Builder().build();
 
     public static final ProtoAdapter<UserMpLoginRequest> ADAPTER =
             new ProtoAdapter_UserMpLoginRequest();
@@ -61,6 +65,11 @@ public final class UserMpLoginRequest
     }
 
     @Override
+    public MessageOptions messageOptions() {
+        return MESSAGE_OPTIONS;
+    }
+
+    @Override
     public Builder newBuilder() {
         Builder builder = new Builder();
         builder.appId = appId;
@@ -94,8 +103,8 @@ public final class UserMpLoginRequest
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(", appId=").append(appId);
-        builder.append(", code=").append(code);
+        builder.append(", appId=").append(Internal.sanitize(appId));
+        builder.append(", code=").append(Internal.sanitize(code));
         return builder.replace(0, 2, "UserMpLoginRequest{").append('}').toString();
     }
 
@@ -130,7 +139,10 @@ public final class UserMpLoginRequest
             extends ProtoAdapter<UserMpLoginRequest> {
 
         public ProtoAdapter_UserMpLoginRequest() {
-            super(FieldEncoding.LENGTH_DELIMITED, UserMpLoginRequest.class);
+            super(
+                    FieldEncoding.LENGTH_DELIMITED,
+                    UserMpLoginRequest.class,
+                    "type.googleapis.com/StoreProto.UserMpLoginRequest");
         }
 
         @Override

@@ -11,23 +11,31 @@ import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.FieldAccessExpr;
+import com.github.javaparser.ast.expr.MarkerAnnotationExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.Name;
 import com.github.javaparser.ast.expr.NameExpr;
+import com.github.javaparser.ast.expr.ObjectCreationExpr;
+import com.github.javaparser.ast.expr.StringLiteralExpr;
 import com.github.javaparser.ast.expr.ThisExpr;
+import com.github.javaparser.ast.nodeTypes.NodeWithName;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ExplicitConstructorInvocationStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.stmt.Statement;
+import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
 import com.github.javaparser.ast.visitor.Visitable;
 import com.github.jg513.webpb.core.context.TypeContext;
 import com.squareup.wire.schema.EnumType;
+import com.squareup.wire.schema.Options;
+import com.squareup.wire.schema.internal.parser.OptionElement;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
@@ -43,7 +51,7 @@ import static com.github.javaparser.ast.Modifier.Keyword;
 
 public class JavaParserFilter {
 
-    private static Map<String, String> methodsMapping = new HashMap<String, String>() {{
+    private static final Map<String, String> methodsMapping = new HashMap<String, String>() {{
         put("java_import", "javaImports");
         put("java_message_anno", "javaMessageAnnotations");
         put("java_setter", "javaSetter");
@@ -58,7 +66,7 @@ public class JavaParserFilter {
         put("ts_string", "tsString");
     }};
 
-    private JavaParser javaParser = new JavaParser();
+    private final JavaParser javaParser = new JavaParser();
 
     public CompilationUnit filter(TypeContext typeContext, String content) {
         CompilationUnit unit = javaParser.parse(content)
@@ -67,87 +75,74 @@ public class JavaParserFilter {
             return unit;
         }
 
-        unit
-            .accept(new ModifierVisitor<TypeContext>() {
+        unit.accept(new ModifierVisitor<TypeContext>() {
 
-                ClassOrInterfaceDeclaration classDeclaration = null;
+            ClassOrInterfaceDeclaration classDeclaration = null;
 
-                @Override
-                public Visitable visit(ClassOrInterfaceDeclaration n, TypeContext arg) {
-                    if (!isMessage(n)) {
-                        return super.visit(n, arg);
-                    }
-                    classDeclaration = n;
-                    visitWireFields(n, unit, arg);
-                    if (n.getConstructors().stream().anyMatch(ctor -> ctor.getParameters().isEmpty())) {
-                        return super.visit(n, arg);
-                    }
-                    n.getConstructors().stream()
-                        .findFirst()
-                        .ifPresent(ctor -> ctor.getBody().getStatements().stream()
-                            .filter(Statement::isExplicitConstructorInvocationStmt)
-                            .findFirst()
-                            .map(Statement::asExplicitConstructorInvocationStmt)
-                            .ifPresent(stmt -> {
-                                Expression expression = stmt.getArguments().get(stmt.getArguments().size() - 1);
-                                n.getMembers().addBefore(
-                                    new ConstructorDeclaration()
-                                        .addModifier(Keyword.PUBLIC)
-                                        .setName(ctor.getName())
-                                        .setBody(new BlockStmt(new NodeList<>(
-                                            new ExplicitConstructorInvocationStmt(false, null, new NodeList<>(
-                                                new NameExpr("ADAPTER"),
-                                                new FieldAccessExpr(new NameExpr("ByteString"), "EMPTY")
-                                            ))
-                                        ))),
-                                    ctor);
-                            })
-                        );
+            @Override
+            public Visitable visit(ClassOrInterfaceDeclaration n, TypeContext arg) {
+                if (!isMessage(n)) {
                     return super.visit(n, arg);
                 }
-
-                @Override
-                public Node visit(ImportDeclaration n, TypeContext arg) {
-                    Name importName = n.getName();
-                    importName.getQualifier().ifPresent(name -> {
-                        if ("com.google.protobuf".equals(name.asString())) {
-                            n.setName(new Name(
-                                new Name("com.github.jg513.webpb.options"),
-                                importName.getIdentifier()
-                            ));
-                        }
-                    });
+                this.classDeclaration = n;
+                addMessageOptions(unit, n, arg);
+                visitWireFields(n, unit, arg);
+                if (n.getConstructors().stream().anyMatch(ctor -> ctor.getParameters().isEmpty())) {
                     return super.visit(n, arg);
                 }
+                addDefaultConstructor(n);
+                return super.visit(n, arg);
+            }
 
-                @Override
-                public Visitable visit(MethodCallExpr n, TypeContext arg) {
-                    if (methodsMapping.containsKey(n.getNameAsString())) {
-                        n.setName(methodsMapping.get(n.getNameAsString()));
-                        visitOptionsVariableInitializer(unit, n);
+            @Override
+            public Node visit(ImportDeclaration n, TypeContext arg) {
+                Name importName = n.getName();
+                importName.getQualifier().ifPresent(name -> {
+                    if ("com.google.protobuf".equals(name.asString())) {
+                        n.setName(new Name(
+                            new Name("com.github.jg513.webpb.options"),
+                            importName.getIdentifier()
+                        ));
                     }
-                    return super.visit(n, arg);
-                }
+                });
+                return super.visit(n, arg);
+            }
 
-                @Override
-                public Visitable visit(FieldDeclaration n, TypeContext arg) {
-                    if (n.isStatic() && n.getVariable(0).getNameAsString().equals("MESSAGE_OPTIONS")) {
-                        List<ConstructorDeclaration> constructors = classDeclaration.getConstructors();
-                        classDeclaration.getMembers().addAfter(
-                            new MethodDeclaration()
-                                .setModifiers(Keyword.PUBLIC)
-                                .setType("MessageOptions")
-                                .setName("messageOptions")
-                                .setBody(new BlockStmt(
-                                    NodeList.nodeList(new ReturnStmt("MESSAGE_OPTIONS"))
-                                )),
-                            constructors.get(constructors.size() - 1)
-                        );
-                    }
-                    return super.visit(n, arg);
+            @Override
+            public Visitable visit(MethodCallExpr n, TypeContext arg) {
+                if (methodsMapping.containsKey(n.getNameAsString())) {
+                    n.setName(methodsMapping.get(n.getNameAsString()));
+                    visitOptionsVariableInitializer(unit, n);
                 }
-            }, typeContext);
+                return super.visit(n, arg);
+            }
+
+            @Override
+            public Visitable visit(FieldDeclaration n, TypeContext arg) {
+                if (n.isStatic() && n.getVariable(0).getNameAsString().equals("MESSAGE_OPTIONS")) {
+                    List<ConstructorDeclaration> constructors = classDeclaration.getConstructors();
+                    classDeclaration.getMembers().addAfter(
+                        new MethodDeclaration()
+                            .addAnnotation(new MarkerAnnotationExpr("Override"))
+                            .setModifiers(Keyword.PUBLIC)
+                            .setType("MessageOptions")
+                            .setName("messageOptions")
+                            .setBody(new BlockStmt(
+                                NodeList.nodeList(new ReturnStmt("MESSAGE_OPTIONS"))
+                            )),
+                        constructors.get(constructors.size() - 1)
+                    );
+                    addImport(unit, "com.github.jg513.webpb.options.MessageOptions");
+                }
+                return super.visit(n, arg);
+            }
+        }, typeContext);
         return unit;
+    }
+
+    private void addImport(CompilationUnit unit, String importing) {
+        unit.addImport(importing);
+        unit.getImports().sort(Comparator.comparing(NodeWithName::getNameAsString));
     }
 
     private boolean isMessage(ClassOrInterfaceDeclaration declaration) {
@@ -165,6 +160,61 @@ public class JavaParserFilter {
                 return type1.asString().equals(declaration.getNameAsString())
                     && type2.asString().equals(declaration.getNameAsString() + ".Builder");
             });
+    }
+
+    private void addMessageOptions(CompilationUnit unit,
+                                   ClassOrInterfaceDeclaration declaration,
+                                   TypeContext typeContext) {
+        declaration.addImplementedType("WebpbMessage");
+        addImport(unit, "com.github.jg513.webpb.core.WebpbMessage");
+
+        ClassOrInterfaceType optionsType = new ClassOrInterfaceType(null, "MessageOptions");
+
+        FieldDeclaration field = new FieldDeclaration();
+        field.setModifiers(Keyword.PUBLIC, Keyword.STATIC, Keyword.FINAL);
+
+        ObjectCreationExpr creationExpr = new ObjectCreationExpr(
+            null, new ClassOrInterfaceType(optionsType, "Builder"), new NodeList<>()
+        );
+
+        MethodCallExpr callExpr = null;
+        Options options = typeContext.getType().getOptions();
+        NodeList<Expression> tags = new NodeList<>();
+        NodeList<Expression> annotations = new NodeList<>();
+        for (OptionElement element : options.getElements()) {
+            switch (element.getName()) {
+                case "method":
+                    callExpr = new MethodCallExpr(
+                        callExpr == null ? creationExpr : callExpr,
+                        "method",
+                        new NodeList<>(new StringLiteralExpr(String.valueOf(element.getValue())))
+                    );
+                    break;
+                case "path":
+                    callExpr = new MethodCallExpr(
+                        callExpr == null ? creationExpr : callExpr,
+                        "path",
+                        new NodeList<>(new StringLiteralExpr(String.valueOf(element.getValue())))
+                    );
+                    break;
+                case "tag":
+                    tags.add(new StringLiteralExpr(String.valueOf(element.getValue())));
+                    break;
+                case "java_message_anno":
+                    annotations.add(new StringLiteralExpr(String.valueOf(element.getValue())));
+                    break;
+            }
+        }
+        if (!tags.isEmpty()) {
+            callExpr = new MethodCallExpr(callExpr == null ? creationExpr : callExpr, "tags", tags);
+        }
+        if (!annotations.isEmpty()) {
+            callExpr = new MethodCallExpr(callExpr == null ? creationExpr : callExpr, "javaAnnotations", annotations);
+        }
+        callExpr = new MethodCallExpr(callExpr == null ? creationExpr : callExpr, "build");
+        field.addVariable(new VariableDeclarator(optionsType, "MESSAGE_OPTIONS", callExpr));
+
+        declaration.getMembers().addFirst(field);
     }
 
     private void visitWireFields(TypeDeclaration<?> typeDeclaration, CompilationUnit unit, TypeContext typeContext) {
@@ -189,6 +239,28 @@ public class JavaParserFilter {
         imports.stream()
             .sorted(Comparator.comparing(Name::asString))
             .forEach(i -> unit.addImport(i.asString()));
+    }
+
+    public void addDefaultConstructor(ClassOrInterfaceDeclaration declaration) {
+        declaration.getConstructors().stream()
+            .findFirst()
+            .ifPresent(ctor -> ctor.getBody().getStatements().stream()
+                .filter(Statement::isExplicitConstructorInvocationStmt)
+                .findFirst()
+                .map(Statement::asExplicitConstructorInvocationStmt)
+                .ifPresent(stmt -> declaration.getMembers().addBefore(
+                    new ConstructorDeclaration()
+                        .addModifier(Keyword.PUBLIC)
+                        .setName(ctor.getName())
+                        .setBody(new BlockStmt(new NodeList<>(
+                            new ExplicitConstructorInvocationStmt(false, null, new NodeList<>(
+                                new NameExpr("ADAPTER"),
+                                new FieldAccessExpr(new NameExpr("ByteString"), "EMPTY")
+                            ))
+                        ))),
+                    ctor)
+                )
+            );
     }
 
     private void addGetters(TypeContext typeContext,

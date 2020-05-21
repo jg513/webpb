@@ -2,6 +2,7 @@
 // Source file: Store.proto
 package com.github.jg513.example.store;
 
+import com.github.jg513.webpb.core.WebpbMessage;
 import com.github.jg513.webpb.options.MessageOptions;
 import com.squareup.wire.FieldEncoding;
 import com.squareup.wire.Message;
@@ -16,27 +17,22 @@ import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.StringBuilder;
-import java.util.Arrays;
-import okio.ByteString;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import java.util.Collections;
+import okio.ByteString;
 
 @Getter
 @Setter
 @Accessors(chain = true)
-public final class StorePb extends Message<StorePb, StorePb.Builder> {
+public final class StorePb extends Message<StorePb, StorePb.Builder> implements WebpbMessage {
+
+    public static final MessageOptions MESSAGE_OPTIONS =
+            new MessageOptions.Builder().javaAnnotations("@JsonInclude(Include.NON_NULL)").build();
 
     public static final ProtoAdapter<StorePb> ADAPTER = new ProtoAdapter_StorePb();
 
     private static final long serialVersionUID = 0L;
-
-    public static final MessageOptions MESSAGE_OPTIONS =
-            new MessageOptions.Builder()
-                    .javaMessageAnnotations(
-                            Collections.singletonList("@JsonInclude(Include.NON_NULL)"))
-                    .build();
 
     public static final Integer DEFAULT_ID = 0;
 
@@ -77,6 +73,7 @@ public final class StorePb extends Message<StorePb, StorePb.Builder> {
         this.city = city;
     }
 
+    @Override
     public MessageOptions messageOptions() {
         return MESSAGE_OPTIONS;
     }
@@ -119,7 +116,7 @@ public final class StorePb extends Message<StorePb, StorePb.Builder> {
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(", id=").append(id);
-        builder.append(", name=").append(name);
+        builder.append(", name=").append(Internal.sanitize(name));
         builder.append(", city=").append(city);
         return builder.replace(0, 2, "StorePb{").append('}').toString();
     }
@@ -161,7 +158,10 @@ public final class StorePb extends Message<StorePb, StorePb.Builder> {
     private static final class ProtoAdapter_StorePb extends ProtoAdapter<StorePb> {
 
         public ProtoAdapter_StorePb() {
-            super(FieldEncoding.LENGTH_DELIMITED, StorePb.class);
+            super(
+                    FieldEncoding.LENGTH_DELIMITED,
+                    StorePb.class,
+                    "type.googleapis.com/StoreProto.StorePb");
         }
 
         @Override

@@ -2,7 +2,8 @@
 // Source file: Store.proto
 package com.github.jg513.example.store;
 
-import com.github.jg513.webpb.options.FieldOptions;
+import com.github.jg513.webpb.core.WebpbMessage;
+import com.github.jg513.webpb.options.MessageOptions;
 import com.squareup.wire.FieldEncoding;
 import com.squareup.wire.Message;
 import com.squareup.wire.ProtoAdapter;
@@ -16,15 +17,17 @@ import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.StringBuilder;
-import okio.ByteString;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import okio.ByteString;
 
 @Getter
 @Setter
 @Accessors(chain = true)
-public final class EmptyPb extends Message<EmptyPb, EmptyPb.Builder> {
+public final class EmptyPb extends Message<EmptyPb, EmptyPb.Builder> implements WebpbMessage {
+
+    public static final MessageOptions MESSAGE_OPTIONS = new MessageOptions.Builder().build();
 
     public static final ProtoAdapter<EmptyPb> ADAPTER = new ProtoAdapter_EmptyPb();
 
@@ -36,6 +39,11 @@ public final class EmptyPb extends Message<EmptyPb, EmptyPb.Builder> {
 
     public EmptyPb(ByteString unknownFields) {
         super(ADAPTER, unknownFields);
+    }
+
+    @Override
+    public MessageOptions messageOptions() {
+        return MESSAGE_OPTIONS;
     }
 
     @Override
@@ -77,14 +85,14 @@ public final class EmptyPb extends Message<EmptyPb, EmptyPb.Builder> {
     @Getter
     @Setter
     @Accessors(chain = true)
-    public static final class EnclosingPb extends Message<EnclosingPb, EnclosingPb.Builder> {
+    public static final class EnclosingPb extends Message<EnclosingPb, EnclosingPb.Builder>
+            implements WebpbMessage {
+
+        public static final MessageOptions MESSAGE_OPTIONS = new MessageOptions.Builder().build();
 
         public static final ProtoAdapter<EnclosingPb> ADAPTER = new ProtoAdapter_EnclosingPb();
 
         private static final long serialVersionUID = 0L;
-
-        public static final FieldOptions FIELD_OPTIONS_INNERSTRING =
-                new FieldOptions.Builder().tsString(true).build();
 
         public static final Long DEFAULT_INNERSTRING = 0L;
 
@@ -105,6 +113,11 @@ public final class EmptyPb extends Message<EmptyPb, EmptyPb.Builder> {
         public EnclosingPb(Long innerString, ByteString unknownFields) {
             super(ADAPTER, unknownFields);
             this.innerString = innerString;
+        }
+
+        @Override
+        public MessageOptions messageOptions() {
+            return MESSAGE_OPTIONS;
         }
 
         @Override
@@ -164,7 +177,10 @@ public final class EmptyPb extends Message<EmptyPb, EmptyPb.Builder> {
         private static final class ProtoAdapter_EnclosingPb extends ProtoAdapter<EnclosingPb> {
 
             public ProtoAdapter_EnclosingPb() {
-                super(FieldEncoding.LENGTH_DELIMITED, EnclosingPb.class);
+                super(
+                        FieldEncoding.LENGTH_DELIMITED,
+                        EnclosingPb.class,
+                        "type.googleapis.com/StoreProto.EmptyPb.EnclosingPb");
             }
 
             @Override
@@ -210,7 +226,10 @@ public final class EmptyPb extends Message<EmptyPb, EmptyPb.Builder> {
     private static final class ProtoAdapter_EmptyPb extends ProtoAdapter<EmptyPb> {
 
         public ProtoAdapter_EmptyPb() {
-            super(FieldEncoding.LENGTH_DELIMITED, EmptyPb.class);
+            super(
+                    FieldEncoding.LENGTH_DELIMITED,
+                    EmptyPb.class,
+                    "type.googleapis.com/StoreProto.EmptyPb");
         }
 
         @Override

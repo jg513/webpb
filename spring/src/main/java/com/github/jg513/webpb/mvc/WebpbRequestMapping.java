@@ -15,6 +15,7 @@ import java.lang.annotation.Target;
 @Documented
 @RequestMapping
 public @interface WebpbRequestMapping {
+
     @AliasFor(annotation = RequestMapping.class)
     String name() default "";
 

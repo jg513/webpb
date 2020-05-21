@@ -2,6 +2,7 @@
 // Source file: Store.proto
 package com.github.jg513.example.store;
 
+import com.github.jg513.webpb.core.WebpbMessage;
 import com.github.jg513.webpb.options.MessageOptions;
 import com.squareup.wire.FieldEncoding;
 import com.squareup.wire.Message;
@@ -13,24 +14,24 @@ import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.StringBuilder;
-import okio.ByteString;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import okio.ByteString;
 
 @Getter
 @Setter
 @Accessors(chain = true)
 public final class StoreCurrentRequest
-        extends Message<StoreCurrentRequest, StoreCurrentRequest.Builder> {
+        extends Message<StoreCurrentRequest, StoreCurrentRequest.Builder> implements WebpbMessage {
+
+    public static final MessageOptions MESSAGE_OPTIONS =
+            new MessageOptions.Builder().method("GET").path("/stores/current").build();
 
     public static final ProtoAdapter<StoreCurrentRequest> ADAPTER =
             new ProtoAdapter_StoreCurrentRequest();
 
     private static final long serialVersionUID = 0L;
-
-    public static final MessageOptions MESSAGE_OPTIONS =
-            new MessageOptions.Builder().method("GET").path("/stores/current").build();
 
     public StoreCurrentRequest() {
         this(ByteString.EMPTY);
@@ -40,6 +41,7 @@ public final class StoreCurrentRequest
         super(ADAPTER, unknownFields);
     }
 
+    @Override
     public MessageOptions messageOptions() {
         return MESSAGE_OPTIONS;
     }
@@ -84,7 +86,10 @@ public final class StoreCurrentRequest
             extends ProtoAdapter<StoreCurrentRequest> {
 
         public ProtoAdapter_StoreCurrentRequest() {
-            super(FieldEncoding.LENGTH_DELIMITED, StoreCurrentRequest.class);
+            super(
+                    FieldEncoding.LENGTH_DELIMITED,
+                    StoreCurrentRequest.class,
+                    "type.googleapis.com/StoreProto.StoreCurrentRequest");
         }
 
         @Override

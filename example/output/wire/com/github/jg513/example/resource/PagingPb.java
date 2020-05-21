@@ -2,6 +2,8 @@
 // Source file: Resource.proto
 package com.github.jg513.example.resource;
 
+import com.github.jg513.webpb.core.WebpbMessage;
+import com.github.jg513.webpb.options.MessageOptions;
 import com.squareup.wire.FieldEncoding;
 import com.squareup.wire.Message;
 import com.squareup.wire.ProtoAdapter;
@@ -15,15 +17,17 @@ import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.StringBuilder;
-import okio.ByteString;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import okio.ByteString;
 
 @Getter
 @Setter
 @Accessors(chain = true)
-public final class PagingPb extends Message<PagingPb, PagingPb.Builder> {
+public final class PagingPb extends Message<PagingPb, PagingPb.Builder> implements WebpbMessage {
+
+    public static final MessageOptions MESSAGE_OPTIONS = new MessageOptions.Builder().build();
 
     public static final ProtoAdapter<PagingPb> ADAPTER = new ProtoAdapter_PagingPb();
 
@@ -80,6 +84,11 @@ public final class PagingPb extends Message<PagingPb, PagingPb.Builder> {
         this.size = size;
         this.totalCount = totalCount;
         this.totalPage = totalPage;
+    }
+
+    @Override
+    public MessageOptions messageOptions() {
+        return MESSAGE_OPTIONS;
     }
 
     @Override
@@ -181,7 +190,10 @@ public final class PagingPb extends Message<PagingPb, PagingPb.Builder> {
     private static final class ProtoAdapter_PagingPb extends ProtoAdapter<PagingPb> {
 
         public ProtoAdapter_PagingPb() {
-            super(FieldEncoding.LENGTH_DELIMITED, PagingPb.class);
+            super(
+                    FieldEncoding.LENGTH_DELIMITED,
+                    PagingPb.class,
+                    "type.googleapis.com/ResourceProto.PagingPb");
         }
 
         @Override

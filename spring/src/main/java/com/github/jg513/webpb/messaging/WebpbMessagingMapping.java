@@ -14,5 +14,6 @@ import java.lang.annotation.Target;
 @Documented
 @MessageMapping
 public @interface WebpbMessagingMapping {
+
     Class<? extends Message> message() default Message.class;
 }

@@ -8,6 +8,7 @@ import org.springframework.web.reactive.result.method.annotation.RequestMappingH
 import java.lang.reflect.Method;
 
 public class WebpbReactiveControllerMapping extends RequestMappingHandlerMapping {
+
     @NotNull
     @Override
     protected RequestMappingInfo getMappingForMethod(@NotNull Method method,

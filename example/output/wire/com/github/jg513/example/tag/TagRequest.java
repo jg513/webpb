@@ -2,6 +2,7 @@
 // Source file: Tag.proto
 package com.github.jg513.example.tag;
 
+import com.github.jg513.webpb.core.WebpbMessage;
 import com.github.jg513.webpb.options.MessageOptions;
 import com.squareup.wire.FieldEncoding;
 import com.squareup.wire.Message;
@@ -13,27 +14,23 @@ import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.StringBuilder;
-import java.util.Arrays;
-import okio.ByteString;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import okio.ByteString;
 
 @Getter
 @Setter
 @Accessors(chain = true)
-public final class TagRequest extends Message<TagRequest, TagRequest.Builder> {
+public final class TagRequest extends Message<TagRequest, TagRequest.Builder>
+        implements WebpbMessage {
+
+    public static final MessageOptions MESSAGE_OPTIONS =
+            new MessageOptions.Builder().method("GET").path("/tag").tags("java", "other").build();
 
     public static final ProtoAdapter<TagRequest> ADAPTER = new ProtoAdapter_TagRequest();
 
     private static final long serialVersionUID = 0L;
-
-    public static final MessageOptions MESSAGE_OPTIONS =
-            new MessageOptions.Builder()
-                    .method("GET")
-                    .path("/tag")
-                    .tags(Arrays.asList("java", "other"))
-                    .build();
 
     public TagRequest() {
         this(ByteString.EMPTY);
@@ -43,6 +40,7 @@ public final class TagRequest extends Message<TagRequest, TagRequest.Builder> {
         super(ADAPTER, unknownFields);
     }
 
+    @Override
     public MessageOptions messageOptions() {
         return MESSAGE_OPTIONS;
     }
@@ -86,7 +84,10 @@ public final class TagRequest extends Message<TagRequest, TagRequest.Builder> {
     private static final class ProtoAdapter_TagRequest extends ProtoAdapter<TagRequest> {
 
         public ProtoAdapter_TagRequest() {
-            super(FieldEncoding.LENGTH_DELIMITED, TagRequest.class);
+            super(
+                    FieldEncoding.LENGTH_DELIMITED,
+                    TagRequest.class,
+                    "type.googleapis.com/TagProto.TagRequest");
         }
 
         @Override

@@ -16,6 +16,7 @@ import java.lang.reflect.Method;
 import java.util.Objects;
 
 public class WebpbRSocketMessageHandler extends RSocketMessageHandler {
+
     @NotNull
     @Override
     protected CompositeMessageCondition getCondition(@NotNull AnnotatedElement element) {

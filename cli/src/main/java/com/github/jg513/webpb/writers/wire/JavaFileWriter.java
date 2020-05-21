@@ -67,18 +67,20 @@ public class JavaFileWriter implements Callable<Unit> {
                 return null;
             }
             try {
-                CompilationUnit unit = this.context.fileContext(spec.getProtoFile())
+                Optional<CompilationUnit> optional = this.context.fileContext(spec.getProtoFile())
                     .flatMap(fileContext -> fileContext.typeContext(type))
                     .flatMap(typeContext -> Optional.of(
                         javaParserFilter.filter(typeContext, javaFile.toString())
-                    ))
-                    .get();
-                if (unit.getPackageDeclaration().isPresent()) {
-                    path = createDirectories(path, unit.getPackageDeclaration().get());
+                    ));
+                if (optional.isPresent()) {
+                    CompilationUnit unit = optional.get();
+                    if (unit.getPackageDeclaration().isPresent()) {
+                        path = createDirectories(path, unit.getPackageDeclaration().get());
+                    }
+                    Path out = path.resolve(typeSpec.name + ".java");
+                    String content = formatter.formatSource(unit.toString());
+                    Files.write(out, content.getBytes());
                 }
-                Path out = path.resolve(typeSpec.name + ".java");
-                String content = formatter.formatSource(unit.toString());
-                Files.write(out, content.getBytes());
             } catch (IOException e) {
                 throw new IOException(
                     String.format("Error emitting %s.%s to %s",
