@@ -27,6 +27,7 @@ public class WebpbUtils {
             return;
         }
         RequestMapping requestMapping = AnnotatedElementUtils.findMergedAnnotation(method, RequestMapping.class);
+        assert requestMapping != null;
         WebpbRequestMapping webpbRequestMapping = method.getAnnotation(WebpbRequestMapping.class);
 
         Class<?> clazz = webpbRequestMapping.message();

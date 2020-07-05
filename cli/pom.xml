@@ -6,7 +6,7 @@
 
     <groupId>com.github.jg513</groupId>
     <artifactId>webpb-cli</artifactId>
-    <version>0.0.3</version>
+    <version>0.0.4-SNAPSHOT</version>
     <name>cli</name>
 
     <properties>
@@ -22,7 +22,7 @@
         <dependency>
             <groupId>com.github.jg513</groupId>
             <artifactId>webpb-spring</artifactId>
-            <version>0.0.4</version>
+            <version>0.0.5-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <groupId>*</groupId>

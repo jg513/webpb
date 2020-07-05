@@ -4,6 +4,7 @@ import com.github.jg513.webpb.core.WebpbUtils;
 import com.github.jg513.webpb.options.MessageOptions;
 import com.squareup.wire.Message;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.messaging.handler.CompositeMessageCondition;
@@ -17,7 +18,7 @@ import java.util.Objects;
 
 public class WebpbRSocketMessageHandler extends RSocketMessageHandler {
 
-    @NotNull
+    @Nullable
     @Override
     protected CompositeMessageCondition getCondition(@NotNull AnnotatedElement element) {
         WebpbMessagingMapping annotation =

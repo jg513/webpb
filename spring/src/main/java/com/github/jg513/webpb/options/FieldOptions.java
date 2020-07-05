@@ -1,10 +1,7 @@
 package com.github.jg513.webpb.options;
 
-import lombok.Getter;
-
 import java.util.List;
 
-@Getter
 public class FieldOptions {
 
     private boolean omitted;
@@ -12,6 +9,18 @@ public class FieldOptions {
     private List<String> javaAnnotations;
 
     private boolean tsString;
+
+    public boolean isOmitted() {
+        return omitted;
+    }
+
+    public List<String> getJavaAnnotations() {
+        return javaAnnotations;
+    }
+
+    public boolean isTsString() {
+        return tsString;
+    }
 
     public static class Builder {
 

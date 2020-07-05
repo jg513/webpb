@@ -247,7 +247,7 @@ final class TypescriptGenerator {
             generateMetaPath(type, path);
         });
         trimDuplicatedNewline();
-        indent().append("});\n\n");
+        indent().append("}) as Webpb.WebpbMeta;\n\n");
     }
 
     private void generateMetaPath(MessageType type, String path) {

@@ -1,10 +1,7 @@
 package com.github.jg513.webpb.options;
 
-import lombok.Getter;
-
 import java.util.List;
 
-@Getter
 public class FileOptions {
 
     private List<String> javaImports;
@@ -14,6 +11,22 @@ public class FileOptions {
     private boolean javaSetter;
 
     private boolean javaGetter;
+
+    public List<String> getJavaImports() {
+        return javaImports;
+    }
+
+    public List<String> getJavaMessageAnnotations() {
+        return javaMessageAnnotations;
+    }
+
+    public boolean isJavaSetter() {
+        return javaSetter;
+    }
+
+    public boolean isJavaGetter() {
+        return javaGetter;
+    }
 
     public static class Builder {
 
