@@ -23,7 +23,7 @@ export class PageablePb implements IPageablePb {
             class: 'PageablePb',
             method: '',
             path: ''
-        });
+        }) as Webpb.WebpbMeta;
     }
 
     static create(properties: IPageablePb): PageablePb {
@@ -51,7 +51,7 @@ export class PagingPb implements IPagingPb {
             class: 'PagingPb',
             method: '',
             path: ''
-        });
+        }) as Webpb.WebpbMeta;
     }
 
     static create(properties: IPagingPb): PagingPb {

@@ -19,7 +19,7 @@ export class Any implements IAny {
             class: 'Any',
             method: '',
             path: ''
-        });
+        }) as Webpb.WebpbMeta;
     }
 
     static create(properties: IAny): Any {

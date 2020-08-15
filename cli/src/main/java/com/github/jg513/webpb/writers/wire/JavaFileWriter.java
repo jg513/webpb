@@ -40,9 +40,9 @@ public class JavaFileWriter implements Callable<Unit> {
 
     private final WireLogger log;
 
-    private JavaParserFilter javaParserFilter = new JavaParserFilter();
+    private final JavaParserFilter javaParserFilter = new JavaParserFilter();
 
-    private Formatter formatter = new Formatter(JavaFormatterOptions.builder()
+    private final Formatter formatter = new Formatter(JavaFormatterOptions.builder()
         .style(JavaFormatterOptions.Style.AOSP)
         .build());
 
@@ -56,6 +56,9 @@ public class JavaFileWriter implements Callable<Unit> {
             Type type = spec.getType();
             TypeSpec typeSpec = javaGenerator.generateType(type);
             ClassName javaTypeName = javaGenerator.generatedTypeName(type);
+            if (javaTypeName.packageName().startsWith("com.google")) {
+                return null;
+            }
             JavaFile javaFile = JavaFile.builder(javaTypeName.packageName(), typeSpec)
                 .addFileComment("$L", WireCompiler.CODE_GENERATED_BY_WIRE)
                 .addFileComment("\nSource file: $L", type.getLocation().withPathOnly())

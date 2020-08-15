@@ -23,7 +23,7 @@ export class StorePb implements IStorePb {
             class: 'StorePb',
             method: '',
             path: ''
-        });
+        }) as Webpb.WebpbMeta;
     }
 
     static create(properties: IStorePb): StorePb {
@@ -42,7 +42,7 @@ export class Project implements IProject {
             class: 'Project',
             method: '',
             path: ''
-        });
+        }) as Webpb.WebpbMeta;
     }
 
     static create(): Project {
@@ -106,7 +106,7 @@ export class StoreRequest implements IStoreRequest, Webpb.WebpbMessage {
             class: 'StoreRequest',
             method: 'GET',
             path: `/stores/${p.id}`
-        });
+        }) as Webpb.WebpbMeta;
     }
 
     static create(properties: IStoreRequest): StoreRequest {
@@ -130,7 +130,7 @@ export class StoreResponse implements IStoreResponse {
             class: 'StoreResponse',
             method: '',
             path: ''
-        });
+        }) as Webpb.WebpbMeta;
     }
 
     static create(properties: IStoreResponse): StoreResponse {
@@ -152,7 +152,7 @@ export class StoreResponse implements IStoreResponse {
                 class: 'StoreNestedPb',
                 method: '',
                 path: ''
-            });
+            }) as Webpb.WebpbMeta;
         }
 
         static create(properties: IStoreNestedPb): StoreNestedPb {
@@ -171,7 +171,7 @@ export class StoreCurrentRequest implements IStoreCurrentRequest, Webpb.WebpbMes
             class: 'StoreCurrentRequest',
             method: 'GET',
             path: `/stores/current`
-        });
+        }) as Webpb.WebpbMeta;
     }
 
     static create(): StoreCurrentRequest {
@@ -190,7 +190,7 @@ export class EmptyPb implements IEmptyPb {
             class: 'EmptyPb',
             method: '',
             path: ''
-        });
+        }) as Webpb.WebpbMeta;
     }
 
     static create(): EmptyPb {
@@ -212,7 +212,7 @@ export class EmptyPb implements IEmptyPb {
                 class: 'EnclosingPb',
                 method: '',
                 path: ''
-            });
+            }) as Webpb.WebpbMeta;
         }
 
         static create(properties: IEnclosingPb): EnclosingPb {
@@ -241,7 +241,7 @@ export class StoresRequest implements IStoresRequest, Webpb.WebpbMessage {
                 page: Webpb.getter(p, 'pageable.page'),
                 size: Webpb.getter(p, 'pageable.size'),
             })}`
-        });
+        }) as Webpb.WebpbMeta;
     }
 
     static create(properties: IStoresRequest): StoresRequest {
@@ -265,7 +265,7 @@ export class StoresResponse implements IStoresResponse {
             class: 'StoresResponse',
             method: '',
             path: ''
-        });
+        }) as Webpb.WebpbMeta;
     }
 
     static create(properties: IStoresResponse): StoresResponse {
@@ -289,7 +289,7 @@ export class UserMpLoginRequest implements IUserMpLoginRequest {
             class: 'UserMpLoginRequest',
             method: '',
             path: ''
-        });
+        }) as Webpb.WebpbMeta;
     }
 
     static create(properties: IUserMpLoginRequest): UserMpLoginRequest {

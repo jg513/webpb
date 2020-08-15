@@ -12,6 +12,7 @@ import com.github.jg513.webpb.exception.ConsoleErrorException;
 import com.squareup.wire.schema.MessageType;
 import com.squareup.wire.schema.ProtoFile;
 import com.squareup.wire.schema.Type;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -40,6 +41,9 @@ public class JavaWriter extends CodeWriter {
                 continue;
             }
             ProtoFile file = ((PendingTypeSpec) spec).getProtoFile();
+            if (StringUtils.startsWith(file.javaPackage(), "com.google")) {
+                return null;
+            }
             Type type = ((PendingTypeSpec) spec).getType();
             if (type instanceof MessageType && !context.getTags().isEmpty()) {
                 List<String> tags = (List<String>) type.getOptions().get(MessageOptions.TAG);

@@ -24,7 +24,7 @@ export class ErrorMessage implements IErrorMessage {
             class: 'ErrorMessage',
             method: '',
             path: ''
-        });
+        }) as Webpb.WebpbMeta;
     }
 
     static create(properties: IErrorMessage): ErrorMessage {
