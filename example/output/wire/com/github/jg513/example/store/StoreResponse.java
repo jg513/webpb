@@ -15,15 +15,16 @@ import java.io.IOException;
 import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
-import java.lang.StringBuilder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 import okio.ByteString;
 
 @Getter
 @Setter
 @Accessors(chain = true)
+@ToString
 public final class StoreResponse extends Message<StoreResponse, StoreResponse.Builder>
         implements WebpbMessage {
 
@@ -95,14 +96,6 @@ public final class StoreResponse extends Message<StoreResponse, StoreResponse.Bu
         return result;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append(", store=").append(store);
-        builder.append(", nested=").append(nested);
-        return builder.replace(0, 2, "StoreResponse{").append('}').toString();
-    }
-
     public static final class Builder extends Message.Builder<StoreResponse, Builder> {
 
         public StorePb store;
@@ -133,6 +126,7 @@ public final class StoreResponse extends Message<StoreResponse, StoreResponse.Bu
     @Getter
     @Setter
     @Accessors(chain = true)
+    @ToString
     public static final class StoreNestedPb extends Message<StoreNestedPb, StoreNestedPb.Builder>
             implements WebpbMessage {
 
@@ -193,13 +187,6 @@ public final class StoreResponse extends Message<StoreResponse, StoreResponse.Bu
                 super.hashCode = result;
             }
             return result;
-        }
-
-        @Override
-        public String toString() {
-            StringBuilder builder = new StringBuilder();
-            builder.append(", employee=").append(Internal.sanitize(employee));
-            return builder.replace(0, 2, "StoreNestedPb{").append('}').toString();
         }
 
         public static final class Builder extends Message.Builder<StoreNestedPb, Builder> {

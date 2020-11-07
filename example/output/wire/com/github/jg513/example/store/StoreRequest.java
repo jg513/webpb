@@ -20,18 +20,19 @@ import java.lang.Long;
 import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
-import java.lang.StringBuilder;
 import java.util.List;
 import java.util.Map;
 import javax.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 import okio.ByteString;
 
 @Getter
 @Setter
 @Accessors(chain = true)
+@ToString
 public final class StoreRequest extends Message<StoreRequest, StoreRequest.Builder>
         implements WebpbMessage {
 
@@ -291,32 +292,6 @@ public final class StoreRequest extends Message<StoreRequest, StoreRequest.Build
             super.hashCode = result;
         }
         return result;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append(", id=").append(id);
-        builder.append(", email=").append(Internal.sanitize(email));
-        if (valid != null) builder.append(", valid=").append(valid);
-        if (!data.isEmpty()) builder.append(", data=").append(data);
-        if (!projects.isEmpty()) builder.append(", projects=").append(projects);
-        if (!unpacked.isEmpty()) builder.append(", unpacked=").append(unpacked);
-        if (!packed.isEmpty()) builder.append(", packed=").append(packed);
-        if (!projectList.isEmpty()) builder.append(", projectList=").append(projectList);
-        builder.append(", project=").append(project);
-        builder.append(", max=").append(max);
-        if (!longMap.isEmpty()) builder.append(", longMap=").append(longMap);
-        if (!projectMap.isEmpty()) builder.append(", projectMap=").append(projectMap);
-        if (!typeMap.isEmpty()) builder.append(", typeMap=").append(typeMap);
-        builder.append(", binary=").append(binary);
-        builder.append(", type=").append(type);
-        builder.append(", floatData=").append(floatData);
-        builder.append(", stringField=").append(stringField);
-        if (anyName != null) builder.append(", anyName=").append(Internal.sanitize(anyName));
-        if (anyProject != null) builder.append(", anyProject=").append(anyProject);
-        if (anyStore != null) builder.append(", anyStore=").append(anyStore);
-        return builder.replace(0, 2, "StoreRequest{").append('}').toString();
     }
 
     public static final class Builder extends Message.Builder<StoreRequest, Builder> {

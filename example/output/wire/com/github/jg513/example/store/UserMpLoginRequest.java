@@ -15,15 +15,16 @@ import java.io.IOException;
 import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
-import java.lang.StringBuilder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 import okio.ByteString;
 
 @Getter
 @Setter
 @Accessors(chain = true)
+@ToString
 public final class UserMpLoginRequest
         extends Message<UserMpLoginRequest, UserMpLoginRequest.Builder> implements WebpbMessage {
 
@@ -98,14 +99,6 @@ public final class UserMpLoginRequest
             super.hashCode = result;
         }
         return result;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append(", appId=").append(Internal.sanitize(appId));
-        builder.append(", code=").append(Internal.sanitize(code));
-        return builder.replace(0, 2, "UserMpLoginRequest{").append('}').toString();
     }
 
     public static final class Builder extends Message.Builder<UserMpLoginRequest, Builder> {

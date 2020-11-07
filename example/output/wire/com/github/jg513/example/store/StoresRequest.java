@@ -17,10 +17,10 @@ import java.lang.Integer;
 import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
-import java.lang.StringBuilder;
 import javax.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 import okio.ByteString;
 import org.hibernate.validator.constraints.Range;
@@ -28,6 +28,7 @@ import org.hibernate.validator.constraints.Range;
 @Getter
 @Setter
 @Accessors(chain = true)
+@ToString
 public final class StoresRequest extends Message<StoresRequest, StoresRequest.Builder>
         implements WebpbMessage {
 
@@ -118,15 +119,6 @@ public final class StoresRequest extends Message<StoresRequest, StoresRequest.Bu
             super.hashCode = result;
         }
         return result;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append(", pageable=").append(pageable);
-        builder.append(", type=").append(type);
-        builder.append(", city=").append(city);
-        return builder.replace(0, 2, "StoresRequest{").append('}').toString();
     }
 
     public static final class Builder extends Message.Builder<StoresRequest, Builder> {

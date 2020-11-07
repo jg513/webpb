@@ -17,15 +17,16 @@ import java.lang.Integer;
 import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
-import java.lang.StringBuilder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 import okio.ByteString;
 
 @Getter
 @Setter
 @Accessors(chain = true)
+@ToString
 public final class PageablePb extends Message<PageablePb, PageablePb.Builder>
         implements WebpbMessage {
 
@@ -112,16 +113,6 @@ public final class PageablePb extends Message<PageablePb, PageablePb.Builder>
             super.hashCode = result;
         }
         return result;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        if (pagination != null) builder.append(", pagination=").append(pagination);
-        if (page != null) builder.append(", page=").append(page);
-        if (size != null) builder.append(", size=").append(size);
-        if (sort != null) builder.append(", sort=").append(Internal.sanitize(sort));
-        return builder.replace(0, 2, "PageablePb{").append('}').toString();
     }
 
     public static final class Builder extends Message.Builder<PageablePb, Builder> {

@@ -38,6 +38,7 @@ import com.squareup.wire.schema.Options;
 import com.squareup.wire.schema.internal.parser.OptionElement;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -57,7 +58,6 @@ public class JavaParserFilter {
         put("java_setter", "javaSetter");
         put("java_getter", "javaGetter");
 
-
         put("omitted", "omitted");
         put("method", "method");
         put("path", "path");
@@ -75,6 +75,7 @@ public class JavaParserFilter {
             return unit;
         }
 
+        List<TypeDeclaration<?>> typeDeclarations = new ArrayList<>();
         unit.accept(new ModifierVisitor<TypeContext>() {
 
             ClassOrInterfaceDeclaration classDeclaration = null;
@@ -84,6 +85,7 @@ public class JavaParserFilter {
                 if (!isMessage(n)) {
                     return super.visit(n, arg);
                 }
+                typeDeclarations.add(n);
                 this.classDeclaration = n;
                 addMessageOptions(unit, n, arg);
                 visitWireFields(n, unit, arg);
@@ -137,6 +139,28 @@ public class JavaParserFilter {
                 return super.visit(n, arg);
             }
         }, typeContext);
+
+        for (TypeDeclaration<?> n : typeDeclarations) {
+            if (!typeContext.isJavaToStringMethod()) {
+                MethodDeclaration toStringMethod = null;
+                for (MethodDeclaration method : n.getMethods()) {
+                    if (StringUtils.equals("toString", method.getNameAsString()) && method.getParameters().isEmpty()) {
+                        toStringMethod = method;
+                    }
+                }
+                n.remove(toStringMethod);
+            }
+        }
+        ImportDeclaration importNode = null;
+        for (ImportDeclaration importDeclaration : unit.getImports()) {
+            if (importDeclaration.getNameAsString().equals("java.lang.StringBuilder")) {
+                importNode = importDeclaration;
+                break;
+            }
+        }
+        if (importNode != null) {
+            unit.remove(importNode);
+        }
         return unit;
     }
 

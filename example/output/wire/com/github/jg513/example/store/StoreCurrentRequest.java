@@ -13,15 +13,16 @@ import java.io.IOException;
 import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
-import java.lang.StringBuilder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 import okio.ByteString;
 
 @Getter
 @Setter
 @Accessors(chain = true)
+@ToString
 public final class StoreCurrentRequest
         extends Message<StoreCurrentRequest, StoreCurrentRequest.Builder> implements WebpbMessage {
 
@@ -64,12 +65,6 @@ public final class StoreCurrentRequest
     @Override
     public int hashCode() {
         return unknownFields().hashCode();
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        return builder.replace(0, 2, "StoreCurrentRequest{").append('}').toString();
     }
 
     public static final class Builder extends Message.Builder<StoreCurrentRequest, Builder> {

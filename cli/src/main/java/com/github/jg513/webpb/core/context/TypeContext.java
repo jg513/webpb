@@ -33,12 +33,15 @@ public class TypeContext {
 
     private boolean javaSetter;
 
+    private boolean javaToStringMethod;
+
     public TypeContext(FileContext fileContext, Type type) {
         this.type = type;
         this.context = fileContext.getContext();
         this.fileContext = fileContext;
         this.javaGetter = fileContext.isJavaGetter();
         this.javaSetter = fileContext.isJavaSetter();
+        this.javaToStringMethod = fileContext.isJavaToStringMethod();
         fileContext.getMessageAnnotations().keySet().forEach(expr ->
             this.annotations.put(expr.clone(), expr.getName())
         );

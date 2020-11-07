@@ -16,15 +16,16 @@ import java.lang.Integer;
 import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
-import java.lang.StringBuilder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 import okio.ByteString;
 
 @Getter
 @Setter
 @Accessors(chain = true)
+@ToString
 public final class PagingPb extends Message<PagingPb, PagingPb.Builder> implements WebpbMessage {
 
     public static final MessageOptions MESSAGE_OPTIONS = new MessageOptions.Builder().build();
@@ -126,16 +127,6 @@ public final class PagingPb extends Message<PagingPb, PagingPb.Builder> implemen
             super.hashCode = result;
         }
         return result;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append(", page=").append(page);
-        builder.append(", size=").append(size);
-        builder.append(", totalCount=").append(totalCount);
-        builder.append(", totalPage=").append(totalPage);
-        return builder.replace(0, 2, "PagingPb{").append('}').toString();
     }
 
     public static final class Builder extends Message.Builder<PagingPb, Builder> {

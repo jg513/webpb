@@ -15,15 +15,16 @@ import java.io.IOException;
 import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
-import java.lang.StringBuilder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 import okio.ByteString;
 
 @Getter
 @Setter
 @Accessors(chain = true)
+@ToString
 public final class ErrorMessage extends Message<ErrorMessage, ErrorMessage.Builder>
         implements WebpbMessage {
 
@@ -94,14 +95,6 @@ public final class ErrorMessage extends Message<ErrorMessage, ErrorMessage.Build
             super.hashCode = result;
         }
         return result;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append(", code=").append(code);
-        if (message != null) builder.append(", message=").append(Internal.sanitize(message));
-        return builder.replace(0, 2, "ErrorMessage{").append('}').toString();
     }
 
     public static final class Builder extends Message.Builder<ErrorMessage, Builder> {

@@ -21,4 +21,6 @@ public class FileOptions {
     public static final ProtoMember TS_STREAM = ProtoMember.get(FILE_OPTIONS, "ts_stream");
 
     public static final ProtoMember TS_LONG_AS_STRING = ProtoMember.get(FILE_OPTIONS, "ts_long_as_string");
+
+    public static final ProtoMember JAVA_TO_STRING_METHOD = ProtoMember.get(FILE_OPTIONS, "java_to_string_method");
 }

@@ -16,15 +16,16 @@ import java.lang.Long;
 import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
-import java.lang.StringBuilder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 import okio.ByteString;
 
 @Getter
 @Setter
 @Accessors(chain = true)
+@ToString
 public final class EmptyPb extends Message<EmptyPb, EmptyPb.Builder> implements WebpbMessage {
 
     public static final MessageOptions MESSAGE_OPTIONS = new MessageOptions.Builder().build();
@@ -66,12 +67,6 @@ public final class EmptyPb extends Message<EmptyPb, EmptyPb.Builder> implements 
         return unknownFields().hashCode();
     }
 
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        return builder.replace(0, 2, "EmptyPb{").append('}').toString();
-    }
-
     public static final class Builder extends Message.Builder<EmptyPb, Builder> {
 
         public Builder() {}
@@ -85,6 +80,7 @@ public final class EmptyPb extends Message<EmptyPb, EmptyPb.Builder> implements 
     @Getter
     @Setter
     @Accessors(chain = true)
+    @ToString
     public static final class EnclosingPb extends Message<EnclosingPb, EnclosingPb.Builder>
             implements WebpbMessage {
 
@@ -145,13 +141,6 @@ public final class EmptyPb extends Message<EmptyPb, EmptyPb.Builder> implements 
                 super.hashCode = result;
             }
             return result;
-        }
-
-        @Override
-        public String toString() {
-            StringBuilder builder = new StringBuilder();
-            builder.append(", innerString=").append(innerString);
-            return builder.replace(0, 2, "EnclosingPb{").append('}').toString();
         }
 
         public static final class Builder extends Message.Builder<EnclosingPb, Builder> {

@@ -20,13 +20,15 @@ import java.util.Optional;
 @Getter
 public class FileContext {
 
-    private Map<Type, TypeContext> typeContexts = new HashMap<>();
+    private static final String TRUE = "true";
 
-    private SchemaContext context;
+    private final Map<Type, TypeContext> typeContexts = new HashMap<>();
 
-    private ProtoFile protoFile;
+    private final SchemaContext context;
 
-    private Map<AnnotationExpr, Name> messageAnnotations = new LinkedHashMap<>();
+    private final ProtoFile protoFile;
+
+    private final Map<AnnotationExpr, Name> messageAnnotations = new LinkedHashMap<>();
 
     private boolean javaGetter = true;
 
@@ -39,6 +41,8 @@ public class FileContext {
     private boolean tsStream = true;
 
     private boolean tsLongAsString = true;
+
+    private boolean javaToStringMethod = true;
 
     public FileContext(SchemaContext context, ProtoFile protoFile) {
         this.context = context;
@@ -56,28 +60,32 @@ public class FileContext {
                 this.tsJson = extend.tsJson;
                 this.tsStream = extend.tsStream;
                 this.tsLongAsString = extend.tsLongAsString;
+                this.javaToStringMethod = extend.javaToStringMethod;
             });
         ParserUtils
             .getList(protoFile.getOptions(), FileOptions.JAVA_COMMON_ANNO)
             .ifPresent(v -> this.messageAnnotations.putAll(context.parseAnnotations(v)));
         ParserUtils
             .get(protoFile.getOptions(), FileOptions.JAVA_GETTER)
-            .ifPresent(v -> this.javaGetter = "true".equals(v));
+            .ifPresent(v -> this.javaGetter = TRUE.equals(v));
         ParserUtils
             .get(protoFile.getOptions(), FileOptions.JAVA_SETTER)
-            .ifPresent(v -> this.javaSetter = "true".equals(v));
+            .ifPresent(v -> this.javaSetter = TRUE.equals(v));
         ParserUtils
             .get(protoFile.getOptions(), FileOptions.TS_LONG)
-            .ifPresent(v -> this.tsLong = "true".equals(v));
+            .ifPresent(v -> this.tsLong = TRUE.equals(v));
         ParserUtils
             .get(protoFile.getOptions(), FileOptions.TS_JSON)
-            .ifPresent(v -> this.tsJson = "true".equals(v));
+            .ifPresent(v -> this.tsJson = TRUE.equals(v));
         ParserUtils
             .get(protoFile.getOptions(), FileOptions.TS_STREAM)
-            .ifPresent(v -> this.tsStream = "true".equals(v));
+            .ifPresent(v -> this.tsStream = TRUE.equals(v));
         ParserUtils
             .get(protoFile.getOptions(), FileOptions.TS_LONG_AS_STRING)
-            .ifPresent(v -> this.tsLongAsString = "true".equals(v));
+            .ifPresent(v -> this.tsLongAsString = TRUE.equals(v));
+        ParserUtils
+            .get(protoFile.getOptions(), FileOptions.JAVA_TO_STRING_METHOD)
+            .ifPresent(v -> this.javaToStringMethod = TRUE.equals(v));
         protoFile.getTypes().forEach(this::genTypeContexts);
     }
 

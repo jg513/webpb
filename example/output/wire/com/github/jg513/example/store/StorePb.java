@@ -16,15 +16,16 @@ import java.lang.Integer;
 import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
-import java.lang.StringBuilder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 import okio.ByteString;
 
 @Getter
 @Setter
 @Accessors(chain = true)
+@ToString
 public final class StorePb extends Message<StorePb, StorePb.Builder> implements WebpbMessage {
 
     public static final MessageOptions MESSAGE_OPTIONS =
@@ -110,15 +111,6 @@ public final class StorePb extends Message<StorePb, StorePb.Builder> implements 
             super.hashCode = result;
         }
         return result;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append(", id=").append(id);
-        builder.append(", name=").append(Internal.sanitize(name));
-        builder.append(", city=").append(city);
-        return builder.replace(0, 2, "StorePb{").append('}').toString();
     }
 
     public static final class Builder extends Message.Builder<StorePb, Builder> {

@@ -18,6 +18,8 @@ extend google.protobuf.FileOptions {
     optional bool ts_stream = 2102;
 
     optional bool ts_long_as_string = 2103;
+
+    optional bool java_to_string_method = 2104;
 }
 
 extend google.protobuf.MessageOptions {
