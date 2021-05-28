@@ -1,2 +1,1 @@
-# webpb
-https://github.com/linqu-tech/webpb
+Redirect: https://github.com/linqu-tech/webpb
